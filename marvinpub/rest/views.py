@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from rest_framework.permissions import IsAdminUser
 from rest_framework.parsers import JSONParser
 from rest_framework import views

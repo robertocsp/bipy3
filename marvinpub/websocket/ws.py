@@ -10,6 +10,6 @@ class Websocket():
 
     def publicar_mensagem(self, cliente, mensagem, *args, **kwargs):
         redis_publisher = RedisPublisher(facility=cliente, broadcast=True)
-        message = RedisMessage(mensagem)
+        mensagem_redis = RedisMessage(mensagem.encode('utf-8'))
         # and somewhere else
-        redis_publisher.publish_message(message)
+        redis_publisher.publish_message(mensagem_redis)
