@@ -12,10 +12,11 @@ class EnviarPedidoView(views.APIView):
     parser_classes = (JSONParser,)
 
     def post(self, request, *args, **kwargs):
+        cliente = request.data.get('cliente', None)
         mensagem = request.data.get('mensagem', None)
         if mensagem:
             websocket = ws.Websocket()
-            websocket.publicar_mensagem(mensagem)
+            websocket.publicar_mensagem(cliente, mensagem)
             return Response({"success": True})
         else:
             return Response({"success": False})

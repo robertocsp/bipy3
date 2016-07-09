@@ -15,17 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-# from rest_framework import routers
 from marvinpub.rest import views
-
-
-# router = routers.DefaultRouter()
-# router.register(r'pedido', views.EnviarPedidoView, r'pedido')
 
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    # url(r'^marvin/api/rest/', include(router.urls)),
     url(r'^marvin/api/rest/pedido[/]?$', views.EnviarPedidoView.as_view(), name='enviar_pedido_view'),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
