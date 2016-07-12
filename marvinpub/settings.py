@@ -40,6 +40,10 @@ INSTALLED_APPS = (
     'ws4redis',
     'rest_framework',
     'corsheaders',
+    'marvinpub',
+    'dashboard',
+    'pedido',
+    'cadastro',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -85,6 +89,11 @@ DATABASES = {
         'OPTIONS': {
             'read_default_file': os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marvinpub_conf'), 'my.cnf'),
         },
+        'NAME': 'marvinpub',  # Or path to database file if using sqlite3.
+        'USER': 'root',  # Not used with sqlite3.
+        'PASSWORD': 'toor',  # Not used with sqlite3.
+        'HOST': 'localhost',  # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '3306',
     }
 }
 
@@ -96,9 +105,9 @@ REST_FRAMEWORK = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
