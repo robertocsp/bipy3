@@ -43,7 +43,8 @@ INSTALLED_APPS = (
     'marvinpub',
     'dashboard',
     'pedido',
-    'cadastro',
+    'cliente',
+    'loja',
 )
 
 MIDDLEWARE_CLASSES = (
