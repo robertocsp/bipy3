@@ -1,0 +1,76 @@
+{% extends "includes/layout.html" %}
+
+{% block conteudo %}
+
+<div class="container upload">
+    <div class="texto-intro">
+      <div class="circulo">
+        <span class="glyphicon glyphicon-cutlery" aria-hidden="true"></span>
+      </div>
+      <label>Mantenha sempre seu cardápio atualizado conosco. Carregue-o abaixo. Não se esqueça de salvar as alterações clicando no botão "Salvar cardápio".</label>
+    </div>
+    <div class="col-md-6">
+        <h2 class="tel"><i class="fa fa-send"></i> Telegram</h2>
+        <form>
+          <input id="file-tel" name="file-es[]" type="file" multiple>
+          <br />
+
+        </form>
+        <button type="submit" class="btn btn-primary save-card">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar Cardápio Telegram
+          </button>
+    </div>
+    <div class="col-md-6">
+        <h2 class="fb"><i class="fa fa-facebook"></i> Messeger Facebook</h2>
+        <form>
+          <input id="file-fb" name="file-es[]" type="file" multiple>
+          <br />
+        </form>
+        <button type="submit" class="btn btn-primary save-card">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar Cardápio Messenger
+          </button>
+          <br /><br /><br /><br />
+    </div>
+    <div id="myModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Confirmação</h4>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja modificar seu cardápio?</p>
+                <p class="text-warning"><small>Confirmando, seu cardápio será alterado</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary">Confirmar alteração do cardápio</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="text/javascript">
+       $('#file-tel').fileinput({
+          language: 'pt-BR',
+          uploadUrl: '#',
+          allowedFileExtensions : ['jpg', 'png','gif'],
+       });
+       $('#file-fb').fileinput({
+          language: 'pt-BR',
+          uploadUrl: '#',
+          allowedFileExtensions : ['jpg', 'png','gif'],
+      });
+
+       $(".save-card").click(function(){
+          $("#myModal").modal('show');
+       });
+    </script>
+
+{% endblock %}

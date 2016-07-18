@@ -1,0 +1,108 @@
+{% extends "includes/layout.html" %}
+
+{% block conteudo %}
+
+<div class="container">
+    <div class="page-header">
+      <h1><i class="fa fa-line-chart"></i> Dashboard</h1>
+    </div>
+    <div class="col-md-9 lista-graficos">
+       <h4><i class="fa fa-bar-chart"></i> Pedidos últimos 12 meses Facebook</h4>
+       <canvas id="fb"></canvas><br><br>
+       <h4><i class="fa fa-bar-chart"></i> Pedidos últimos 12 meses Telegram</h4>
+       <canvas id="tel"></canvas>
+    </div>
+    <div class="col-md-3 lista-graficos">
+      <h4><i class="fa fa-area-chart"></i> Resumo</h4><br>
+      <div class="pedidos-box">
+        <div class="bullet-box"><i class="fa fa-map"></i></div>
+        <div class="text-box"><label><strong>2087</strong><br>Total Pedidos feitos ontem</label></div>
+      </div>
+      <div class="pedidos-box">
+        <div class="bullet-box"><i class="fa fa-facebook"></i></div>
+        <div class="text-box"><label><strong>1087</strong><br>Total Pedidos feitos ontem Facebook</label></div>
+      </div>
+      <div class="pedidos-box">
+        <div class="bullet-box"><i class="fa fa-send"></i></div>
+        <div class="text-box"><label><strong>1000</strong><br>Total Pedidos feitos ontem Telegram</label></div>
+      </div>
+      <div class="pedidos-box">
+        <div class="bullet-box"><i class="fa fa-list"></i></div>
+        <div class="text-box"><label><strong>15505</strong><br>Total Pedidos feitos último mês</label></div>
+      </div>
+    </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script src="../../static/marvinpub/js/chart.js"></script>
+  <script type="text/javascript">
+      var dataFb = {
+          labels: ["Junho 2015", "Julho 2015", "Agosto 2015", "Setembro 2015", "Outubro 2015", "Novembro 2015", "Dezembro 2015", "Janeiro 2016", "Fevereiro 2016", "Março 2016", "Abril 2016", "Maio 2016"],
+          datasets: [
+              {
+                  label: "Pedidos x Mês",
+                  fill: false,
+                  lineTension: 0.1,
+                  backgroundColor: "rgba(75,192,192,0.4)",
+                  borderColor: "rgba(75,192,192,1)",
+                  borderCapStyle: 'butt',
+                  borderDash: [],
+                  borderDashOffset: 0.0,
+                  borderJoinStyle: 'miter',
+                  pointBorderColor: "rgba(75,192,192,1)",
+                  pointBackgroundColor: "#fff",
+                  pointBorderWidth: 1,
+                  pointHoverRadius: 5,
+                  pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                  pointHoverBorderColor: "rgba(220,220,220,1)",
+                  pointHoverBorderWidth: 2,
+                  pointRadius: 1,
+                  pointHitRadius: 10,
+                  data: [2500, 2890, 2858, 2703, 3004, 3122, 3211, 3004, 2858, 3211, 2858, 3211]
+              }
+          ]
+      };
+      var facebook = $("#fb");
+      var myLineChart = new Chart(facebook, {
+          type: 'line',
+          data: dataFb
+      });
+
+      //Pedido telegram
+      var dataTel = {
+          labels: ["Junho 2015", "Julho 2015", "Agosto 2015", "Setembro 2015", "Outubro 2015", "Novembro 2015", "Dezembro 2015", "Janeiro 2016", "Fevereiro 2016", "Março 2016", "Abril 2016", "Maio 2016"],
+          datasets: [
+              {
+                  label: "Pedidos x Mês",
+                  fill: false,
+                  lineTension: 0.1,
+                  backgroundColor: "rgba(75,192,192,0.4)",
+                  borderColor: "rgba(75,192,192,1)",
+                  borderCapStyle: 'butt',
+                  borderDash: [],
+                  borderDashOffset: 0.0,
+                  borderJoinStyle: 'miter',
+                  pointBorderColor: "rgba(75,192,192,1)",
+                  pointBackgroundColor: "#fff",
+                  pointBorderWidth: 1,
+                  pointHoverRadius: 5,
+                  pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                  pointHoverBorderColor: "rgba(220,220,220,1)",
+                  pointHoverBorderWidth: 2,
+                  pointRadius: 1,
+                  pointHitRadius: 10,
+                  data: [2600, 2590, 2258, 2103, 5004, 5122, 3211, 3004, 2858, 3211, 2858, 3211]
+              }
+          ]
+      };
+      var telegram = $("#tel");
+      var myLineChart = new Chart(telegram, {
+          type: 'line',
+          data: dataTel
+      });
+   </script>
+
+{% endblock %}

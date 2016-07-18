@@ -15,10 +15,18 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+
 from marvinpub.rest import views
+from dashboard.views import *
 
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^marvin/api/rest/pedido[/]?$', views.EnviarPedidoView.as_view(), name='enviar_pedido_view'),
+    url(r'^home/$', home, name='Home'),
+    url(r'^login/$', login, name='login'),
+    url(r'^upload/$', upload, name='upload'),
+    url(r'^pedidos/$', pedidos, name='pedidos'),
+    url(r'^historico/$', historico_pedidos, name='Home'),
+    url(r'^cadastro/$', cadastro, name='Home')
 ]

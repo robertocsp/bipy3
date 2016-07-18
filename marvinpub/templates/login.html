@@ -1,0 +1,36 @@
+{% extends "includes/layout_no_header.html" %}
+
+{% block conteudo %}
+
+    <div class="geral">
+      <div class="col-md-8 left-login">
+
+      </div>
+      <div class="col-md-4 right-login">
+        <div class="col-md-12">
+            <h1><span>Marvin</span><span>Pub</span></h1>
+        </div>
+        <div class="col-md-12 form-login">
+            <form action="index.html">
+                <div class="input-group">
+                  <span class="input-group-addon" id="basic-addon1"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
+                  <input type="text" class="form-control" placeholder="Usuário..." aria-describedby="basic-addon1">
+                </div><br />
+                <div class="input-group">
+                  <span class="input-group-addon" id="basic-addon1"><span class="fa fa-unlock" aria-hidden="true"></span></span>
+                  <input type="password" class="form-control" placeholder="Senha..." aria-describedby="basic-addon1">
+                </div><br />
+                <button type="submit" class="btn btn-primary">
+                  <span class="glyphicon glyphicon-okr" aria-hidden="true"></span> Entrar
+                </button><br /><br />
+                <a href="#">Esqueci minha senha</a>
+            </form>
+        </div>
+        <footer>
+          <p>©Copyright Marvin Pub 2016. Todos os direitos reservados. <br /><a href="#">Termos e condições de uso</a></p>
+      </footer>
+      </div>
+    </div>
+
+{% endblock %}
+{% block scripts %}{% endblock %}
