@@ -14,17 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import include, url
+from marvinpub.views import *
 from django.contrib import admin
-
 from marvinpub.rest import views
-from dashboard.views import *
-
+from django.views.generic.base import TemplateView
 
 urlpatterns = [
+    url(r'^$', login_geral, name='login_geral'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^dashboard/$', TemplateView.as_view(template_name='dashboard.html'), name="dashboard"),
     url(r'^marvin/api/rest/pedido[/]?$', views.EnviarPedidoView.as_view(), name='enviar_pedido_view'),
     url(r'^home/$', home, name='Home'),
-    url(r'^login/$', login, name='login'),
     url(r'^upload/$', upload, name='upload'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^historico/$', historico_pedidos, name='Home'),
