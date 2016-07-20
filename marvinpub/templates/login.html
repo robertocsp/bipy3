@@ -11,15 +11,17 @@
             <h1><span>Marvin</span><span>Pub</span></h1>
         </div>
         <div class="col-md-12 form-login">
-            <form action="index.html">
+            <!--<form action="index.html">-->
+            <form action="" method="post">
                 <div class="input-group">
                   <span class="input-group-addon" id="basic-addon1"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
-                  <input type="text" class="form-control" placeholder="Usuário..." aria-describedby="basic-addon1">
+                  <input type="text" id="id_username" class="" name="username" class="form-control" placeholder="Usuário..." aria-describedby="basic-addon1">
                 </div><br />
                 <div class="input-group">
                   <span class="input-group-addon" id="basic-addon1"><span class="fa fa-unlock" aria-hidden="true"></span></span>
-                  <input type="password" class="form-control" placeholder="Senha..." aria-describedby="basic-addon1">
+                  <input type="password" id="id_senha" name="senha" class="form-control" placeholder="Senha..." aria-describedby="basic-addon1">
                 </div><br />
+                {% csrf_token %}
                 <button type="submit" class="btn btn-primary">
                   <span class="glyphicon glyphicon-okr" aria-hidden="true"></span> Entrar
                 </button><br /><br />

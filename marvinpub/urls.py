@@ -14,10 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import include, url
-from marvinpub.views import *
 from django.contrib import admin
-from marvinpub.rest import views
 from django.views.generic.base import TemplateView
+
+from marvinpub.rest import views
+from marvinpub.views import *
+from dashboard.views import *
 
 urlpatterns = [
     url(r'^$', login_geral, name='login_geral'),
