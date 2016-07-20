@@ -69,7 +69,7 @@ class MessageCounter(telepot.helper.ChatHandler):
             response = requests.post(url, data=json.dumps(data), headers=headers)
             print(response)
 
-bot = telepot.DelegatorBot('242453983:AAEEsHGJFofzJ85VI8vKRI5QkAsoPTJixJE', [
+bot = telepot.DelegatorBot('238197035:AAF3XCZ-o8Ru_HeqG58Vd8E_5ZbDii6mgp0', [
     (per_chat_id(), create_open(MessageCounter, timeout=120)),
 ])
 bot.message_loop(run_forever=True)
