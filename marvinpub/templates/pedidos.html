@@ -19,18 +19,18 @@
           <option>Concluído</option>
           <option>Enregue</option>
           <option>Cancelado</option>
-        </select>
+        </select><br><br>
       </div>
       <div class="col-md-4">
-        <input type="text" placeholder="Cliente..." class="form-control">
+        <input type="text" placeholder="Cliente..." class="form-control"><br><br>
       </div>
       <div class="col-md-4">
-        <input type="text" placeholder="Número Pedido..." class="form-control">
-      </div><br><br>
-        <div class="col-md-3">
-        <label>Visualizar os pedidos a partir de:</label>
+        <input type="text" placeholder="Número Pedido..." class="form-control"><br><br>
       </div>
       <div class="col-md-3">
+        <h5><i class="fa fa-calendar-times-o"></i> Visualizar os pedidos a partir de:</h5>
+      </div>
+      <div class="col-md-2">
           <input type="text" placeholder="selecione a data..." id="pedido-de" class="form-control">
       </div>
       <div class="col-md-3">
@@ -65,13 +65,16 @@
       </div>
     </div>
   </div>
+    <button type="button" class="btn btn-default btn-restaurar" aria-label="Left Align" style="display: none">
+      <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span> Restaurar colunas
+    </button>
     <div class="dnd">
-
+        <br><br>
       <!--Coluna de pedidos solicitados-->
 
       <div class="coluna">
         <h3 class="info">
-          <label class="status-label text-laranja"><i class="fa fa-hand-paper-o fa-2x"></i> Solicitado</label>
+          <label class="status-label text-laranja"><i class="fa fa-hand-paper-o fa-2x"></i> <span>Solicitado</span></label>
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="solicitado" class="droptrue">
@@ -87,7 +90,7 @@
             </div>
             <div class="conteudo-pedido">
               <ul>
-                <li><label class="status-label"><strong>Número do pedido:</strong> 100244</label></li>
+                <li><label class="status-label"><strong>Número do pedido:</strong> 10244</label></li>
                 <li class="messeger detalhe-pedido-icon">
                   <label class="status-label">
                     <strong>Detalhes:</strong>
@@ -232,7 +235,7 @@
             </div>
             <div class="conteudo-pedido">
               <ul>
-                <li><label class="status-label"><strong>Número do pedido:</strong> 100500</label></li>
+                <li><label class="status-label"><strong>Número do pedido:</strong> 10500</label></li>
                 <li class="detalhe-pedido-icon">
                   <label class="status-label">
                     <strong>Detalhes:</strong>
@@ -364,7 +367,7 @@
       </div>
       <div class="coluna">
         <h3 class="info">
-          <label class="status-label text-azul"><i class="fa fa-hand-grab-o fa-2x"></i> Em processo</label>
+          <label class="status-label text-azul"><i class="fa fa-hand-grab-o fa-2x"></i> <span>Em processo</span></label>
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="em-processo" class="droptrue">
@@ -372,7 +375,7 @@
       </div>
       <div class="coluna">
         <h3 class="info">
-          <label class="status-label text-verde"><i class="fa fa-hand-pointer-o fa-2x "></i> Concluído</label>
+          <label class="status-label text-verde"><i class="fa fa-hand-pointer-o fa-2x "></i> <span>Concluído</span></label>
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="concluido" class="droptrue">
@@ -380,7 +383,7 @@
       </div>
       <div class="coluna">
         <h3 class="info">
-          <label class="status-label text-verde"><i class="fa fa-thumbs-o-up fa-2x "></i> Entregue</label>
+          <label class="status-label text-verde"><i class="fa fa-thumbs-o-up fa-2x "></i> <span>Entregue</span></label>
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="entregue" class="droptrue">
@@ -388,7 +391,7 @@
       </div>
       <div class="coluna">
         <h3 class="info">
-          <label class="status-label text-red"><i class="fa fa-thumbs-o-down fa-2x"></i> Cancelado</label>
+          <label class="status-label text-red"><i class="fa fa-thumbs-o-down fa-2x"></i> <span>Cancelado</span></label>
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="cancelado" class="droptrue">
@@ -421,7 +424,7 @@
 
     // Datepicker
     $('#pedido-de').datepicker({
-        language: 'pt-BR'
+        dateFormat: 'dd/mm/yy'
     });
 
     // Seta altura do background quando a janela do dialogo é exibida
@@ -456,6 +459,39 @@
       $('#' + $destino).prepend("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
       $(this).closest('li').remove();
 
+    });
+
+    //efeito para expandir colunas
+    $('.expandi').click(function(){
+        //inserir span no titulo coluna
+        //inserir btn para restaurar as colunas
+        $(".btn-restaurar").show(600);
+        $('i.fa-ellipsis-h').removeClass('fa-ellipsis-h').addClass('fa-ellipsis-v');
+        $('.coluna').addClass('coluna-normal');
+        $('.coluna').removeClass('col-active');
+        $(this).parent('.info').parent('.coluna').removeClass('coluna-normal');
+        $(this).parent('.info').parent('.coluna').addClass('col-active');
+        $(this).find('.fa').removeClass('fa-ellipsis-v').addClass('fa-ellipsis-h');
+
+        $('.coluna-normal').animate({
+          width: "5%"
+        }, 1500 );
+
+        $('.col-active').animate({
+          width: "75%"
+        }, 1500 );
+
+    });
+
+    //Botao restaurar as colunas
+    $('.btn-restaurar').click(function(){
+        $(".btn-restaurar").hide(600);
+        $('.coluna').removeClass('col-active');
+        $('.coluna').removeClass('coluna-normal');
+        $('i.fa-ellipsis-h').removeClass('fa-ellipsis-h').addClass('fa-ellipsis-v');
+        $('.coluna').animate({
+          width: "220px"
+        }, 1500 );
     });
   });
 </script>
