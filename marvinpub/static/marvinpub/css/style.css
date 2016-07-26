@@ -417,9 +417,17 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     font-size: 18px;
     border: 2px solid #cecece;
     border-radius: 29px;
-    margin-right: 14px;
+    margin-right: 7px;
     color: #cecece;
     height: 30px;
+}
+
+.coluna .detalhe-pedido-icon .status-label i:last-child{
+    margin-right: 0px;
+    font-size: 18px;
+    line-height: 18px;
+    text-align: center;
+    width: 32px;
 }
 
 .coluna .detalhe-pedido-icon .status-label i.fa-send:before {

@@ -1,5 +1,7 @@
 {% extends "includes/layout.html" %}
 
+{% block  pedidos %}active{% endblock %}
+
 {% block conteudo %}
 
 <div class="container">
@@ -24,6 +26,42 @@
       </div>
       <div class="col-md-4">
         <input type="text" placeholder="Número Pedido..." class="form-control">
+      </div><br><br>
+        <div class="col-md-3">
+        <label>Visualizar os pedidos a partir de:</label>
+      </div>
+      <div class="col-md-3">
+          <input type="text" placeholder="selecione a data..." id="pedido-de" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <label>
+          <select class="form-control">
+              <option>00:00</option>
+              <option>01:00</option>
+              <option>02:00</option>
+              <option>03:00</option>
+              <option>04:00</option>
+              <option>05:00</option>
+              <option>06:00</option>
+              <option>07:00</option>
+              <option>08:00</option>
+              <option>09:00</option>
+              <option>10:00</option>
+              <option>11:00</option>
+              <option>12:00</option>
+              <option>13:00</option>
+              <option>14:00</option>
+              <option>15:00</option>
+              <option>16:00</option>
+              <option>17:00</option>
+              <option>18:00</option>
+              <option>19:00</option>
+              <option>20:00</option>
+              <option>21:00</option>
+              <option>22:00</option>
+              <option>23:00</option>
+          </select>
+        </label>
       </div>
     </div>
   </div>
@@ -55,6 +93,7 @@
                     <strong>Detalhes:</strong>
                     <i class="fa fa-facebook open-dialogo"></i>
                     <i class="fa fa-list-ol open-lista-pedidos"></i>
+                    <i>55</i>
                   </label>
 
                   <!-- Lista de pedidos-->
@@ -199,6 +238,7 @@
                     <strong>Detalhes:</strong>
                     <i class="fa fa-send open-dialogo"></i>
                     <i class="fa fa-list-ol open-lista-pedidos"></i>
+                    <i>51</i>
                   </label>
 
                   <!-- Lista de pedidos-->
@@ -366,13 +406,6 @@
 <script type="text/javascript">
 
   $(document).ready(function($) {
-    //Scroll dialogo
-    $(".dialogo ul").mCustomScrollbar({
-        scrollButtons:{enable:true},
-        theme:"3d",
-        setRight: 0
-    });
-
 
     //drag and drop pedidos
     $( "ul.droptrue" ).sortable({
@@ -387,7 +420,7 @@
     });
 
     // Datepicker
-    $('#pedido-de, #pedido-ate').datepicker({
+    $('#pedido-de').datepicker({
         language: 'pt-BR'
     });
 
