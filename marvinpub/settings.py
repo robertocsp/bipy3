@@ -73,6 +73,9 @@ TEMPLATES = [
 
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'django.core.context_processors.static',
+                'ws4redis.context_processors.default',
             ],
         },
     },
@@ -85,7 +88,7 @@ WSGI_APPLICATION = 'marvinpub.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 #producao
 #:3306
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -99,19 +102,20 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'OPTIONS': {
-#             'read_default_file': os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marvinpub_conf'), 'my.cnf'),
-#         },
-#         'NAME': 'marvinpub',  # Or path to database file if using sqlite3.
-#         'USER': 'root',  # Not used with sqlite3.
-#         'PASSWORD': 'toor',  # Not used with sqlite3.
-#         'HOST': 'localhost',  # Set to empty string for localhost. Not used with sqlite3.
-#         'PORT': '3306',
-#     }
-# }
+"""
+DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.mysql',
+         'OPTIONS': {
+             'read_default_file': os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marvinpub_conf'), 'my.cnf'),
+         },
+         'NAME': 'marvinpub',  # Or path to database file if using sqlite3.
+         'USER': 'root',  # Not used with sqlite3.
+         'PASSWORD': 'toor',  # Not used with sqlite3.
+         'HOST': 'localhost',  # Set to empty string for localhost. Not used with sqlite3.
+         'PORT': '3306',
+     }
+}
 
 REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
@@ -140,5 +144,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 WEBSOCKET_URL = '/ws/'
+
+WS4REDIS_HEARTBEAT = '--heartbeat--'
+
+#configuracao para nao persistir as mensagens enviadas via websocket
+#quando o valor eh positivo a cada reconexao no canal a ultima mensagem eh sempre enviada novamente para o cliente
+#a principio nao vejo necessidade de precisar receber a ultima mensagem enviada pelo canal novamente em um reload de pagina
+WS4REDIS_EXPIRE = -1
 
 CORS_ORIGIN_ALLOW_ALL = True
