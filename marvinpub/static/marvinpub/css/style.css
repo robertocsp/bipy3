@@ -277,9 +277,15 @@ footer p{
 }
 
 .droptrue li ul li{
-    margin: 12px 0 0 6px;
+    margin: 12px 0px 0px 6px;
     width: 94%;
-    position: relative;
+    height: 26px;
+    float: left;
+    height: 23px;
+}
+
+.droptrue li .dialogo ul li{
+    height: auto;
 }
 
 .droptrue li ul li:first-child{
@@ -327,7 +333,7 @@ footer p{
 .status-list{
     float: left;
     width: 100%;
-    padding-top: 8px;
+    padding-top: 3px;
 }
 
 .status-list label{
@@ -477,14 +483,23 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 }
 
 .coluna .conteudo-pedido{
-    position: relative;
+    float: left;
     width: 100%;
     border-bottom: 1px solid #dedede;
-    height: 119px;
+    height: 80px;
+}
+
+.content-dialog{
+    position: relative;
 }
 
 .coluna .droptrue > li{
     margin-left: 11px;
+}
+
+.header-pedido{
+    float: left;
+    width: 100%;
 }
 
 

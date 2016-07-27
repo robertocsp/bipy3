@@ -119,7 +119,7 @@
                   <!--Fim lista de pedidos-->
 
                   <!-- inicio dialogo messenger. Em relaçao ao telegram, alterar a classe abaixo para mudar o layout-->
-
+                  <div class="content-dialog">
                   <div class="dialogo messeger">
                     <a href="javascript:void(0);" class="close">X</a>
                     <div class="cabecalho-chat">
@@ -203,6 +203,7 @@
                       <i class="glyphicon glyphicon-play"></i>
                     </div>
                   </div>
+                  </div>
                 </li>
               </ul>
             </div>
@@ -266,7 +267,7 @@
                   </div>
 
                   <!-- inicio dialogo telegram -->
-
+                    <div class="content-dialog">
                   <div class="dialogo telegram">
                     <a href="javascript:void(0);" class="close">X</a>
                     <div class="cabecalho-chat">
@@ -350,6 +351,7 @@
                       <i class="glyphicon glyphicon-play"></i>
                     </div>
                   </div>
+                 </div>
                 </li>
               </ul>
             </div>
@@ -417,6 +419,7 @@
       placeholder: "sortable-placeholder",
       revert: 200,
       tolerance: "pointer",
+      handle: ".header-pedido p",
       receive: function( event, ui ) {
         // evento do momento em que o box e "solto" na coluna de destino
       }
