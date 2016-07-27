@@ -244,7 +244,7 @@ footer p{
 }
 
 .droptrue > li{
-    width: 90%;
+    width: 196px;
     background: #fff;
     margin: 0 0 20px 12px;
     border-radius: 5px;
@@ -252,10 +252,40 @@ footer p{
     height: 170px;
 }
 
+.col-active .expandi{
+    margin-right: 12px;
+}
+
+.coluna-normal .info .status-label span{
+    display: none;
+}
+
+.coluna-normal .info label{
+    padding-left: 8px;
+}
+
+.coluna-normal .info label.expandi{
+    padding-left: 15px;
+}
+
+.coluna.coluna-normal .info .status-label {
+    width: 14px;
+}
+
+.coluna-normal .conteudo-pedido, .coluna-normal .footer-pedido, .coluna-normal .cabecalho p{
+    display: none;
+}
+
 .droptrue li ul li{
-    margin: 12px 0 0 6px;
+    margin: 12px 0px 0px 6px;
     width: 94%;
-    position: relative;
+    height: 26px;
+    float: left;
+    height: 23px;
+}
+
+.droptrue li .dialogo ul li{
+    height: auto;
 }
 
 .droptrue li ul li:first-child{
@@ -303,7 +333,7 @@ footer p{
 .status-list{
     float: left;
     width: 100%;
-    padding-top: 8px;
+    padding-top: 3px;
 }
 
 .status-list label{
@@ -417,9 +447,17 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     font-size: 18px;
     border: 2px solid #cecece;
     border-radius: 29px;
-    margin-right: 14px;
+    margin-right: 7px;
     color: #cecece;
     height: 30px;
+}
+
+.coluna .detalhe-pedido-icon .status-label i:last-child{
+    margin-right: 0px;
+    font-size: 18px;
+    line-height: 18px;
+    text-align: center;
+    width: 32px;
 }
 
 .coluna .detalhe-pedido-icon .status-label i.fa-send:before {
@@ -445,14 +483,30 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 }
 
 .coluna .conteudo-pedido{
-    position: relative;
+    float: left;
     width: 100%;
     border-bottom: 1px solid #dedede;
-    height: 119px;
+    height: 80px;
+}
+
+.content-dialog{
+    position: relative;
 }
 
 .coluna .droptrue > li{
     margin-left: 11px;
+}
+
+.header-pedido{
+    float: left;
+    width: 100%;
+}
+
+
+.coluna-normal .droptrue > li {
+  width: 87%;
+  margin-left: 3px;
+  height: 50px;
 }
 
 .list-group-item{
@@ -807,7 +861,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     border-right: 1px solid #dedede;
 }
 
-h4{
+h4, h5{
     color: #aaa;
 }
 
