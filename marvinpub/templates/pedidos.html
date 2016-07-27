@@ -405,8 +405,145 @@
 
 {% endblock %}
 
-
 {% block scripts %}
+  <script id="template-pedido" type="text/x-jquery-tmpl">
+{% verbatim %}
+          <li class="ui-state-default">
+            <div class="header-pedido">
+              <div class="cabecalho">
+                <img class="media-object img-circle" src="../../static/marvinpub/img/default_user.png" width="40" height="40" alt="" >
+                <p>{{= nome_cliente}}<br> <span class="ultimo">Agora</span></p>
+              </div>
+            </div>
+            <div class="conteudo-pedido">
+              <ul>
+                <li><label class="status-label"><strong>Número do pedido:</strong> 10500</label></li>
+                <li class="detalhe-pedido-icon">
+                  <label class="status-label">
+                    <strong>Detalhes:</strong>
+                    <i class="fa fa-send open-dialogo"></i>
+                    <i class="fa fa-list-ol open-lista-pedidos"></i>
+                    <i>51</i>
+                  </label>
+
+                  <!-- Lista de pedidos-->
+
+                  <div class="lista-pedidos">
+                    <a href="javascript:void(0);" class="close">X</a>
+                    <div class="bs-example">
+                        <div class="list-group">
+                            {{each itens_pedido}}
+                            <!-- Item pedido-->
+                            <a href="javascript:void(0);" class="list-group-item">
+                                {{= descricao}}<span class="badge">{{= quantidade}}</span>
+                            </a>
+                            <!--Fim item-->
+                            {{/each}}
+                        </div>
+                    </div>
+                  </div>
+
+                  <!-- inicio dialogo bot -->
+                    <div class="content-dialog">
+                  <div class="dialogo telegram">
+                    <a href="javascript:void(0);" class="close">X</a>
+                    <div class="cabecalho-chat">
+                      <p>Fábio Marques<br> <span class="ultimo">Último pedido feito há 3 dias</span><p>
+                    </div>
+                    <ul>
+                      <li>
+                        <span>Enviado 12 de maio às 19:32</span>
+                      </li>
+                      <li class="cons">
+                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> Fábio</h4>
+                            <p>Olá</p>
+                          </div>
+                      </li>
+                      <span class="bico"></span>
+                      <li class="est">
+                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                            <p>Olá, Fábio! Digite o número de sua mesa para iniciarmos o seu atendimento.</p>
+                          </div>
+                      </li>
+                       <li class="cons">
+                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> Fábio</h4>
+                            <p>15</p>
+                          </div>
+                      </li>
+                      <span class="bico"></span>
+                      <li>
+                        <span>Enviado 12 de maio às 19:33</span>
+                      </li>
+                      <li class="est">
+                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                            <p>Excelente! Veja o nosso cardápio e digite aqui o que deseja. Ah, quanto mais detalhado melhor :)</p>
+                          </div>
+                      </li>
+                      <li class="cons">
+                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> Fábio</h4>
+                            <p>1 chope escuro 300 ml</p>
+                          </div>
+                      </li>
+                      <span class="bico"></span>
+                      <li class="est">
+                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                            <p>Mais alguma coisa?</p>
+                          </div>
+                      </li>
+                      <li class="cons">
+                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> Fábio</h4>
+                            <p>não</p>
+                          </div>
+                      </li>
+                      <span class="bico"></span>
+                      <li>
+                        <span>Enviado 12 de maio às 19:34</span>
+                      </li>
+                      <li class="est">
+                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                            <p>Ok, seu pedido já está indo.</p>
+                          </div>
+                      </li>
+                    </ul>
+                    <div class="box-teclado">
+                      <label>
+                        <input type="text" placeholder="Mensagem..." name="texto">
+                      </label>
+                      <i class="glyphicon glyphicon-play"></i>
+                    </div>
+                  </div>
+                 </div>
+                </li>
+              </ul>
+            </div>
+            <div class="footer-pedido">
+              <div class="status-list">
+                <label class="solicitado" class="ativo"><input type="radio" name="solicitado"/><i class="fa fa-hand-paper-o"></i></label>
+                <label class="em-processo"><input type="radio" name="em-processo"/><i class="fa fa-hand-grab-o"></i></label>
+                <label class="concluido"><input type="radio" name="concluido"/><i class="fa fa-hand-pointer-o"></i></label>
+                <label class="entregue"><input type="radio" name="entregue"/><i class="fa fa-thumbs-o-up"></i></label>
+                <label class="cancelado"><input type="radio" name="cancelado"/><i class="fa fa-thumbs-o-down"></i></label>
+              </div>
+            </div>
+          </li>
+{% endverbatim %}
+  </script>
 
 <script type="text/javascript">
 
@@ -498,7 +635,7 @@
     });
 
     var ws4redis = WS4Redis({
-        uri: '{{ WEBSOCKET_URI }}cliente?subscribe-broadcast',
+        uri: '{{ WEBSOCKET_URI }}1?subscribe-broadcast',
         receive_message: receiveMessage,
         heartbeat_msg: {{ WS4REDIS_HEARTBEAT }}
     });
@@ -511,6 +648,9 @@
     // receive a message though the websocket from the server
     function receiveMessage(msg) {
         console.log('Message from Websocket: ' + msg);
+        var input = JSON.parse(msg);
+        console.log(input);
+        $.tmpl($('#template-pedido'), input).prependTo($('#solicitado'));
     }
   });
 </script>
