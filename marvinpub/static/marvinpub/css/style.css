@@ -293,6 +293,36 @@ footer p{
     float: left;
 }
 
+.btn-expandir-tela{
+    float: left;
+    display: block;
+    margin: 0 20px 0 0;
+}
+
+.linha-btn strong, .linha-btn span{
+    color: #666;
+}
+
+.todo{
+    position: absolute;
+    background: #fff;
+    padding:20px;
+}
+
+.todo .coluna{
+    width: 19.2%;
+}
+
+.linha-btn{
+    float: left;
+    width: 100%;
+    margin: 0 0 10px 0;
+}
+
+.btn-expandir-tela i{
+    font-size: 20px;
+}
+
 .droptrue li ul li:last-child{
     margin: 6px 0 8px 6px;
 }

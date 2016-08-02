@@ -65,11 +65,17 @@
       </div>
     </div>
   </div>
-    <button type="button" class="btn btn-default btn-restaurar" aria-label="Left Align" style="display: none">
-      <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span> Restaurar colunas
-    </button>
+
     <div class="dnd">
-        <br><br>
+        <div class="linha-btn">
+            <button type="button" class="btn btn-default btn-expandir-tela" aria-label="Left Align">
+              <span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span> <strong>Expandir tela</strong>
+            </button>
+            <button type="button" class="btn btn-default btn-restaurar" aria-label="Left Align" style="display: none">
+              <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span> <strong>Restaurar colunas</strong>
+            </button>
+
+        </div>
       <!--Coluna de pedidos solicitados-->
 
       <div class="coluna">
@@ -632,6 +638,23 @@
         $('.coluna').animate({
           width: "220px"
         }, 1500 );
+    });
+
+    //Expandir area das colunas
+    $(".btn-expandir-tela").click(function(){
+        if($(this).find("span").hasClass("glyphicon-resize-full")){
+            $(this).find("span").removeClass("glyphicon-resize-full").addClass("glyphicon-resize-small");
+            $(this).find("strong").text("Diminuir tela");
+            $(".dnd").addClass("todo");
+            $(".dnd").animate({
+              left: 0,
+              top: 0
+            }, 1500 );
+        }else{
+            $(".dnd").removeClass("todo");
+            $(this).find("span").removeClass("glyphicon-resize-small").addClass("glyphicon-resize-full");
+            $(this).find("strong").text("Expandir tela");
+        }
     });
 
     var ws4redis = WS4Redis({
