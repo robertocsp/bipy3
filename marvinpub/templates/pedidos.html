@@ -414,22 +414,22 @@
 {% block scripts %}
   <script id="template-pedido" type="text/x-jquery-tmpl">
 {% verbatim %}
-          <li class="ui-state-default">
+          <li class="ui-state-default" data-uid="{{= card_uid}}>
             <div class="header-pedido">
               <div class="cabecalho">
-                <img class="media-object img-circle" src="../../static/marvinpub/img/default_user.png" width="40" height="40" alt="" >
-                <p>{{= nome_cliente}}<br> <span class="ultimo">Agora</span></p>
+                <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/marvinpub/img/default_user.png{{/if}}" width="40" height="40" alt="" >
+                <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
               </div>
             </div>
             <div class="conteudo-pedido">
               <ul>
-                <li><label class="status-label"><strong>Número do pedido:</strong> 10500</label></li>
-                <li class="detalhe-pedido-icon">
+                <li><label class="status-label"><strong>Número do pedido:</strong> {{= numero_pedido}}</label></li>
+                <li class="{{if origem == 'fbmessenger'}}messeger {{/if}}detalhe-pedido-icon">
                   <label class="status-label">
                     <strong>Detalhes:</strong>
-                    <i class="fa fa-send open-dialogo"></i>
+                    <i class="fa fa-{{if origem == 'fbmessenger'}}facebook{{else}}send{{/if}} open-dialogo"></i>
                     <i class="fa fa-list-ol open-lista-pedidos"></i>
-                    <i>51</i>
+                    <i>{{= mesa}}</i>
                   </label>
 
                   <!-- Lista de pedidos-->
@@ -451,12 +451,31 @@
 
                   <!-- inicio dialogo bot -->
                     <div class="content-dialog">
-                  <div class="dialogo telegram">
+                  <div class="dialogo {{if origem == 'fbmessenger'}}messeger{{else}}telegram{{/if}}">
                     <a href="javascript:void(0);" class="close">X</a>
                     <div class="cabecalho-chat">
-                      <p>Fábio Marques<br> <span class="ultimo">Último pedido feito há 3 dias</span><p>
+                      <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}_1" data-minutes-passed="0">0 minutos</span></span></p>
                     </div>
-                    <ul>
+                    <ul id="{{= card_uid}}_messages">
+                    {{each mensagem}}
+                     {{if typeof cliente != 'undefined'}}
+                      <li class="cons">
+                          <img class="media-object img-circle" src="{{if typeof $data.foto_cliente != 'undefined'}}{{= $data.foto_cliente}}{{else}}../../static/marvinpub/img/default_user.png{{/if}}" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> {{= $data.nome_cliente}}</h4>
+                            <p>{{= cliente}}</p>
+                          </div>
+                      </li>
+                     {{else typeof bot != 'undefined'}}
+                      <li class="est">
+                          <div class="balao">
+                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                            <p>{{= bot}}</p>
+                          </div>
+                      </li>
+                     {{/if}}
+                    {{/each}}
+<!--
                       <li>
                         <span>Enviado 12 de maio às 19:32</span>
                       </li>
@@ -526,12 +545,13 @@
                             <p>Ok, seu pedido já está indo.</p>
                           </div>
                       </li>
+-->
                     </ul>
                     <div class="box-teclado">
                       <label>
                         <input type="text" placeholder="Mensagem..." name="texto">
                       </label>
-                      <i class="glyphicon glyphicon-play"></i>
+                      <i class="glyphicon glyphicon-play btn-send" id="{{= card_uid}}_btn-send" data-uid="{{= card_uid}}"></i>
                     </div>
                   </div>
                  </div>
@@ -540,21 +560,56 @@
             </div>
             <div class="footer-pedido">
               <div class="status-list">
-                <label class="solicitado" class="ativo"><input type="radio" name="solicitado"/><i class="fa fa-hand-paper-o"></i></label>
-                <label class="em-processo"><input type="radio" name="em-processo"/><i class="fa fa-hand-grab-o"></i></label>
-                <label class="concluido"><input type="radio" name="concluido"/><i class="fa fa-hand-pointer-o"></i></label>
-                <label class="entregue"><input type="radio" name="entregue"/><i class="fa fa-thumbs-o-up"></i></label>
-                <label class="cancelado"><input type="radio" name="cancelado"/><i class="fa fa-thumbs-o-down"></i></label>
+                <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid="{{= card_uid}}"/><i class="fa fa-hand-paper-o"></i></label>
+                <label class="em-processo"><input type="radio" name="em-processo" data-uid="{{= card_uid}}"/><i class="fa fa-hand-grab-o"></i></label>
+                <label class="concluido"><input type="radio" name="concluido" data-uid="{{= card_uid}}"/><i class="fa fa-hand-pointer-o"></i></label>
+                <label class="entregue"><input type="radio" name="entregue" data-uid="{{= card_uid}}"/><i class="fa fa-thumbs-o-up"></i></label>
+                <label class="cancelado"><input type="radio" name="cancelado" data-uid="{{= card_uid}}"/><i class="fa fa-thumbs-o-down"></i></label>
               </div>
             </div>
           </li>
 {% endverbatim %}
-  </script>
+ </script>
+ <script id="template-message" type="text/x-jquery-tmpl">
+{% verbatim %}
+          <li class="est">
+              <div class="balao">
+                <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                <p>{{= bot}}</p>
+              </div>
+          </li>
+{% endverbatim %}
+ </script>
 
 <script type="text/javascript">
-
+  var pedidos_interval = {};
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+  function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
   $(document).ready(function($) {
-
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        }
+    });
     //drag and drop pedidos
     $( "ul.droptrue" ).sortable({
       connectWith: "ul",
@@ -565,6 +620,11 @@
       handle: ".header-pedido p",
       receive: function( event, ui ) {
         // evento do momento em que o box e "solto" na coluna de destino
+        $.post('/marvin/api/rest/status',
+               {uid: $(ui.item).attr("data-uid"), status: $(event.target).attr('id')},
+               function(data) {
+          console.log(data);
+        });
       }
     });
 
@@ -604,7 +664,11 @@
       $(this).closest('li').hide("300");
       $('#' + $destino).prepend("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
       $(this).closest('li').remove();
-
+      $.post('/marvin/api/rest/status',
+             {uid: $(this).find("input").attr("data-uid"), status: $(this).find("input").attr("name")},
+             function(data) {
+        console.log(data);
+      });
     });
 
     //efeito para expandir colunas
@@ -657,6 +721,17 @@
         }
     });
 
+    $(".btn-send").click(function(){
+      var $this = $(this);
+      $.post('/marvin/api/rest/mensagem',
+             {uid: $(this).attr("data-uid"), message: $(this).parent().find("input").val()},
+             function(data) {
+        console.log(data);
+        $.tmpl($('#template-message'), {bot: $this.parent().find("input").val()}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
+        $(this).parent().find("input").val('');
+      });
+    });
+
     var ws4redis = WS4Redis({
         uri: '{{ WEBSOCKET_URI }}1?subscribe-broadcast',
         receive_message: receiveMessage,
@@ -674,6 +749,25 @@
         var input = JSON.parse(msg);
         console.log(input);
         $.tmpl($('#template-pedido'), input).prependTo($('#solicitado'));
+        $("#" + input.card_uid + "_btn-send").click(function(){
+          var $this = $(this);
+          $.post('/marvin/api/rest/mensagem',
+                 {uid: $(this).attr("data-uid"), message: $(this).parent().find("input").val()},
+                 function(data) {
+            console.log(data);
+            $.tmpl($('#template-message'), {bot: $this.parent().find("input").val()}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
+            $(this).parent().find("input").val('');
+          });
+        });
+        intervalId = setInterval(function() {
+            minutesPassed = parseInt($('#' + input.card_uid).attr('data-minutes-passed'));
+            minutesPassed += 1;
+            $('#' + input.card_uid).attr('data-minutes-passed', minutesPassed);
+            $('#' + input.card_uid).html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
+            $('#' + input.card_uid + '_1').attr('data-minutes-passed', minutesPassed);
+            $('#' + input.card_uid + '_1').html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
+        }, 60000);
+        pedidos_interval[input.card_uid] = intervalId;
     }
   });
 </script>

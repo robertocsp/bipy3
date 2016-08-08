@@ -20,7 +20,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ua7uuho8)f$ygf%ym2v8!1o=$8#-v_h1df@8p$cne#o15^jn=i'
+with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marvinpub_conf'), 'keys.txt')) as keys_file:
+    for line in keys_file:
+        key_value_pair = line.strip().split('=')
+        if key_value_pair[0] == 'secret_key':
+            SECRET_KEY = key_value_pair[1]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -109,11 +113,6 @@ DATABASES = {
          'OPTIONS': {
              'read_default_file': os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marvinpub_conf'), 'my.cnf'),
          },
-         'NAME': 'marvinpub',  # Or path to database file if using sqlite3.
-         'USER': 'root',  # Not used with sqlite3.
-         'PASSWORD': 'toor',  # Not used with sqlite3.
-         'HOST': 'localhost',  # Set to empty string for localhost. Not used with sqlite3.
-         'PORT': '3306',
      }
 }
 
@@ -152,3 +151,24 @@ WS4REDIS_HEARTBEAT = '--heartbeat--'
 WS4REDIS_EXPIRE = -1
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+if not os.path.exists(os.path.join(os.path.dirname(BASE_DIR), 'logs')):
+    os.makedirs(os.path.join(os.path.dirname(BASE_DIR), 'logs'))
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'logs'), 'debug.log'),
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

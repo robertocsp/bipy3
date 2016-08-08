@@ -20,7 +20,8 @@ class Pedido(models.Model):
         ("solicitado", "Solicitado"),
         ("cancelado", "Cancelado"),
         ("entregue", "Entregue"),
-        ("emprocessamento", "EmProcessamento"),
+        ("emprocessamento", "Em Processamento"),
+        ("concluido", "Concluído"),
     )
     status = models.CharField(max_length=20, choices=STATUS, blank=True, null=True)
     data = models.DateField(auto_now=True, auto_now_add=False)
@@ -35,7 +36,8 @@ class Pedido(models.Model):
     cliente = models.ForeignKey(Cliente, null=True, blank=True)
 
     def __unicode__(self):
-        return self.nome
+        return repr(self.numero) + ';' + repr(self.data) + ';' + repr(self.status)
+
 
 class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, null=True, blank=True)

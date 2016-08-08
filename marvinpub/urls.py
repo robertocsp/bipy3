@@ -26,6 +26,8 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^dashboard/$', TemplateView.as_view(template_name='dashboard.html'), name="dashboard"),
     url(r'^marvin/api/rest/pedido[/]?$', views.EnviarPedidoView.as_view(), name='enviar_pedido_view'),
+    url(r'^marvin/api/rest/status[/]?$', views.StatusPedidoView.as_view(), name='status_pedido_view'),
+    url(r'^marvin/api/rest/mensagem[/]?$', views.EnviarMensagemView.as_view(), name='enviar_mensagem_view'),
     url(r'^home/$', home, name='Home'),
     url(r'^upload/$', upload, name='upload'),
     url(r'^pedidos/$', pedidos, name='pedidos'),

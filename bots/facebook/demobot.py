@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This bot listens to port 5002 for incoming connections from Facebook. It takes
-in any messages that the bot receives and echos it back.
+This bot listens to port 5002 for incoming connections from Facebook.
 """
 import os
 import logging
@@ -9,6 +8,7 @@ import requests
 import json
 import unicodedata
 import datetime
+import base64
 
 from string import Template
 from flask import Flask, request, send_from_directory, Response
@@ -23,7 +23,17 @@ except ImportError:
 
 app = Flask(__name__)
 FACEBOOK_GRAPH_URL = "https://graph.facebook.com/v2.7"
-TOKEN = "TOKEN"
+# Ajustar o valor de BASE_DIR conforme necessidade
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+with open(os.path.join(os.path.join(BASE_DIR, 'marvinpub_conf'), 'keys.txt')) as keys_file:
+    for line in keys_file:
+        key_value_pair = line.strip().split('=')
+        if key_value_pair[0] == 'facebook_token':
+            TOKEN = key_value_pair[1]
+        if key_value_pair[0] == 'super_user_user':
+            SUPER_USER_USER = key_value_pair[1]
+        if key_value_pair[0] == 'super_user_password':
+            SUPER_USER_PASSWORD = key_value_pair[1]
 
 logging_handler = RotatingFileHandler(filename='demoindoorbot.log', maxBytes=3*1024*1024, backupCount=2)
 logging_handler.setFormatter(Formatter(logging.BASIC_FORMAT, None))
@@ -65,7 +75,6 @@ class GraphAPIError(Exception):
 
 
 def get_object(fb_id, **args):
-    """Fetches the given object from the graph."""
     return fb_request('/' + fb_id, args=args)
 
 
@@ -74,14 +83,6 @@ def post(post_args=None, json=None, files=None, headers=None):
 
 
 def fb_request(path, args=None, post_args=None, json=None, files=None, method=None, headers=None):
-    """Fetches the given path in the Graph API.
-
-    We translate args to a valid query string. If post_args is
-    given, we send a POST request to the given path with the given
-    arguments.
-
-    """
-
     args = args or {}
 
     if post_args is not None or json is not None:
@@ -127,15 +128,6 @@ def fb_request(path, args=None, post_args=None, json=None, files=None, method=No
 
 
 def send_image_message(recipient_id, image_path, content_type):
-    '''
-        This sends an image to the specified recipient.
-        Image must be PNG or JPEG.
-        Input:
-          recipient_id: recipient id to send to
-          image_path: path to image to be sent
-        Output:
-          Response from API as <dict>
-    '''
     payload = {
         'recipient': json.dumps(
             {
@@ -344,11 +336,6 @@ def define_mesa(message, recipient_id):
         return True
     else:
         conversas[recipient_id]['nao_entendidas'] += 1
-        if conversas[recipient_id]['nao_entendidas'] > 1:
-            result = send_quickreply_message(recipient_id, get_mensagem('robo'),
-                                             get_quickreply_menu())
-        else:
-            result = send_text_message(recipient_id, get_mensagem('mesa1'))
         return False
 
 
@@ -365,17 +352,14 @@ def anota_pedido(message, recipient_id):
             app_log.debug('=========================>>>>> 2 ' + item)
             item_pedido = item.strip().split(' ', 1)
             quantidade = [int(qtde) for qtde in [item_pedido[0]] if qtde.isdigit()]
-            if len(quantidade) == 1:
+            if len(quantidade) == 1 and quantidade[0] > 0:
                 pedido.append({
                     'descricao': item_pedido[1],
                     'quantidade': quantidade[0]
                 })
             else:
                 pedido = []
-                if len(item_pedido) == 2:
-                    erros.append(item_pedido[1])
-                else:
-                    erros.append(item_pedido[0])
+                erros.append(item)
     app_log.debug('=========================>>>>> 3 ' + repr(conversas[recipient_id]['itens_pedido']))
     conversas[recipient_id]['itens_pedido'] += pedido
     app_log.debug('=========================>>>>> 4 ' + repr(conversas[recipient_id]['itens_pedido']))
@@ -384,25 +368,49 @@ def anota_pedido(message, recipient_id):
 
 def editar_pedido(message, recipient_id):
     item_pedido = message.strip().split(' ', 2)
-    if len(item_pedido) != 3:
+    if len(item_pedido) != 2 and len(item_pedido) != 3:
         return False
     i = [int(qtde) for qtde in [item_pedido[0]] if qtde.isdigit()]
     quantidade = [int(qtde) for qtde in [item_pedido[1]] if qtde.isdigit()]
     if len(i) != 1 or len(quantidade) != 1:
         return False
-    conversas[recipient_id]['itens_pedido'][i[0] - 1]['descricao'] = item_pedido[2]
-    conversas[recipient_id]['itens_pedido'][i[0] - 1]['quantidade'] = quantidade[0]
+    if quantidade[0] > 0 and len(item_pedido) != 3:
+        return False
+    if quantidade[0] > 0:
+        conversas[recipient_id]['itens_pedido'][i[0] - 1]['descricao'] = item_pedido[2]
+        conversas[recipient_id]['itens_pedido'][i[0] - 1]['quantidade'] = quantidade[0]
+    else:
+        del conversas[recipient_id]['itens_pedido'][i[0] - 1]
     return True
 
 
+def enviar_pedido(recipient_id, user_name, foto, itens_pedido, conversa, mesa):
+    data = {}
+    pass
+    data['id_loja'] = '1'
+    data['origem'] = 'fbmessenger'
+    data['id_cliente'] = recipient_id
+    data['nome_cliente'] = user_name
+    data['foto_cliente'] = foto
+    data['mensagem'] = conversa
+    data['itens_pedido'] = itens_pedido
+    data['mesa'] = mesa
+    url = 'http://localhost:8000/marvin/api/rest/pedido'
+    headers = {'content-type': 'application/json',
+               'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    app_log.debug(repr(response))
+
+
 def set_variaveis(recipient_id, passo=(True, 0), nao_entendidas=(True, 0), itens_pedido=(True, None),
-                  menu_acessado=(True, None), datetime_pedido=(True, None)):
+                  menu_acessado=(True, None), datetime_pedido=(True, None), conversa=(True, None)):
     app_log.debug('==set_variaveis=======================>>>>> 1 ' + recipient_id)
     app_log.debug('==set_variaveis=======================>>>>> 2 ' + repr(passo))
     app_log.debug('==set_variaveis=======================>>>>> 3 ' + repr(nao_entendidas))
     app_log.debug('==set_variaveis=======================>>>>> 4 ' + repr(itens_pedido))
     app_log.debug('==set_variaveis=======================>>>>> 5 ' + repr(menu_acessado))
     app_log.debug('==set_variaveis=======================>>>>> 6 ' + repr(datetime_pedido))
+    app_log.debug('==set_variaveis=======================>>>>> 7 ' + repr(conversa))
     if datetime_pedido[0]:
         conversas[recipient_id]['datahora_inicio_pedido'] = datetime_pedido[1]
     if passo[0]:
@@ -413,12 +421,15 @@ def set_variaveis(recipient_id, passo=(True, 0), nao_entendidas=(True, 0), itens
         conversas[recipient_id]['itens_pedido'] = [] if not itens_pedido[1] else itens_pedido[1]
     if menu_acessado[0]:
         conversas[recipient_id]['menu_acessado'] = menu_acessado[1]
-    app_log.debug('==set_variaveis=======================>>>>> 7 ' + repr(conversas[recipient_id]
+    if conversa[0]:
+        conversas[recipient_id]['conversa'] = [] if not conversa[1] else conversa[1]
+    app_log.debug('==set_variaveis=======================>>>>> 8 ' + repr(conversas[recipient_id]
                                                                           ['datahora_inicio_pedido']))
-    app_log.debug('==set_variaveis=======================>>>>> 8 ' + repr(conversas[recipient_id]['passo']))
-    app_log.debug('==set_variaveis=======================>>>>> 9 ' + repr(conversas[recipient_id]['nao_entendidas']))
-    app_log.debug('==set_variaveis=======================>>>>> 10 ' + repr(conversas[recipient_id]['itens_pedido']))
-    app_log.debug('==set_variaveis=======================>>>>> 11 ' + repr(conversas[recipient_id]['menu_acessado']))
+    app_log.debug('==set_variaveis=======================>>>>> 9 ' + repr(conversas[recipient_id]['passo']))
+    app_log.debug('==set_variaveis=======================>>>>> 10 ' + repr(conversas[recipient_id]['nao_entendidas']))
+    app_log.debug('==set_variaveis=======================>>>>> 11 ' + repr(conversas[recipient_id]['itens_pedido']))
+    app_log.debug('==set_variaveis=======================>>>>> 12 ' + repr(conversas[recipient_id]['menu_acessado']))
+    app_log.debug('==set_variaveis=======================>>>>> 13 ' + repr(conversas[recipient_id]['conversa']))
 
 
 @app.route('/', defaults={'path': ''})
@@ -471,87 +482,138 @@ def hello():
                         # com ele, enviar, cancelar, rever pedido, adicionar mais itens
                         # por enquanto, como nao tem esta tratativa o pedido pendente de envio sera cancelado
                         set_variaveis(recipient_id)
-                        result = send_text_message(recipient_id, get_mensagem('ola',
-                                                                              arg1=conversas[recipient_id]['usuario']
-                                                                                            ['first_name']))
+                        bot1 = get_mensagem('ola', arg1=conversas[recipient_id]['usuario']['first_name'])
+                        bot2 = get_mensagem('menu')
+                        result = send_text_message(recipient_id, bot1)
                         app_log.debug(result)
-                        result = send_text_message(recipient_id, get_mensagem('menu'))
+                        result = send_text_message(recipient_id, bot2)
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
+                        conversas[recipient_id]['conversa'].append({'bot': bot1})
+                        conversas[recipient_id]['conversa'].append({'bot': bot2})
                     elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() == u'menu':
-                        result = send_quickreply_message(recipient_id, get_mensagem('auxilio'), get_quickreply_menu())
+                        bot = get_mensagem('auxilio')
+                        result = send_quickreply_message(recipient_id, bot, get_quickreply_menu())
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
+                        conversas[recipient_id]['conversa'].append({'bot': bot})
                     elif conversas[recipient_id]['menu_acessado'] == 'menu_trocar_mesa':  # troca de mesa
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         if define_mesa(message, recipient_id):
                             set_variaveis(recipient_id,
                                           passo=(False, None),
                                           itens_pedido=(False, None),
-                                          datetime_pedido=(False, None))
-                            result = send_text_message(recipient_id, get_mensagem('mesa3'))
-                            result = send_quickreply_message(recipient_id, get_mensagem('auxilio1'),
-                                                             get_quickreply_menu())
+                                          datetime_pedido=(False, None),
+                                          conversa=(False, None))
+                            bot1 = get_mensagem('mesa3')
+                            bot2 = get_mensagem('auxilio1')
+                            result = send_text_message(recipient_id, bot1)
+                            result = send_quickreply_message(recipient_id, bot2, get_quickreply_menu())
+                            conversas[recipient_id]['conversa'].append({'bot': bot1})
+                            conversas[recipient_id]['conversa'].append({'bot': bot2})
+                        else:
+                            if conversas[recipient_id]['nao_entendidas'] > 1:
+                                bot = get_mensagem('robo')
+                                result = send_quickreply_message(recipient_id, bot, get_quickreply_menu())
+                                conversas[recipient_id]['conversa'].append({'bot': bot})
+                            else:
+                                bot = get_mensagem('mesa1')
+                                result = send_text_message(recipient_id, bot)
+                                conversas[recipient_id]['conversa'].append({'bot': bot})
                     elif conversas[recipient_id]['menu_acessado'] == 'menu_rever_pedido':  # rever item do pedido
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         if not editar_pedido(message, recipient_id):
                             conversas[recipient_id]['nao_entendidas'] += 1
                             if conversas[recipient_id]['nao_entendidas'] > 1:
-                                result = send_quickreply_message(recipient_id, get_mensagem('robo'),
-                                                                 get_quickreply_menu())
+                                bot = get_mensagem('robo')
+                                result = send_quickreply_message(recipient_id, bot, get_quickreply_menu())
+                                conversas[recipient_id]['conversa'].append({'bot': bot})
                             else:
-                                result = send_text_message(recipient_id, get_mensagem('rever1',
-                                                                                      arg1='1',
-                                                                                      arg2=repr(conversas
-                                                                                                [recipient_id]
-                                                                                                ['itens_pedido'][0]
-                                                                                                ['quantidade']+2),
-                                                                                      arg3=conversas[recipient_id]
-                                                                                                    ['itens_pedido'][0]
-                                                                                                    ['descricao']))
+                                bot = get_mensagem('rever1', arg1='1',
+                                                   arg2=repr(conversas[recipient_id]
+                                                             ['itens_pedido'][0]['quantidade']+2),
+                                                   arg3=conversas[recipient_id]['itens_pedido'][0]['descricao'])
+                                result = send_text_message(recipient_id, bot)
+                                conversas[recipient_id]['conversa'].append({'bot': bot})
                         else:
                             set_variaveis(recipient_id,
                                           passo=(False, None),
                                           itens_pedido=(False, None),
-                                          datetime_pedido=(False, None))
-                            result = send_quickreply_message(recipient_id, get_mensagem('auxilio1'),
-                                                             get_quickreply_menu())
+                                          datetime_pedido=(False, None),
+                                          conversa=(False, None))
+                            bot = get_mensagem('auxilio1')
+                            result = send_quickreply_message(recipient_id, bot, get_quickreply_menu())
+                            conversas[recipient_id]['conversa'].append({'bot': bot})
                     elif conversas[recipient_id]['passo'] == 1:
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         # result = send_image_message(recipient_id, 'cardapio01.jpg', 'image/jpeg')
                         # app_log.debug(result)
                         if define_mesa(message, recipient_id):
                             set_variaveis(recipient_id,
                                           passo=(True, 2),
                                           itens_pedido=(False, None),
-                                          datetime_pedido=(False, None))
-                            result = send_text_message(recipient_id, get_mensagem('pedido'))
-                            result = send_text_message(recipient_id, get_mensagem('pedido1'))
-                            result = send_text_message(recipient_id, get_mensagem('pedido2'))
+                                          datetime_pedido=(False, None),
+                                          conversa=(False, None))
+                            bot1 = get_mensagem('pedido')
+                            bot2 = get_mensagem('pedido1')
+                            bot3 = get_mensagem('pedido2')
+                            result = send_text_message(recipient_id, bot1)
+                            result = send_text_message(recipient_id, bot2)
+                            result = send_text_message(recipient_id, bot3)
+                            conversas[recipient_id]['conversa'].append({'bot': bot1})
+                            conversas[recipient_id]['conversa'].append({'bot': bot2})
+                            conversas[recipient_id]['conversa'].append({'bot': bot3})
+                        else:
+                            if conversas[recipient_id]['nao_entendidas'] > 1:
+                                bot = get_mensagem('robo')
+                                result = send_quickreply_message(recipient_id, bot, get_quickreply_menu())
+                                conversas[recipient_id]['conversa'].append({'bot': bot})
+                            else:
+                                bot = get_mensagem('mesa1')
+                                result = send_text_message(recipient_id, bot)
+                                conversas[recipient_id]['conversa'].append({'bot': bot})
                     elif conversas[recipient_id]['passo'] == 2:
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         is_pedido_anotado = anota_pedido(message, recipient_id)
                         if is_pedido_anotado == True:
                             set_variaveis(recipient_id,
                                           passo=(True, 3),
                                           itens_pedido=(False, None),
-                                          datetime_pedido=(False, None))
-                            result = send_quickreply_message(recipient_id,
-                                                             get_mensagem('anotado',
-                                                                          arg1=conversas[recipient_id]
-                                                                                        ['usuario']['first_name']),
-                                                             get_quickreply_pedido())
+                                          datetime_pedido=(False, None),
+                                          conversa=(False, None))
+                            bot = get_mensagem('anotado', arg1=conversas[recipient_id]['usuario']['first_name'])
+                            result = send_quickreply_message(recipient_id, bot, get_quickreply_pedido())
+                            conversas[recipient_id]['conversa'].append({'bot': bot})
                         else:
                             conversas[recipient_id]['nao_entendidas'] += 1
                             if conversas[recipient_id]['nao_entendidas'] > 1:
-                                result = send_quickreply_message(recipient_id, get_mensagem('robo'),
-                                                                 get_quickreply_menu())
+                                bot = get_mensagem('robo')
+                                result = send_quickreply_message(recipient_id, bot, get_quickreply_menu())
+                                conversas[recipient_id]['conversa'].append({'bot': bot})
                             else:
-                                result = send_text_message(recipient_id, get_mensagem('qtde', arg1=is_pedido_anotado))
-                                result = send_text_message(recipient_id, get_mensagem('qtde1'))
+                                bot1 = get_mensagem('qtde', arg1=is_pedido_anotado)
+                                bot2 = get_mensagem('qtde1')
+                                result = send_text_message(recipient_id, bot1)
+                                result = send_text_message(recipient_id, bot2)
+                                conversas[recipient_id]['conversa'].append({'bot': bot1})
+                                conversas[recipient_id]['conversa'].append({'bot': bot2})
                     elif conversas[recipient_id]['passo'] == 3:
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         conversas[recipient_id]['nao_entendidas'] += 1
-                        result = send_quickreply_message(recipient_id, get_mensagem('anotado1'),
-                                                         get_quickreply_pedido())
+                        bot = get_mensagem('anotado1')
+                        result = send_quickreply_message(recipient_id, bot, get_quickreply_pedido())
+                        conversas[recipient_id]['conversa'].append({'bot': bot})
                     elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() in agradecimentos:
-                        result = send_text_message(recipient_id, get_mensagem('agradeco'))
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
+                        bot = get_mensagem('agradeco')
+                        result = send_text_message(recipient_id, bot)
+                        conversas[recipient_id]['conversa'].append({'bot': bot})
                     else:
-                        result = send_quickreply_message(recipient_id, get_mensagem('robo'),
-                                                         get_quickreply_menu())
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
+                        bot = get_mensagem('robo')
+                        result = send_quickreply_message(recipient_id, bot, get_quickreply_menu())
+                        conversas[recipient_id]['conversa'].append({'bot': bot})
                 elif x['message'].get('quick_reply') and x['message']['quick_reply'].get('payload'):
                     payload = x['message']['quick_reply']['payload']
+                    message = x['message']['text']
                     app_log.debug(payload)
                     if payload == 'menu_novo_pedido':
                         # TODO verificar pedido nao enviado
@@ -559,36 +621,54 @@ def hello():
                         # com ele, enviar, cancelar, rever pedido, adicionar mais itens
                         # por enquanto, como nao tem esta tratativa o pedido pendente de envio sera cancelado
                         set_variaveis(recipient_id, datetime_pedido=(True, datetime.datetime.utcnow()))
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         # TODO criar rotina que zera a informacao de mesa do cliente
                         # ideal eh ter uma rotina que zere a informacao de mesa do usuario, alem do fechar conta, para
                         # nao perguntar toda vez o numero da mesa do cliente, quando for iniciar um pedido
                         conversas[recipient_id]['mesa'] = -1
                         if conversas[recipient_id]['mesa'] == -1:
                             conversas[recipient_id]['passo'] = 1
-                            result = send_text_message(recipient_id, get_mensagem('mesa'))
+                            bot = get_mensagem('mesa')
+                            result = send_text_message(recipient_id, bot)
+                            conversas[recipient_id]['conversa'].append({'bot': bot})
                         else:
                             conversas[recipient_id]['passo'] = 2
-                            result = send_text_message(recipient_id, get_mensagem('pedido'))
-                            result = send_text_message(recipient_id, get_mensagem('pedido1'))
-                            result = send_text_message(recipient_id, get_mensagem('pedido2'))
+                            bot1 = get_mensagem('pedido')
+                            bot2 = get_mensagem('pedido1')
+                            bot3 = get_mensagem('pedido2')
+                            result = send_text_message(recipient_id, bot1)
+                            result = send_text_message(recipient_id, bot2)
+                            result = send_text_message(recipient_id, bot3)
+                            conversas[recipient_id]['conversa'].append({'bot': bot1})
+                            conversas[recipient_id]['conversa'].append({'bot': bot2})
+                            conversas[recipient_id]['conversa'].append({'bot': bot3})
                     elif payload == 'menu_cancelar_pedido':
                         set_variaveis(recipient_id)
                         result = send_text_message(recipient_id, get_mensagem('encerrar'))
                     elif payload == 'menu_trocar_mesa':
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         # TODO enviar para o servidor a troca de mesa para atualizar os pedidos em abeto
                         set_variaveis(recipient_id,
                                       passo=(False, None),
                                       itens_pedido=(False, None),
                                       datetime_pedido=(False, None),
-                                      menu_acessado=(True, 'menu_trocar_mesa'))
-                        result = send_text_message(recipient_id, get_mensagem('mesa2'))
+                                      menu_acessado=(True, 'menu_trocar_mesa'),
+                                      conversa=(False, None))
+                        bot = get_mensagem('mesa2')
+                        result = send_text_message(recipient_id, bot)
+                        conversas[recipient_id]['conversa'].append({'bot': bot})
                     elif payload == 'menu_nada_fazer':
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         set_variaveis(recipient_id,
                                       passo=(False, None),
                                       itens_pedido=(False, None),
-                                      datetime_pedido=(False, None))
-                        result = send_text_message(recipient_id, get_mensagem('encerrar'))
+                                      datetime_pedido=(False, None),
+                                      conversa=(False, None))
+                        bot = get_mensagem('encerrar')
+                        result = send_text_message(recipient_id, bot)
+                        conversas[recipient_id]['conversa'].append({'bot': bot})
                     elif payload == 'menu_rever_pedido':
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         if len(conversas[recipient_id]['itens_pedido']) > 0:
                             pedidos = None
                             for i, item in enumerate(conversas[recipient_id]['itens_pedido']):
@@ -601,24 +681,41 @@ def hello():
                                           passo=(False, None),
                                           itens_pedido=(False, None),
                                           datetime_pedido=(False, None),
-                                          menu_acessado=(True, 'menu_rever_pedido'))
-                            result = send_text_message(recipient_id, get_mensagem('rever'))
-                            result = send_text_message(recipient_id, pedidos)
+                                          menu_acessado=(True, 'menu_rever_pedido'),
+                                          conversa=(False, None))
+                            bot1 = get_mensagem('rever')
+                            bot2 = pedidos
+                            result = send_text_message(recipient_id, bot1)
+                            result = send_text_message(recipient_id, bot2)
+                            conversas[recipient_id]['conversa'].append({'bot': bot1})
+                            conversas[recipient_id]['conversa'].append({'bot': bot2})
                         else:
-                            result = send_quickreply_message(recipient_id, get_mensagem('rever2'),
-                                                             get_quickreply_menu())
+                            bot = get_mensagem('rever2')
+                            result = send_quickreply_message(recipient_id, bot, get_quickreply_menu())
+                            conversas[recipient_id]['conversa'].append({'bot': bot})
                             # TODO pegar os pedidos em aberto do servidor
                     elif payload == 'menu_ajuda' or payload == 'menu_adicionar_item_pedido' or \
                             payload == 'menu_fechar_conta':
                         result = send_text_message(recipient_id, get_mensagem('desenv'))
                     elif conversas[recipient_id]['passo'] == 3 and payload == 'pedir_mais':
+                        conversas[recipient_id]['conversa'].append({'cliente': message})
                         set_variaveis(recipient_id,
                                       passo=(True, 2),
                                       itens_pedido=(False, None),
-                                      datetime_pedido=(False, None))
-                        result = send_text_message(recipient_id, get_mensagem('pedido3'))
+                                      datetime_pedido=(False, None),
+                                      conversa=(False, None))
+                        bot = get_mensagem('pedido3')
+                        result = send_text_message(recipient_id, bot)
+                        conversas[recipient_id]['conversa'].append({'bot': bot})
                     elif conversas[recipient_id]['passo'] == 3 and payload == 'finalizar_pedido':
                         # TODO enviar mensagem para cliente com o que está sendo enviado!!!
+                        enviar_pedido(recipient_id,
+                                      conversas[recipient_id]['usuario']['first_name'] + ' ' +
+                                      conversas[recipient_id]['usuario']['last_name'],
+                                      conversas[recipient_id]['usuario']['profile_pic'],
+                                      conversas[recipient_id]['itens_pedido'],
+                                      conversas[recipient_id]['conversa'],
+                                      conversas[recipient_id]['mesa'])
                         set_variaveis(recipient_id)
                         result = send_text_message(recipient_id, get_mensagem('enviar'))
         resp = Response('success', status=200, mimetype='text/plain')
