@@ -728,7 +728,7 @@
              function(data) {
         console.log(data);
         $.tmpl($('#template-message'), {bot: $this.parent().find("input").val()}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
-        $(this).parent().find("input").val('');
+        $this.parent().find("input").val('');
       });
     });
 
@@ -756,7 +756,7 @@
                  function(data) {
             console.log(data);
             $.tmpl($('#template-message'), {bot: $this.parent().find("input").val()}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
-            $(this).parent().find("input").val('');
+            $this.parent().find("input").val('');
           });
         });
         intervalId = setInterval(function() {
