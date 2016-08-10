@@ -108,7 +108,7 @@ ul, li{
 } 
 
 .left-login{
-	background-image: url('../img/telegram-login.jpg');
+	background-image: url('../img/telegram-login-2.jpg');
 	background-size: cover;
 	opacity: 1;
 }
@@ -150,7 +150,11 @@ ul, li{
     width: 300px;
 }
 
-.form-login .btn-primary, .form-login .btn-primary:hover {
+.font17{
+    font-size: 17px;
+}
+
+.form-login .btn-primary, .form-login .btn-primary:hover, .filtros-pedidos .btn-primary.btn-verde, .filtros-pedidos .btn-primary.btn-verde:hover{
     color: #fff;
     background-color: rgba(75,192,192,1);
     border-color: rgba(75,192,192,1);
@@ -482,6 +486,10 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     height: 30px;
 }
 
+.coluna .detalhe-pedido-icon .status-label i.logo{
+    border: 0;
+}
+
 .coluna .detalhe-pedido-icon .status-label i:last-child{
     margin-right: 0px;
     font-size: 18px;
@@ -551,6 +559,10 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 	padding: 0;
 }
 
+.pedidos .detalhe .dialogo{
+    height: 429px;
+}
+
 .dialogo.telegram{
     background: url('../img/bg-tel.jpg') no-repeat;
     background-size: cover;
@@ -572,6 +584,13 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     background: #fff;
     border: 1px solid #dedede;
 
+}
+
+.messeger .logo{
+    background-image: url(../img/fb-messeger.png);
+    background-repeat: no-repeat;
+    background-size: 31px;
+    background-position: 0 0;
 }
 
 .detalhe-pedido-icon .lista-pedidos{
@@ -633,7 +652,8 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 }
 
 .dialogo ul{
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     height: 379px;
     padding: 0;
     margin-bottom: 0;
@@ -797,7 +817,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     border-top-right-radius: 13px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 13px;
-    background: #3b5998;
+    background: #0084ff;
     color: #fff;
 }
 
@@ -862,13 +882,14 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 
 .box-teclado i {
     float: right;
-    margin: 8px 15px 0 0;
-    color: green;
-    font-size: 22px;
+    margin: 8px 8px 0 0;
+    color: #0084ff;
+    font-size: 15px;
+    font-style: normal;
 }
 
 .messeger .box-teclado i{
-    color: #3b5998;
+    color: #0084ff;
 }
 
 .box-teclado i:hover{
@@ -1052,7 +1073,7 @@ h4, h5{
 .cabecalho-chat{
     clear: both;
     width: 100%;
-    background: #3b5998;
+    background: #0084ff;
     height: 50px;
     margin: 0;
     padding: 0;    
