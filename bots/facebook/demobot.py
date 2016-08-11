@@ -239,6 +239,11 @@ def get_quickreply_menu():
         },
         {
             'content_type': 'text',
+            'title': u'Finalizar contato',
+            'payload': 'menu_finalizar_contato'
+        },
+        {
+            'content_type': 'text',
             'title': u'Fechar a conta',
             'payload': 'menu_fechar_conta'
         }
@@ -306,7 +311,7 @@ def get_mensagem(id_mensagem, **args):
         'qtde':      Template(u'$arg1\nPerdoe-me, mas não consegui identificar a quantidade do(s) seguinte(s) item(ns) '
                               u'acima.'),
         'qtde1':     Template(u'Peço, por favor, que reenvie sua última mensagem corrigindo-os.'),
-        'enviar':    Template(u'Ok, seu pedido já já estará aí.\nCaso queira mais alguma coisa digitar menu e escolher '
+        'enviar':    Template(u'Ok, seu pedido já já estará aí.\nCaso queira mais alguma coisa digite menu e escolha '
                               u'a opção "Novo pedido".'),
         'agradeco':  Template(u'Eu que agradeço.\nQualquer coisa é só digitar menu e escolher a opção "Novo pedido".'),
         'robo':      Template(u'Desculpe por não entender, afinal, sou um robô. :)\nVocê gostaria de? '
@@ -323,6 +328,8 @@ def get_mensagem(id_mensagem, **args):
         'rever2':    Template(u'Não foram encontrados pedidos em aberto. Como posso auxiliá-lo(a)?'),
         'auxilio':   Template(u'Em que posso ajudá-lo(a)?'),
         'auxilio1':  Template(u'Em que posso ajudá-lo(a) agora?'),
+        'dashboard': Template(u'$arg1, vou dar uma pausa em nossa conversa, pois tem uma mensagem lá de dentro para '
+                              u'você. Para finalizar este contato digite menu e escolha a opção "Finalizar contato".'),
         'desenv':    Template(u'Função em desenvolvimento...')
     }
     return mensagens[id_mensagem].substitute(args)
@@ -395,7 +402,7 @@ def enviar_pedido(recipient_id, user_name, foto, itens_pedido, conversa, mesa):
     data['mensagem'] = conversa
     data['itens_pedido'] = itens_pedido
     data['mesa'] = mesa
-    url = 'http://localhost:8000/marvin/api/rest/pedido'
+    url = 'http://localhost:8888/marvin/api/rest/pedido'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -468,6 +475,7 @@ def hello():
                         'nao_entendidas': 0,
                         'datahora_inicio_pedido': None,
                         'menu_acessado': None,
+                        'suspensa': 0,
                     }
                     app_log.debug('usuario:: ' + repr(user))
 
@@ -718,6 +726,13 @@ def hello():
                                       conversas[recipient_id]['mesa'])
                         set_variaveis(recipient_id)
                         result = send_text_message(recipient_id, get_mensagem('enviar'))
+            elif x.get('dashboard'):
+                conversas[recipient_id]['suspensa'] += 1
+                if conversas[recipient_id]['suspensa'] == 1:
+                    result = send_text_message(recipient_id, get_mensagem('dashboard', arg1=conversas[recipient_id]
+                                                                                                     ['usuario']
+                                                                                                     ['first_name']))
+                result = send_text_message(recipient_id, x['dashboard']['message'])
         resp = Response('success', status=200, mimetype='text/plain')
         resp.status_code = 200
         return resp
