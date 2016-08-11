@@ -8,70 +8,79 @@
   <div class="page-header">
     <h1><i class="fa fa-list"></i> Pedidos</h1>
   </div>
-  <div class="filtros-pedidos col-md-12">
-    <h4><i class="fa fa-filter"></i> Filtrar pedidos</h4><br>
-    <div class="form-group">
-      <div class="col-md-4">
-        <select class="form-control" id="sel1">
-          <option>Status Pedido</option>
-          <option>Solicitado</option>
-          <option>Em processo</option>
-          <option>Concluído</option>
-          <option>Enregue</option>
-          <option>Cancelado</option>
-        </select><br><br>
+    <div class="filtros-pedidos">
+       <div class="form-group col-md-6">
+          <div class="col-md-12">
+            <h4 class="font17"><i class="fa fa-calendar-times-o"></i> Visualizar os pedidos a partir de:</h4><br>
+          </div>
+          <div class="col-md-6">
+              <input type="text" placeholder="selecione a data..." id="pedido-de" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label>
+              <select class="form-control">
+                  <option>00:00</option>
+                  <option>01:00</option>
+                  <option>02:00</option>
+                  <option>03:00</option>
+                  <option>04:00</option>
+                  <option>05:00</option>
+                  <option>06:00</option>
+                  <option>07:00</option>
+                  <option>08:00</option>
+                  <option>09:00</option>
+                  <option>10:00</option>
+                  <option>11:00</option>
+                  <option>12:00</option>
+                  <option>13:00</option>
+                  <option>14:00</option>
+                  <option>15:00</option>
+                  <option>16:00</option>
+                  <option>17:00</option>
+                  <option>18:00</option>
+                  <option>19:00</option>
+                  <option>20:00</option>
+                  <option>21:00</option>
+                  <option>22:00</option>
+                  <option>23:00</option>
+              </select><br>
+            </label>
+          </div>
+
+          <div class="col-md-12">
+              <button type="submit" class="btn btn-primary btn-verde">
+                  <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Selecionar Data/Horario
+                </button><br>
+          </div>
       </div>
-      <div class="col-md-3">
-        <input type="text" placeholder="Cliente..." class="form-control"><br>
-      </div>
-      <div class="col-md-2">
-        <input type="text" placeholder="Número Pedido..." class="form-control"><br><br>
-      </div>
-      <div class="col-md-4">
-        <h5 class="font17"><i class="fa fa-calendar-times-o"></i> Visualizar os pedidos a partir de:</h5>
-      </div>
-      <div class="col-md-2">
-          <input type="text" placeholder="selecione a data..." id="pedido-de" class="form-control">
-      </div>
-      <div class="col-md-3">
-        <label>
-          <select class="form-control">
-              <option>00:00</option>
-              <option>01:00</option>
-              <option>02:00</option>
-              <option>03:00</option>
-              <option>04:00</option>
-              <option>05:00</option>
-              <option>06:00</option>
-              <option>07:00</option>
-              <option>08:00</option>
-              <option>09:00</option>
-              <option>10:00</option>
-              <option>11:00</option>
-              <option>12:00</option>
-              <option>13:00</option>
-              <option>14:00</option>
-              <option>15:00</option>
-              <option>16:00</option>
-              <option>17:00</option>
-              <option>18:00</option>
-              <option>19:00</option>
-              <option>20:00</option>
-              <option>21:00</option>
-              <option>22:00</option>
-              <option>23:00</option>
-          </select>
-        </label>
-      </div>
+      <div class="col-md-6">
+            <h4><i class="fa fa-filter"></i> Filtrar pedidos</h4><br>
+            <div class="form-group">
+
+              <div class="col-md-6">
+                <input type="text" placeholder="Cliente..." class="form-control"><br>
+              </div>
+              <div class="col-md-6">
+                <input type="text" placeholder="Número Pedido..." class="form-control"><br>
+              </div>
+              <div class="col-md-12">
+                  <button type="submit" class="btn btn-primary btn-verde">
+                    <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filtrar
+                  </button>
+              </div>
+            </div>
+        </div>
     </div>
-      <div class="col-md-12"><br>
-          <button type="submit" class="btn btn-primary btn-verde">
-              <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filtrar
-            </button>
-      </div>
-  </div>
     <div class="dnd">
         <div class="linha-btn">
+            <select class="form-control status-combo" id="sel1">
+              <option value="status" selected="selected">Todos os Status</option>
+              <option value="solicitado">Solicitado</option>
+              <option value="em-processo">Em processo</option>
+              <option value="concluido">Concluído</option>
+              <option value="entregue">Entregue</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
             <button type="button" class="btn btn-default btn-expandir-tela" aria-label="Left Align">
               <span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span> <strong>Expandir tela</strong>
             </button>
@@ -700,6 +709,7 @@
     //Botao restaurar as colunas
     $('.btn-restaurar').click(function(){
         $(".btn-restaurar").hide(600);
+        $(".coluna").show();
         $('.coluna').removeClass('col-active');
         $('.coluna').removeClass('coluna-normal');
         $('i.fa-ellipsis-h').removeClass('fa-ellipsis-h').addClass('fa-ellipsis-v');
@@ -722,6 +732,24 @@
             $(".dnd").removeClass("todo");
             $(this).find("span").removeClass("glyphicon-resize-small").addClass("glyphicon-resize-full");
             $(this).find("strong").text("Expandir tela");
+        }
+    });
+
+    //select status
+    $(".status-combo").change(function(){
+        id = $(this).find("option:selected").val();
+        $(".coluna").removeClass("coluna-normal");
+        if (id == "status"){
+            $(".coluna").show("slow");
+            $(".coluna").animate({
+              width: "19.2%"
+            }, 1500 );
+        }else{
+            $(".coluna").hide("slow");
+            $("#" + id).parent(".coluna").show("slow");
+            $("#" + id).parent(".coluna").animate({
+              width: "100%"
+            }, 1500 );
         }
     });
 
