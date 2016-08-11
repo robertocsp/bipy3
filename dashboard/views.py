@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from django.shortcuts import render, render_to_response
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def dashboard(request):
+    # exemplo
+    variaveis = 0
+    return render(request, 'dashboard.html', {'variaveis': variaveis})
 
 def login(request):
     return render(request, 'login.html')
