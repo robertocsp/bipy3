@@ -1,0 +1,101 @@
+{% load pedido_tags %}
+
+{% for pedido in pedidos %}
+{% minutos_passados pedido.data pedido.hora as minutos_resultado %}
+{% pedido_uid pedido.data pedido.numero as card_uid %}
+  <li class="ui-state-default" data-uid="{{ card_uid }}">
+    <div class="header-pedido">
+      <div class="cabecalho">
+        <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/marvinpub/img/default_user.png{% endif %}" width="40" height="40" alt="" >
+        <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span id="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
+      </div>
+    </div>
+    <div class="conteudo-pedido">
+      <ul>
+        <li><label class="status-label"><strong>Número do pedido:</strong> {{ pedido.numero }}</label></li>
+        <li class="{% if pedido.origem == 'fbmessenger' %}messeger {% endif %}detalhe-pedido-icon">
+          <label class="status-label">
+            <strong>Detalhes:</strong>
+            <i class="logo open-dialogo"></i>
+            <i class="fa fa-list-ol open-lista-pedidos"></i>
+            <i>{{ pedido.mesa }}</i>
+          </label>
+
+          <!-- Lista de pedidos-->
+          <div class="lista-pedidos">
+            <a href="javascript:void(0);" class="close">X</a>
+            <div class="bs-example">
+                <div class="list-group">
+                    {% for item in pedido.itens.all %}
+                    <a href="javascript:void(0);" class="list-group-item">
+                        {{ item.produto }}<span class="badge">{{ item.quantidade }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+          </div>
+          <!-- inicio dialogo bot -->
+            <div class="content-dialog">
+          <div class="dialogo {% if pedido.origem == 'fbmessenger' %}messeger{% else %}telegram{% endif %}">
+            <a href="javascript:void(0);" class="close">X</a>
+            <div class="cabecalho-chat">
+              <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span id="{{ card_uid }}_1" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
+            </div>
+            <ul id="{{ card_uid }}_messages">
+            {% for item in pedido.historico %}
+             {% if 'cliente' in item %}
+              <li class="cons">
+                  <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/marvinpub/img/default_user.png{% endif %}" width="40" height="40" alt="">
+                  <div class="balao">
+                    <h4 class="media-heading"> {{ pedido.cliente.nome }}</h4>
+                    <p>{{ item.cliente }}</p>
+                  </div>
+              </li>
+             {% elif 'bot' in item %}
+              <li class="est">
+                  <div class="balao">
+                    <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                    <p>{{ item.bot }}</p>
+                  </div>
+              </li>
+             {% endif %}
+            {% endfor %}
+            </ul>
+            <div class="box-teclado">
+              <label>
+                <input type="text" placeholder="Mensagem..." name="texto">
+              </label>
+              <i class="btn-send" id="{{ card_uid }}_btn-send" data-uid="{{ card_uid }}">Enviar</i>
+            </div>
+          </div>
+         </div>
+        </li>
+      </ul>
+    </div>
+    <div class="footer-pedido">
+      <div class="status-list">
+        <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid="{{ card_uid }}"/>
+            <i class="fa fa-hand-paper-o"></i>
+        </label>
+        <label class="em-processo"><input type="radio" name="em-processo" data-uid="{{ card_uid }}"/>
+            <i class="fa fa-hand-grab-o"></i>
+        </label>
+        <label class="concluido"><input type="radio" name="concluido" data-uid="{{ card_uid }}"/>
+            <i class="fa fa-hand-pointer-o"></i>
+        </label>
+        <label class="entregue"><input type="radio" name="entregue" data-uid="{{ card_uid }}"/>
+            <i class="fa fa-thumbs-o-up"></i>
+        </label>
+        <label class="cancelado"><input type="radio" name="cancelado" data-uid="{{ card_uid }}"/>
+            <i class="fa fa-thumbs-o-down"></i>
+        </label>
+      </div>
+    </div>
+  </li>
+  <script type="text/javascript">
+      $(document).ready(function() {
+        sendMessageBindClick('{{ card_uid }}');
+        startInterval('{{ card_uid }}');
+      });
+  </script>
+{% endfor %}

@@ -15,6 +15,7 @@ from django.db.models import Max
 import datetime
 import json
 import logging
+import requests
 
 logger = logging.getLogger('django')
 
@@ -26,11 +27,11 @@ class EnviarPedidoView(views.APIView):
 
     def post(self, request, *args, **kwargs):
         with transaction.atomic():
-            cliente = request.data.get('id_loja', None)
+            loja = request.data.get('id_loja', None)
             data_hora_pedido = datetime.datetime.now()
             data_pedido = datetime.date.today()
             max_numero_pedido = Pedido.objects.select_for_update()\
-                .filter(loja=cliente, data=data_pedido) \
+                .filter(loja=loja, data=data_pedido) \
                 .aggregate(Max('numero'))
             logger.debug('-=-=-=-=-=-=-=- num pedido 1: ' + repr(max_numero_pedido))
             if max_numero_pedido.get('numero__max'):
@@ -43,9 +44,9 @@ class EnviarPedidoView(views.APIView):
         request.data['numero_pedido'] = numero_pedido
         request.data['card_uid'] = data_pedido.strftime('%Y%m%d') + repr(numero_pedido)
         logger.debug('-=-=-=-=-=-=-=- num pedido 3: ' + repr(request.data['numero_pedido']))
-        if cliente:
+        if loja:
             websocket = ws.Websocket()
-            websocket.publicar_mensagem(cliente, json.dumps(request.data))
+            websocket.publicar_mensagem(loja, json.dumps(request.data))
             return Response({"success": True})
         else:
             return Response({"success": False})
@@ -69,8 +70,8 @@ def persistencia(request, numero_pedido, data_hora_pedido):
                 cliente = Cliente()
                 cliente.nome = request.data.get('nome_cliente', None)
                 cliente.chave_facebook = request.data.get('id_cliente', None)
-                cliente.foto = request.data.get('foto_cliente', None)
-                cliente.save()
+            cliente.foto = request.data.get('foto_cliente', None)
+            cliente.save()
         pedido = Pedido()
         pedido.numero = numero_pedido
         pedido.cliente = cliente
@@ -80,6 +81,7 @@ def persistencia(request, numero_pedido, data_hora_pedido):
         pedido.origem = origem
         pedido.loja_id = request.data.get('id_loja', None)
         pedido.status = 'solicitado'
+        pedido.mesa = request.data.get('mesa', None)
         pedido.save()  # TODO tratar exceção
         itens_pedido = request.data.get('itens_pedido', None)
         for item in itens_pedido:
@@ -130,12 +132,72 @@ class EnviarMensagemView(views.APIView):
         uid = request.data.get('uid')
         numero = int(uid[8:])
         data_pedido = datetime.datetime.strptime(uid[:8], '%Y%m%d')
-        pedido = Pedido.objects\
-            .filter(numero=numero, data=data_pedido)\
-            .select_related('cliente')
-        for um_pedido in pedido:
-            chave_facebook = um_pedido.cliente.chave_facebook
-            logger.debug('-=-=-=-=-=-=-=- fb uid: ' + chave_facebook)
-        data = {}
-        # TODO enviar mensagem para cliente
+        pedido = self.atualiza_historico(data_pedido, numero, 'bot', request.data.get('message'))
+        if not pedido:
+            return Response({"success": False})
+        chave_facebook = pedido.cliente.chave_facebook
+        logger.debug('-=-=-=-=-=-=-=- fb uid: ' + chave_facebook)
+        data = {
+            'entry': [
+                {
+                    'messaging': [
+                        {
+                            'sender': {
+                                'id': chave_facebook
+                            },
+                            'dashboard': {
+                                'message': request.data.get('message'),
+                                'uid': uid
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+        url = 'https://localhost:5002/webhook'
+        headers = {'content-type': 'application/json'}
+        response = requests.post(url, data=json.dumps(data), headers=headers, verify=False)
+        logger.debug('------======------- response: ' + repr(response))
         return Response({"success": True})
+
+    def atualiza_historico(self, data_pedido, numero, ator, mensagem):
+        with transaction.atomic():
+            pedido = Pedido.objects.select_for_update().filter(numero=numero, data=data_pedido)\
+                .select_related('cliente')
+            if not pedido:
+                return None
+            else:
+                for um_pedido in pedido:
+                    um_pedido.historico.append({ator: mensagem})
+                    um_pedido.save()
+                    return um_pedido
+
+
+
+class EnviarMensagemBotView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        loja = request.data.get('id_loja', None)
+        uid = request.data.get('uid')
+        logger.debug('-=-=-=-=-=-=-=- mensagem bot ' + repr(uid))
+        data_pedido = datetime.datetime.strptime(uid[:8], '%Y%m%d')
+        self.atualiza_historico(data_pedido, int(uid[8:]), 'cliente', request.data.get('cliente'))
+        if loja:
+            websocket = ws.Websocket()
+            websocket.publicar_mensagem(loja, json.dumps(request.data))
+            return Response({"success": True})
+        else:
+            return Response({"success": False})
+
+    def atualiza_historico(self, data_pedido, numero, ator, mensagem):
+        with transaction.atomic():
+            pedido = Pedido.objects.select_for_update().filter(numero=numero, data=data_pedido)
+            if not pedido:
+                return None
+            else:
+                for um_pedido in pedido:
+                    um_pedido.historico.append({ator: mensagem})
+                    um_pedido.save()
+                    return um_pedido

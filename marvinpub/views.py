@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 
+
 #a ideia e fazer um login unico verificando se e marca ou operacao
 def login_geral(request):
     if request.method == 'POST':
@@ -16,9 +17,11 @@ def login_geral(request):
                 # if user.groups.filter(name='marca').count() != 0:
                 #     marca = Marca.objects.get(user=request.user)
                 #     request.session['marca_id'] = marca.id
-                return HttpResponseRedirect('/dashboard/')
-                # else:
-                #     return HttpResponseRedirect('/operacional/dashboard/')
+                if 'next' in request.GET:
+                    next = request.GET['next']
+                    return HttpResponseRedirect(next)
+                else:
+                    return HttpResponseRedirect('/dashboard/')
             else:
                 return render(request, 'login.html', {'form': form, 'error': True})
         else:

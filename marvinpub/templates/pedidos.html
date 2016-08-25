@@ -97,293 +97,7 @@
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="solicitado" class="droptrue">
-
-          <!-- Inicio do pedido-->
-
-          <li class="ui-state-default">
-            <div class="header-pedido">
-              <div class="cabecalho">
-                <img class="media-object img-circle" src="../../static/marvinpub/img/default_user.png" width="40" height="40" alt="">
-                <p>Roberto<br> <span class="ultimo">Pedido feito há 1 minuto</span></p>
-              </div>
-            </div>
-            <div class="conteudo-pedido">
-              <ul>
-                <li><label class="status-label"><strong>Número do pedido:</strong> 10244</label></li>
-                <li class="messeger detalhe-pedido-icon">
-                  <label class="status-label">
-                    <strong>Detalhes:</strong>
-                    <i class="logo open-dialogo"></i>
-                    <i class="fa fa-list-ol open-lista-pedidos"></i>
-                    <i>55</i>
-                  </label>
-
-                  <!-- Lista de pedidos-->
-
-                  <div class="lista-pedidos">
-                    <a href="javascript:void(0);" class="close">X</a>
-                    <div class="bs-example">
-                        <div class="list-group">
-
-                            <!-- Item pedido-->
-                            <a href="javascript:void(0);" class="list-group-item">
-                                Chop escuro 300 ml sem colarinho<span class="badge">1</span>
-                            </a>
-                            <!-- Fim item pedido-->
-
-                        </div>
-                    </div>
-                  </div>
-
-                  <!--Fim lista de pedidos-->
-
-                  <!-- inicio dialogo messenger. Em relaçao ao telegram, alterar a classe abaixo para mudar o layout-->
-                  <div class="content-dialog">
-                  <div class="dialogo messeger">
-                    <a href="javascript:void(0);" class="close">X</a>
-                    <div class="cabecalho-chat">
-                      <p>Roberto<br> <span class="ultimo">Último pedido feito há 3 dias</span><p>
-                    </div>
-                    <ul>
-                      <li>
-                        <span>Enviado 12 de maio às 19:32</span>
-                      </li>
-                      <li class="cons">
-                          <img class="media-object img-circle" src="../../static/marvinpub/img/default_user.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Roberto</h4>
-                            <p>Olá</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Olá, Roberto! Digite o número de sua mesa para iniciarmos o seu atendimento.</p>
-                          </div>
-                      </li>
-                       <li class="cons">
-                          <img class="media-object img-circle" src="../../static/marvinpub/img/default_user.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Roberto</h4>
-                            <p>15</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li>
-                        <span>Enviado 12 de maio às 19:33</span>
-                      </li>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Excelente! Veja o nosso cardápio e digite aqui o que deseja. Ah, quanto mais detalhado melhor :)</p>
-                          </div>
-                      </li>
-                      <li class="cons">
-                          <img class="media-object img-circle" src="../../static/marvinpub/img/default_user.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Roberto</h4>
-                            <p>1 Chop escuro 300 ml sem colarinho</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Mais alguma coisa?</p>
-                          </div>
-                      </li>
-                      <li class="cons">
-                          <img class="media-object img-circle" src="../../static/marvinpub/img/default_user.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Roberto</h4>
-                            <p>não</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li>
-                        <span>Enviado 12 de maio às 19:34</span>
-                      </li>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Ok, seu pedido já está indo.</p>
-                          </div>
-                      </li>
-                    </ul>
-                    <div class="box-teclado">
-                      <label>
-                        <input type="text" placeholder="Mensagem..." name="texto">
-                      </label>
-                      <i>Enviar</i>
-                    </div>
-                  </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Fim dialogo-->
-
-            <!-- radio buttons para alterar o status sem arrastar-->
-
-            <div class="footer-pedido">
-              <div class="status-list">
-                <label class="solicitado" class="ativo"><input type="radio" name="solicitado"/><i class="fa fa-hand-paper-o"></i></label>
-                <label class="em-processo"><input type="radio" name="em-processo"/><i class="fa fa-hand-grab-o"></i></label>
-                <label class="concluido"><input type="radio" name="concluido"/><i class="fa fa-hand-pointer-o"></i></label>
-                <label class="entregue"><input type="radio" name="entregue"/><i class="fa fa-thumbs-o-up"></i></label>
-                <label class="cancelado"><input type="radio" name="cancelado"/><i class="fa fa-thumbs-o-down"></i></label>
-              </div>
-            </div>
-          </li>
-
-          <!-- Fim do pedido-->
-
-          <!-- Inicio do pedido-->
-
-          <li class="ui-state-default">
-            <div class="header-pedido">
-              <div class="cabecalho">
-                <img class="media-object img-circle" src="../../static/marvinpub/img/default_user.png" width="40" height="40" alt="">
-                <p>Joana<br> <span class="ultimo">Pedido feito há 3 minutos</span></p>
-              </div>
-            </div>
-            <div class="conteudo-pedido">
-              <ul>
-                <li><label class="status-label"><strong>Número do pedido:</strong> 10500</label></li>
-                <li class="detalhe-pedido-icon">
-                  <label class="status-label">
-                    <strong>Detalhes:</strong>
-                    <i class="logo open-dialogo"></i>
-                    <i class="fa fa-list-ol open-lista-pedidos"></i>
-                    <i>51</i>
-                  </label>
-
-                  <!-- Lista de pedidos-->
-
-                  <div class="lista-pedidos">
-                    <a href="javascript:void(0);" class="close">X</a>
-                    <div class="bs-example">
-                        <div class="list-group">
-
-                            <!-- Item pedido-->
-                            <a href="javascript:void(0);" class="list-group-item">
-                                Chop escuro 300 ml<span class="badge">1</span>
-                            </a>
-                            <!--Fim item-->
-                            <!-- Item pedido-->
-                            <a href="javascript:void(0);" class="list-group-item">
-                                 Coca-cola 600 ml<span class="badge">1</span>
-                            </a>
-                            <!--Fim item-->
-                        </div>
-                    </div>
-                  </div>
-
-                  <!-- inicio dialogo telegram -->
-                    <div class="content-dialog">
-                  <div class="dialogo telegram">
-                    <a href="javascript:void(0);" class="close">X</a>
-                    <div class="cabecalho-chat">
-                      <p>Fábio Marques<br> <span class="ultimo">Último pedido feito há 3 dias</span><p>
-                    </div>
-                    <ul>
-                      <li>
-                        <span>Enviado 12 de maio às 19:32</span>
-                      </li>
-                      <li class="cons">
-                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Fábio</h4>
-                            <p>Olá</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Olá, Fábio! Digite o número de sua mesa para iniciarmos o seu atendimento.</p>
-                          </div>
-                      </li>
-                       <li class="cons">
-                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Fábio</h4>
-                            <p>15</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li>
-                        <span>Enviado 12 de maio às 19:33</span>
-                      </li>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Excelente! Veja o nosso cardápio e digite aqui o que deseja. Ah, quanto mais detalhado melhor :)</p>
-                          </div>
-                      </li>
-                      <li class="cons">
-                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Fábio</h4>
-                            <p>1 chope escuro 300 ml</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Mais alguma coisa?</p>
-                          </div>
-                      </li>
-                      <li class="cons">
-                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Fábio</h4>
-                            <p>não</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li>
-                        <span>Enviado 12 de maio às 19:34</span>
-                      </li>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Ok, seu pedido já está indo.</p>
-                          </div>
-                      </li>
-                    </ul>
-                    <div class="box-teclado">
-                      <label>
-                        <input type="text" placeholder="Mensagem..." name="texto">
-                      </label>
-                      <i>Enviar</i>
-                    </div>
-                  </div>
-                 </div>
-                </li>
-              </ul>
-            </div>
-            <div class="footer-pedido">
-              <div class="status-list">
-                <label class="solicitado" class="ativo"><input type="radio" name="solicitado"/><i class="fa fa-hand-paper-o"></i></label>
-                <label class="em-processo"><input type="radio" name="em-processo"/><i class="fa fa-hand-grab-o"></i></label>
-                <label class="concluido"><input type="radio" name="concluido"/><i class="fa fa-hand-pointer-o"></i></label>
-                <label class="entregue"><input type="radio" name="entregue"/><i class="fa fa-thumbs-o-up"></i></label>
-                <label class="cancelado"><input type="radio" name="cancelado"/><i class="fa fa-thumbs-o-down"></i></label>
-              </div>
-            </div>
-          </li>
+            {% include "includes/snippets/cards_pedido.html" with pedidos=solicitado %}
         </ul>
       </div>
       <div class="coluna">
@@ -392,6 +106,7 @@
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="em-processo" class="droptrue">
+            {% include "includes/snippets/cards_pedido.html" with pedidos=em_processamento %}
         </ul>
       </div>
       <div class="coluna">
@@ -400,6 +115,7 @@
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="concluido" class="droptrue">
+            {% include "includes/snippets/cards_pedido.html" with pedidos=concluido %}
         </ul>
       </div>
       <div class="coluna">
@@ -408,6 +124,7 @@
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="entregue" class="droptrue">
+            {% include "includes/snippets/cards_pedido.html" with pedidos=entregue %}
         </ul>
       </div>
       <div class="coluna">
@@ -416,6 +133,7 @@
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="cancelado" class="droptrue">
+            {% include "includes/snippets/cards_pedido.html" with pedidos=cancelado %}
         </ul>
       </div>
     </div>
@@ -488,83 +206,12 @@
                       </li>
                      {{/if}}
                     {{/each}}
-<!--
-                      <li>
-                        <span>Enviado 12 de maio às 19:32</span>
-                      </li>
-                      <li class="cons">
-                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Fábio</h4>
-                            <p>Olá</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Olá, Fábio! Digite o número de sua mesa para iniciarmos o seu atendimento.</p>
-                          </div>
-                      </li>
-                       <li class="cons">
-                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Fábio</h4>
-                            <p>15</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li>
-                        <span>Enviado 12 de maio às 19:33</span>
-                      </li>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Excelente! Veja o nosso cardápio e digite aqui o que deseja. Ah, quanto mais detalhado melhor :)</p>
-                          </div>
-                      </li>
-                      <li class="cons">
-                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Fábio</h4>
-                            <p>1 chope escuro 300 ml</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Mais alguma coisa?</p>
-                          </div>
-                      </li>
-                      <li class="cons">
-                          <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Fábio</h4>
-                            <p>não</p>
-                          </div>
-                      </li>
-                      <span class="bico"></span>
-                      <li>
-                        <span>Enviado 12 de maio às 19:34</span>
-                      </li>
-                      <li class="est">
-                          <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>Ok, seu pedido já está indo.</p>
-                          </div>
-                      </li>
--->
                     </ul>
                     <div class="box-teclado">
                       <label>
                         <input type="text" placeholder="Mensagem..." name="texto">
                       </label>
-                      <i class="glyphicon glyphicon-play btn-send" id="{{= card_uid}}_btn-send" data-uid="{{= card_uid}}"></i>
+                      <i class="btn-send" id="{{= card_uid}}_btn-send" data-uid="{{= card_uid}}">Enviar</i>
                     </div>
                   </div>
                  </div>
@@ -585,12 +232,22 @@
  </script>
  <script id="template-message" type="text/x-jquery-tmpl">
 {% verbatim %}
+         {{if typeof cliente != 'undefined'}}
+          <li class="cons">
+              <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/marvinpub/img/default_user.png{{/if}}" width="40" height="40" alt="">
+              <div class="balao">
+                <h4 class="media-heading"> {{= nome_cliente}}</h4>
+                <p>{{= cliente}}</p>
+              </div>
+          </li>
+         {{else typeof bot != 'undefined'}}
           <li class="est">
               <div class="balao">
                 <h4 class="media-heading"> Bar Demonstração Indoor</h4>
                 <p>{{= bot}}</p>
               </div>
           </li>
+         {{/if}}
 {% endverbatim %}
  </script>
 
@@ -614,6 +271,31 @@
   function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  function startInterval(card_uid) {
+    var intervalId = setInterval(function() {
+        minutesPassed = parseInt($('#' + card_uid).attr('data-minutes-passed'));
+        minutesPassed += 1;
+        $('#' + card_uid).attr('data-minutes-passed', minutesPassed);
+        $('#' + card_uid).html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
+        $('#' + card_uid + '_1').attr('data-minutes-passed', minutesPassed);
+        $('#' + card_uid + '_1').html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
+    }, 60000);
+    pedidos_interval[card_uid] = intervalId;
+  }
+  function sendMessageBindClick(card_uid) {
+    $("#" + card_uid + "_btn-send").click(function(){
+      var $this = $(this);
+      $.post('/marvin/api/rest/mensagem',
+             {uid: $(this).attr("data-uid"), message: $(this).parent().find("input").val()},
+             function(data) {
+        console.log(data);
+        $.tmpl($('#template-message'), {bot: $this.parent().find("input").val()}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
+        $this.parent().find("input").val('');
+        var objDiv = document.getElementById($this.attr("data-uid") + '_messages');
+        objDiv.scrollTop = objDiv.scrollHeight;
+      });
+    });
   }
   $(document).ready(function($) {
     $.ajaxSetup({
@@ -753,17 +435,6 @@
         }
     });
 
-    $(".btn-send").click(function(){
-      var $this = $(this);
-      $.post('/marvin/api/rest/mensagem',
-             {uid: $(this).attr("data-uid"), message: $(this).parent().find("input").val()},
-             function(data) {
-        console.log(data);
-        $.tmpl($('#template-message'), {bot: $this.parent().find("input").val()}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
-        $this.parent().find("input").val('');
-      });
-    });
-
     var ws4redis = WS4Redis({
         uri: '{{ WEBSOCKET_URI }}1?subscribe-broadcast',
         receive_message: receiveMessage,
@@ -780,26 +451,15 @@
         console.log('Message from Websocket: ' + msg);
         var input = JSON.parse(msg);
         console.log(input);
-        $.tmpl($('#template-pedido'), input).prependTo($('#solicitado'));
-        $("#" + input.card_uid + "_btn-send").click(function(){
-          var $this = $(this);
-          $.post('/marvin/api/rest/mensagem',
-                 {uid: $(this).attr("data-uid"), message: $(this).parent().find("input").val()},
-                 function(data) {
-            console.log(data);
-            $.tmpl($('#template-message'), {bot: $this.parent().find("input").val()}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
-            $this.parent().find("input").val('');
-          });
-        });
-        intervalId = setInterval(function() {
-            minutesPassed = parseInt($('#' + input.card_uid).attr('data-minutes-passed'));
-            minutesPassed += 1;
-            $('#' + input.card_uid).attr('data-minutes-passed', minutesPassed);
-            $('#' + input.card_uid).html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
-            $('#' + input.card_uid + '_1').attr('data-minutes-passed', minutesPassed);
-            $('#' + input.card_uid + '_1').html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
-        }, 60000);
-        pedidos_interval[input.card_uid] = intervalId;
+        if(input.origem == 'chat') {
+            $.tmpl($('#template-message'), input).appendTo($('#' + input.uid + '_messages'));
+            var objDiv = document.getElementById(input.uid + '_messages');
+            objDiv.scrollTop = objDiv.scrollHeight;
+        } else {
+            $.tmpl($('#template-pedido'), input).prependTo($('#solicitado'));
+            sendMessageBindClick(input.card_uid);
+            startInterval(input.card_uid);
+        }
     }
   });
 </script>

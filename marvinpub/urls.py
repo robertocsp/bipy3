@@ -19,6 +19,7 @@ from django.contrib import admin
 from marvinpub.rest import views
 from marvinpub.views import *
 from dashboard.views import *
+from pedido.views import *
 
 urlpatterns = [
     url(r'^$', login_geral, name='login_geral'),
@@ -30,6 +31,7 @@ urlpatterns = [
     url(r'^marvin/api/rest/pedido[/]?$', views.EnviarPedidoView.as_view(), name='enviar_pedido_view'),
     url(r'^marvin/api/rest/status[/]?$', views.StatusPedidoView.as_view(), name='status_pedido_view'),
     url(r'^marvin/api/rest/mensagem[/]?$', views.EnviarMensagemView.as_view(), name='enviar_mensagem_view'),
+    url(r'^marvin/api/rest/mensagem_bot[/]?$', views.EnviarMensagemBotView.as_view(), name='enviar_mensagem_bot_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^upload/$', upload, name='upload')]
 
