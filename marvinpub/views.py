@@ -12,7 +12,7 @@ def login_geral(request):
             username = request.POST['username']
             senha = request.POST['senha']
             user = authenticate(username=username, password=senha)
-            if user != None:
+            if user is not None:
                 login(request, user)
                 # if user.groups.filter(name='marca').count() != 0:
                 #     marca = Marca.objects.get(user=request.user)

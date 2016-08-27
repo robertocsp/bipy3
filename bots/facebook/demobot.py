@@ -197,8 +197,10 @@ def send_quickreply_message(recipient_id, text, quick_replies):
     return post(json=payload)
 
 
-def get_quickreply_menu(passo=0, possui_itens_pedido=False, conversa_suspensa=False):
+def get_quickreply_menu(recipient_id=None, conversa_suspensa=False):
     menu = []
+    possui_itens_pedido = (len(conversas[recipient_id]['itens_pedido']) > 0)
+    mesa_definida = (conversas[recipient_id]['mesa'] is not None)
     pass
     if not conversa_suspensa:
         menu.append(
@@ -219,7 +221,7 @@ def get_quickreply_menu(passo=0, possui_itens_pedido=False, conversa_suspensa=Fa
                 'title': u'Trocar mesa',
                 'payload': 'menu_trocar_mesa'
             })
-    if not conversa_suspensa and possui_itens_pedido:
+    if not conversa_suspensa and possui_itens_pedido and mesa_definida:
         menu.append(
             {
                 'content_type': 'text',
@@ -232,13 +234,14 @@ def get_quickreply_menu(passo=0, possui_itens_pedido=False, conversa_suspensa=Fa
                 'title': u'Rever pedido',
                 'payload': 'menu_rever_pedido'
             })
-    if not conversa_suspensa and passo != 0 and passo != 13:
+    if not conversa_suspensa and mesa_definida:
         menu.append(
             {
                 'content_type': 'text',
                 'title': u'+ itens ao pedido',
                 'payload': 'pedir_mais'
             })
+    if not conversa_suspensa and possui_itens_pedido and mesa_definida:
         menu.append(
             {
                 'content_type': 'text',
@@ -451,7 +454,7 @@ def resposta_dashboard(message=None, payload=None, uid=None, recipient_id=None, 
         passo_finalizar_contato(recipient_id)
     elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() == u'menu':
         result = send_quickreply_message(recipient_id, get_mensagem('auxilio'),
-                                         get_quickreply_menu(conversa_suspensa=True))
+                                         get_quickreply_menu(recipient_id=recipient_id, conversa_suspensa=True))
     else:
         data = {}
         pass
@@ -521,7 +524,7 @@ def hello():
                     conversas[recipient_id] = {
                         'passo': 0,
                         'usuario': user,
-                        'mesa': -1,
+                        'mesa': None,
                         'itens_pedido': [],
                         'conversa': [],
                         'nao_entendidas': 0,
@@ -683,10 +686,7 @@ def passo_finalizar_pedido(message, recipient_id):
         conversas[recipient_id]['conversa'].append({'bot': bot2})
     else:
         bot = get_mensagem('rever2')
-        result = send_quickreply_message(recipient_id, bot,
-                                         get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                             len(conversas[recipient_id]
-                                                                 ['itens_pedido']) > 0))
+        result = send_quickreply_message(recipient_id, bot, get_quickreply_menu(recipient_id=recipient_id))
         conversas[recipient_id]['conversa'].append({'bot': bot})
 
 
@@ -724,10 +724,7 @@ def passo_rever_pedido_2(message, recipient_id):
         conversas[recipient_id]['conversa'].append({'bot': bot2})
     else:
         bot = get_mensagem('rever2')
-        result = send_quickreply_message(recipient_id, bot,
-                                         get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                             len(conversas[recipient_id]
-                                                                 ['itens_pedido']) > 0))
+        result = send_quickreply_message(recipient_id, bot, get_quickreply_menu(recipient_id=recipient_id))
         conversas[recipient_id]['conversa'].append({'bot': bot})
         # TODO pegar os pedidos em aberto do servidor
 
@@ -771,8 +768,8 @@ def passo_novo_pedido(message, recipient_id):
     set_variaveis(recipient_id, datetime_pedido=(True, datetime.datetime.utcnow()))
     if message:
         conversas[recipient_id]['conversa'].append({'cliente': message})
-    conversas[recipient_id]['mesa'] = -1
-    if conversas[recipient_id]['mesa'] == -1:
+    conversas[recipient_id]['mesa'] = None
+    if conversas[recipient_id]['mesa'] is None:
         conversas[recipient_id]['passo'] = 13
         bot = get_mensagem('mesa')
         result = send_text_message(recipient_id, bot)
@@ -785,10 +782,7 @@ def passo_novo_pedido(message, recipient_id):
 def passo_nao_entendido(message, recipient_id):
     conversas[recipient_id]['conversa'].append({'cliente': message})
     bot = get_mensagem('robo')
-    result = send_quickreply_message(recipient_id, bot,
-                                     get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                         len(conversas[recipient_id]
-                                                             ['itens_pedido']) > 0))
+    result = send_quickreply_message(recipient_id, bot, get_quickreply_menu(recipient_id=recipient_id))
     conversas[recipient_id]['conversa'].append({'bot': bot})
 
 
@@ -811,7 +805,7 @@ def passo_tres(message, recipient_id):
 def passo_dois(message, recipient_id):
     conversas[recipient_id]['conversa'].append({'cliente': message})
     is_pedido_anotado = anota_pedido(message, recipient_id)
-    if is_pedido_anotado == True:
+    if is_pedido_anotado is True:
         conversas[recipient_id]['passo'] = 8
         set_variaveis(recipient_id,
                       itens_pedido=(False, None),
@@ -825,11 +819,7 @@ def passo_dois(message, recipient_id):
         conversas[recipient_id]['nao_entendidas'] += 1
         if conversas[recipient_id]['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
-            result = send_quickreply_message(recipient_id, bot,
-                                             get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                                 len(conversas[recipient_id]
-                                                                     ['itens_pedido']) > 0)
-                                             )
+            result = send_quickreply_message(recipient_id, bot, get_quickreply_menu(recipient_id=recipient_id))
             conversas[recipient_id]['conversa'].append({'bot': bot})
         else:
             bot1 = get_mensagem('qtde', arg1=is_pedido_anotado)
@@ -855,11 +845,7 @@ def passo_um(message, recipient_id):
         conversas[recipient_id]['passo'] = 7
         if conversas[recipient_id]['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
-            result = send_quickreply_message(recipient_id, bot,
-                                             get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                                 len(conversas[recipient_id]
-                                                                     ['itens_pedido']) > 0)
-                                             )
+            result = send_quickreply_message(recipient_id, bot, get_quickreply_menu(recipient_id=recipient_id))
             conversas[recipient_id]['conversa'].append({'bot': bot})
         else:
             bot = get_mensagem('mesa1')
@@ -886,11 +872,7 @@ def passo_rever_pedido(message, recipient_id):
         conversas[recipient_id]['nao_entendidas'] += 1
         if conversas[recipient_id]['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
-            result = send_quickreply_message(recipient_id, bot,
-                                             get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                                 len(conversas[recipient_id]
-                                                                     ['itens_pedido']) > 0)
-                                             )
+            result = send_quickreply_message(recipient_id, bot, get_quickreply_menu(recipient_id=recipient_id))
             conversas[recipient_id]['conversa'].append({'bot': bot})
         else:
             bot = get_mensagem('rever1', arg1='1',
@@ -906,10 +888,7 @@ def passo_rever_pedido(message, recipient_id):
                       datetime_pedido=(False, None),
                       conversa=(False, None))
         bot = get_mensagem('auxilio1')
-        result = send_quickreply_message(recipient_id, bot,
-                                         get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                             len(conversas[recipient_id]
-                                                                 ['itens_pedido']) > 0))
+        result = send_quickreply_message(recipient_id, bot, get_quickreply_menu(recipient_id=recipient_id))
         conversas[recipient_id]['conversa'].append({'bot': bot})
 
 
@@ -925,21 +904,14 @@ def passo_trocar_mesa(message, recipient_id):
         bot1 = get_mensagem('mesa3', arg1=conversas[recipient_id]['mesa'])
         bot2 = get_mensagem('auxilio1')
         result = send_text_message(recipient_id, bot1)
-        result = send_quickreply_message(recipient_id, bot2,
-                                         get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                             len(conversas[recipient_id]
-                                                                 ['itens_pedido']) > 0))
+        result = send_quickreply_message(recipient_id, bot2, get_quickreply_menu(recipient_id=recipient_id))
         conversas[recipient_id]['conversa'].append({'bot': bot1})
         conversas[recipient_id]['conversa'].append({'bot': bot2})
     else:
         conversas[recipient_id]['passo'] = 3
         if conversas[recipient_id]['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
-            result = send_quickreply_message(recipient_id, bot,
-                                             get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                                 len(conversas[recipient_id]
-                                                                     ['itens_pedido']) > 0)
-                                             )
+            result = send_quickreply_message(recipient_id, bot, get_quickreply_menu(recipient_id=recipient_id))
             conversas[recipient_id]['conversa'].append({'bot': bot})
         else:
             bot = get_mensagem('mesa1')
@@ -949,10 +921,7 @@ def passo_trocar_mesa(message, recipient_id):
 
 def passo_menu(message, recipient_id):
     bot = get_mensagem('auxilio')
-    result = send_quickreply_message(recipient_id, bot,
-                                     get_quickreply_menu(conversas[recipient_id]['passo'],
-                                                         len(conversas[recipient_id]
-                                                             ['itens_pedido']) > 0))
+    result = send_quickreply_message(recipient_id, bot, get_quickreply_menu(recipient_id=recipient_id))
     if message:
         conversas[recipient_id]['conversa'].append({'cliente': message})
     conversas[recipient_id]['conversa'].append({'bot': bot})
@@ -972,5 +941,4 @@ def passo_ola(message, recipient_id):
 
 if __name__ == "__main__":
     context = ('fullchain.pem', 'privkey.pem')
-    # app.run(host='0.0.0.0', port=80, debug=True)
     app.run(host='0.0.0.0', port=5002, ssl_context=context, threaded=True, debug=True)

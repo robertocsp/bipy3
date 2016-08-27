@@ -10,48 +10,50 @@
   </div>
     <div class="filtros-pedidos">
        <div class="form-group col-md-6">
+         <form action="/pedidos/" method="get" onsubmit="$('#data_hora_btn_filtro').replaceWith($('<img src=\'/static/marvinpub/img/loading.gif\'></img>'))">
           <div class="col-md-12">
             <h4 class="font17"><i class="fa fa-calendar-times-o"></i> Visualizar os pedidos a partir de:</h4><br>
           </div>
           <div class="col-md-6">
-              <input type="text" placeholder="selecione a data..." id="pedido-de" class="form-control">
+              <input type="text" name="data_filtro" value="{% if filtros.data_filtro %}{{filtros.data_filtro}}{% endif %}" placeholder="selecione a data..." id="pedido-de" class="form-control">
           </div>
           <div class="col-md-6">
             <label>
-              <select class="form-control">
-                  <option>00:00</option>
-                  <option>01:00</option>
-                  <option>02:00</option>
-                  <option>03:00</option>
-                  <option>04:00</option>
-                  <option>05:00</option>
-                  <option>06:00</option>
-                  <option>07:00</option>
-                  <option>08:00</option>
-                  <option>09:00</option>
-                  <option>10:00</option>
-                  <option>11:00</option>
-                  <option>12:00</option>
-                  <option>13:00</option>
-                  <option>14:00</option>
-                  <option>15:00</option>
-                  <option>16:00</option>
-                  <option>17:00</option>
-                  <option>18:00</option>
-                  <option>19:00</option>
-                  <option>20:00</option>
-                  <option>21:00</option>
-                  <option>22:00</option>
-                  <option>23:00</option>
+              <select name="hora_filtro" class="form-control">
+                  <option value="00:00" {% if filtros.hora_filtro and filtros.hora_filtro = '00:00' %}selected="selected"{% endif %}>00:00</option>
+                  <option value="01:00" {% if filtros.hora_filtro and filtros.hora_filtro = '01:00' %}selected="selected"{% endif %}>01:00</option>
+                  <option value="02:00" {% if filtros.hora_filtro and filtros.hora_filtro = '02:00' %}selected="selected"{% endif %}>02:00</option>
+                  <option value="03:00" {% if filtros.hora_filtro and filtros.hora_filtro = '03:00' %}selected="selected"{% endif %}>03:00</option>
+                  <option value="04:00" {% if filtros.hora_filtro and filtros.hora_filtro = '04:00' %}selected="selected"{% endif %}>04:00</option>
+                  <option value="05:00" {% if filtros.hora_filtro and filtros.hora_filtro = '05:00' %}selected="selected"{% endif %}>05:00</option>
+                  <option value="06:00" {% if filtros.hora_filtro and filtros.hora_filtro = '06:00' %}selected="selected"{% endif %}>06:00</option>
+                  <option value="07:00" {% if filtros.hora_filtro and filtros.hora_filtro = '07:00' %}selected="selected"{% endif %}>07:00</option>
+                  <option value="08:00" {% if filtros.hora_filtro and filtros.hora_filtro = '08:00' %}selected="selected"{% endif %}>08:00</option>
+                  <option value="09:00" {% if filtros.hora_filtro and filtros.hora_filtro = '09:00' %}selected="selected"{% endif %}>09:00</option>
+                  <option value="10:00" {% if filtros.hora_filtro and filtros.hora_filtro = '10:00' %}selected="selected"{% endif %}>10:00</option>
+                  <option value="11:00" {% if filtros.hora_filtro and filtros.hora_filtro = '11:00' %}selected="selected"{% endif %}>11:00</option>
+                  <option value="12:00" {% if filtros.hora_filtro and filtros.hora_filtro = '12:00' %}selected="selected"{% endif %}>12:00</option>
+                  <option value="13:00" {% if filtros.hora_filtro and filtros.hora_filtro = '13:00' %}selected="selected"{% endif %}>13:00</option>
+                  <option value="14:00" {% if filtros.hora_filtro and filtros.hora_filtro = '14:00' %}selected="selected"{% endif %}>14:00</option>
+                  <option value="15:00" {% if filtros.hora_filtro and filtros.hora_filtro = '15:00' %}selected="selected"{% endif %}>15:00</option>
+                  <option value="16:00" {% if filtros.hora_filtro and filtros.hora_filtro = '16:00' %}selected="selected"{% endif %}>16:00</option>
+                  <option value="17:00" {% if filtros.hora_filtro and filtros.hora_filtro = '17:00' %}selected="selected"{% endif %}>17:00</option>
+                  <option value="18:00" {% if filtros.hora_filtro and filtros.hora_filtro = '18:00' %}selected="selected"{% endif %}>18:00</option>
+                  <option value="19:00" {% if filtros.hora_filtro and filtros.hora_filtro = '19:00' %}selected="selected"{% endif %}>19:00</option>
+                  <option value="20:00" {% if filtros.hora_filtro and filtros.hora_filtro = '20:00' %}selected="selected"{% endif %}>20:00</option>
+                  <option value="21:00" {% if filtros.hora_filtro and filtros.hora_filtro = '21:00' %}selected="selected"{% endif %}>21:00</option>
+                  <option value="22:00" {% if filtros.hora_filtro and filtros.hora_filtro = '22:00' %}selected="selected"{% endif %}>22:00</option>
+                  <option value="23:00" {% if filtros.hora_filtro and filtros.hora_filtro = '23:00' %}selected="selected"{% endif %}>23:00</option>
               </select><br>
             </label>
           </div>
 
           <div class="col-md-12">
-              <button type="submit" class="btn btn-primary btn-verde">
+              <button id="data_hora_btn_filtro" type="submit" class="btn btn-primary btn-verde">
                   <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Selecionar Data/Horario
                 </button><br>
           </div>
+         </form>
       </div>
       <div class="col-md-6">
             <h4><i class="fa fa-filter"></i> Filtrar pedidos</h4><br>
