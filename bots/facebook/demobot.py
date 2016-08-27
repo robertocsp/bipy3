@@ -201,7 +201,7 @@ def get_quickreply_menu(recipient_id=None, conversa_suspensa=False):
     menu = []
     possui_itens_pedido = (len(conversas[recipient_id]['itens_pedido']) > 0)
     mesa_definida = (conversas[recipient_id]['mesa'] is not None)
-    pass
+    pedido_andamento = (conversas[recipient_id]['datahora_inicio_pedido'] is not None)
     if not conversa_suspensa:
         menu.append(
             {
@@ -221,7 +221,7 @@ def get_quickreply_menu(recipient_id=None, conversa_suspensa=False):
                 'title': u'Trocar mesa',
                 'payload': 'menu_trocar_mesa'
             })
-    if not conversa_suspensa and possui_itens_pedido and mesa_definida:
+    if not conversa_suspensa and possui_itens_pedido and mesa_definida and pedido_andamento:
         menu.append(
             {
                 'content_type': 'text',
@@ -234,14 +234,14 @@ def get_quickreply_menu(recipient_id=None, conversa_suspensa=False):
                 'title': u'Rever pedido',
                 'payload': 'menu_rever_pedido'
             })
-    if not conversa_suspensa and mesa_definida:
+    if not conversa_suspensa and mesa_definida and pedido_andamento:
         menu.append(
             {
                 'content_type': 'text',
                 'title': u'+ itens ao pedido',
                 'payload': 'pedir_mais'
             })
-    if not conversa_suspensa and possui_itens_pedido and mesa_definida:
+    if not conversa_suspensa and possui_itens_pedido and mesa_definida and pedido_andamento:
         menu.append(
             {
                 'content_type': 'text',
