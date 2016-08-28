@@ -3,6 +3,7 @@
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
+from django.db.models import Q
 
 from pedido.models import Pedido
 
@@ -25,7 +26,9 @@ def pedidos(request):
         valor_data_filtro = datetime.datetime.strptime(data_filtro, '%d/%m/%Y').date()
         valor_hora_filtro = datetime.datetime.strptime(hora_filtro, '%H:%M').time()
         logger.debug('-=-=-=-=-=-=-=- data2 e hora2: ' + repr(valor_data_filtro) + ' - ' + repr(valor_hora_filtro))
-        pedidos_resultado = Pedido.objects.filter(loja=1, data__gte=valor_data_filtro, hora__gte=hora_filtro)\
+        pedidos_resultado = Pedido.objects.filter(
+            Q(loja=1),
+            Q(data__gt=valor_data_filtro) | Q(data=valor_data_filtro, hora__gte=hora_filtro))\
             .order_by('status', 'data', 'hora').select_related('cliente')
     else:
         pedidos_resultado = Pedido.objects.filter(loja=1).order_by('status', 'data', 'hora').select_related('cliente')
