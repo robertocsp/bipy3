@@ -1121,3 +1121,43 @@ h4, h5{
 .form-user label{
     font-weight: bold;
 }
+
+/*tela relacionamento*/
+
+.dias{
+    width: 50px;
+    margin-top: -6px;
+}
+
+.label-margin{
+    margin-top: 8px;
+}
+
+.relacionamento .coluna h3 span{
+    font-size: 20px;
+}
+
+.relacionamento .coluna{
+    width: 100%;
+    margin-top: 30px;
+}
+
+.relacionamento .border-right{
+    border-right: 1px solid #eee;
+}
+
+.relacionamento .coluna .conteudo-pedido {
+    height: 70px;
+}
+
+.relacionamento .droptrue li ul li:last-child {
+    margin: 0px 0 8px 6px;
+}
+
+.relacionamento .droptrue > li {
+    height: 121px;
+}
+
+.relacionamento .detalhe-pedido-icon .dialogo {
+    top: 360px;
+}

@@ -33,7 +33,8 @@ urlpatterns = [
     url(r'^marvin/api/rest/mensagem[/]?$', views.EnviarMensagemView.as_view(), name='enviar_mensagem_view'),
     url(r'^marvin/api/rest/mensagem_bot[/]?$', views.EnviarMensagemBotView.as_view(), name='enviar_mensagem_bot_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
-    url(r'^upload/$', upload, name='upload')]
+    url(r'^upload/$', upload, name='upload'),
+    url(r'^relacionamento/$', relacionamento, name='relacionamento')]
 
 
 
