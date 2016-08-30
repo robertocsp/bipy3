@@ -21,7 +21,7 @@ except ImportError:
     from urlparse import parse_qs
     from urllib import urlencode
 
-app = Flask(__name__)
+flask_app = Flask(__name__)
 FACEBOOK_GRAPH_URL = "https://graph.facebook.com/v2.7"
 # Ajustar o valor de BASE_DIR conforme necessidade
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -45,6 +45,7 @@ app_log.addHandler(logging_handler)
 conversas = {}
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
+ROBOT_ICON = u'\U0001f916'
 
 
 class GraphAPIError(Exception):
@@ -161,7 +162,7 @@ def send_button_message(recipient_id, text, buttons):
                     'template_type': 'generic',
                     'elements': [
                         {
-                            'title': text,
+                            'title': ROBOT_ICON + ': ' + text,
                             'buttons': buttons
                         }
                     ]
@@ -172,25 +173,33 @@ def send_button_message(recipient_id, text, buttons):
     return post(json=payload)
 
 
-def send_text_message(recipient_id, text):
+def send_text_message(recipient_id, text, icon=ROBOT_ICON):
+    if icon:
+        payload_text = icon + ': ' + text
+    else:
+        payload_text = text
     payload = {
         'recipient': {
             'id': recipient_id
         },
         'message': {
-            'text': text
+            'text': payload_text
         }
     }
     return post(json=payload)
 
 
-def send_quickreply_message(recipient_id, text, quick_replies):
+def send_quickreply_message(recipient_id, text, quick_replies, icon=ROBOT_ICON):
+    if icon:
+        payload_text = icon + ': ' + text
+    else:
+        payload_text = text
     payload = {
         'recipient': {
             'id': recipient_id
         },
         'message': {
-            'text': text,
+            'text': payload_text,
             'quick_replies': quick_replies
         }
     }
@@ -450,11 +459,8 @@ def enviar_pedido(recipient_id, user_name, foto, itens_pedido, conversa, mesa):
 
 
 def resposta_dashboard(message=None, payload=None, uid=None, recipient_id=None, user_name=None, foto=None):
-    if payload == 'menu_finalizar_contato':
+    if unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() == u'menu':
         passo_finalizar_contato(recipient_id)
-    elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() == u'menu':
-        result = send_quickreply_message(recipient_id, get_mensagem('auxilio'),
-                                         get_quickreply_menu(recipient_id=recipient_id, conversa_suspensa=True))
     else:
         data = {}
         pass
@@ -494,14 +500,14 @@ def set_variaveis(recipient_id, nao_entendidas=(True, 0), itens_pedido=(True, No
     app_log.debug('==set_variaveis=======================>>>>> 13 ' + repr(conversas[recipient_id]['conversa']))
 
 
-@app.route('/', defaults={'path': ''})
-@app.route('/.well-known/acme-challenge/<path:path>')
+@flask_app.route('/', defaults={'path': ''})
+@flask_app.route('/.well-known/acme-challenge/<path:path>')
 def ping(path):
     return send_from_directory('.well-known/acme-challenge', path, as_attachment=False,
                                mimetype='text/plain')
 
 
-@app.route("/webhook", methods=['GET', 'POST'])
+@flask_app.route("/webhook", methods=['GET', 'POST'])
 def hello():
     if request.method == 'GET':
         if request.args.get('hub.verify_token') == 'verificacao-muita-segura-do-demo-indoor-bot':
@@ -521,6 +527,9 @@ def hello():
                     app_log.debug('conversas:: ' + repr(conversas))
                 except KeyError:
                     user = get_object(recipient_id)
+                    # while not user.ready:
+                    #    app_log.debug('user.ready: ' + repr(user.ready))
+                    #    pass
                     conversas[recipient_id] = {
                         'passo': 0,
                         'usuario': user,
@@ -532,6 +541,7 @@ def hello():
                         'suspensa': 0,
                         'uid': None
                     }
+                    # user = user.get()
                     app_log.debug('usuario:: ' + repr(user))
 
             if x.get('message'):
@@ -616,19 +626,17 @@ def hello():
             elif x.get('dashboard'):
                 conversas[recipient_id]['suspensa'] += 1
                 conversas[recipient_id]['uid'] = x['dashboard']['uid']
-                if conversas[recipient_id]['suspensa'] == 1:
-                    result = send_text_message(recipient_id, get_mensagem('dashboard', arg1=conversas[recipient_id]
-                                                                                                     ['usuario']
-                                                                                                     ['first_name']))
-                result = send_text_message(recipient_id, x['dashboard']['message'])
+                # if conversas[recipient_id]['suspensa'] == 1:
+                #    result = send_text_message(recipient_id, get_mensagem('dashboard', arg1=conversas[recipient_id]
+                #                                                                                     ['usuario']
+                #                                                                                     ['first_name']))
+                result = send_text_message(recipient_id, x['dashboard']['message'], icon=u'\U0001f468')
         resp = Response('success', status=200, mimetype='text/plain')
         resp.status_code = 200
         return resp
 
 
 def passo_finalizar_contato(recipient_id):
-    result = send_text_message(recipient_id, get_mensagem('dashboard2'))
-    # TODO verificar onde parou e dar mensagem para retomar o atendimento'
     if conversas[recipient_id]['passo'] == 0 or conversas[recipient_id]['passo'] == 1 or \
             conversas[recipient_id]['passo'] == 2 or conversas[recipient_id]['passo'] == 5:
         passo_menu(None, recipient_id)
@@ -681,7 +689,7 @@ def passo_finalizar_pedido(message, recipient_id):
         bot1 = pedidos
         bot2 = get_mensagem('finalizar')
         result = send_text_message(recipient_id, bot1)
-        result = send_quickreply_message(recipient_id, bot2, get_quickreply_finalizar_pedido())
+        result = send_quickreply_message(recipient_id, bot2, get_quickreply_finalizar_pedido(), icon=None)
         conversas[recipient_id]['conversa'].append({'bot': bot1})
         conversas[recipient_id]['conversa'].append({'bot': bot2})
     else:
@@ -719,7 +727,7 @@ def passo_rever_pedido_2(message, recipient_id):
         bot1 = get_mensagem('rever')
         bot2 = pedidos
         result = send_text_message(recipient_id, bot1)
-        result = send_text_message(recipient_id, bot2)
+        result = send_text_message(recipient_id, bot2, icon=None)
         conversas[recipient_id]['conversa'].append({'bot': bot1})
         conversas[recipient_id]['conversa'].append({'bot': bot2})
     else:
@@ -825,7 +833,7 @@ def passo_dois(message, recipient_id):
             bot1 = get_mensagem('qtde', arg1=is_pedido_anotado)
             bot2 = get_mensagem('qtde1')
             result = send_text_message(recipient_id, bot1)
-            result = send_text_message(recipient_id, bot2)
+            result = send_text_message(recipient_id, bot2, icon=None)
             conversas[recipient_id]['conversa'].append({'bot': bot1})
             conversas[recipient_id]['conversa'].append({'bot': bot2})
 
@@ -858,8 +866,8 @@ def mensagem_pedido(recipient_id):
     bot2 = get_mensagem('pedido1')
     bot3 = get_mensagem('pedido2')
     result = send_text_message(recipient_id, bot1)
-    result = send_text_message(recipient_id, bot2)
-    result = send_text_message(recipient_id, bot3)
+    result = send_text_message(recipient_id, bot2, icon=None)
+    result = send_text_message(recipient_id, bot3, icon=None)
     conversas[recipient_id]['conversa'].append({'bot': bot1})
     conversas[recipient_id]['conversa'].append({'bot': bot2})
     conversas[recipient_id]['conversa'].append({'bot': bot3})
@@ -933,7 +941,7 @@ def passo_ola(message, recipient_id):
     bot2 = get_mensagem('menu')
     result = send_text_message(recipient_id, bot1)
     app_log.debug(result)
-    result = send_text_message(recipient_id, bot2)
+    result = send_text_message(recipient_id, bot2, icon=None)
     conversas[recipient_id]['conversa'].append({'cliente': message})
     conversas[recipient_id]['conversa'].append({'bot': bot1})
     conversas[recipient_id]['conversa'].append({'bot': bot2})
@@ -941,4 +949,4 @@ def passo_ola(message, recipient_id):
 
 if __name__ == "__main__":
     context = ('fullchain.pem', 'privkey.pem')
-    app.run(host='0.0.0.0', port=5002, ssl_context=context, threaded=True, debug=True)
+    flask_app.run(host='0.0.0.0', port=5002, ssl_context=context, threaded=True, debug=True)
