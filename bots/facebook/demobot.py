@@ -45,7 +45,7 @@ app_log.addHandler(logging_handler)
 conversas = {}
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
-ROBOT_ICON = u'\U0001f464'
+ROBOT_ICON = u'\U0001f4bb'
 
 
 class GraphAPIError(Exception):
@@ -630,7 +630,7 @@ def hello():
                 #    result = send_text_message(recipient_id, get_mensagem('dashboard', arg1=conversas[recipient_id]
                 #                                                                                     ['usuario']
                 #                                                                                     ['first_name']))
-                result = send_text_message(recipient_id, x['dashboard']['message'], icon=u'\U0001f468')
+                result = send_text_message(recipient_id, x['dashboard']['message'], icon=u'\U0001f464')
         resp = Response('success', status=200, mimetype='text/plain')
         resp.status_code = 200
         return resp
