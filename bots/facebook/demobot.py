@@ -45,7 +45,7 @@ app_log.addHandler(logging_handler)
 conversas = {}
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
-ROBOT_ICON = u'\U0001f916'
+ROBOT_ICON = u'\U0001f464'
 
 
 class GraphAPIError(Exception):
