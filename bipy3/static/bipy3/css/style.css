@@ -80,15 +80,20 @@ ul, li{
 }
 
 .navbar-header a img{
-    margin: -11px 0 0 0;
+    margin: -15px 0 0 0;
     float: left;
-    width: 29px;
-    height: 32px;
+    width: 108px;
+    height: 55px;
 }
 
 .navbar-header a span.menor{
     font-size: 20px;
     margin: 5px 0 0 0px;
+}
+
+.logo-login a img{
+    width: 438px;
+    margin-left: -105px;
 }
 
 .geral{
@@ -146,7 +151,7 @@ ul, li{
 }
 
 .form-login form{
-	margin: 95px auto 60px auto;
+	margin: 45px auto 60px auto;
     width: 300px;
 }
 
