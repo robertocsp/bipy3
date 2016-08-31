@@ -6,7 +6,7 @@
   <li class="ui-state-default" data-uid="{{ card_uid }}">
     <div class="header-pedido">
       <div class="cabecalho">
-        <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/marvinpub/img/default_user.png{% endif %}" width="40" height="40" alt="" >
+        <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/bipy3/img/default_user.png{% endif %}" width="40" height="40" alt="" >
         <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span id="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
       </div>
     </div>
@@ -45,7 +45,7 @@
             {% for item in pedido.historico %}
              {% if 'cliente' in item %}
               <li class="cons">
-                  <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/marvinpub/img/default_user.png{% endif %}" width="40" height="40" alt="">
+                  <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/bipy3/img/default_user.png{% endif %}" width="40" height="40" alt="">
                   <div class="balao">
                     <h4 class="media-heading"> {{ pedido.cliente.nome }}</h4>
                     <p>{{ item.cliente }}</p>

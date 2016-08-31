@@ -10,7 +10,7 @@
   </div>
     <div class="filtros-pedidos">
        <div class="form-group col-md-6">
-         <form action="/pedidos/" method="get" onsubmit="$('#data_hora_btn_filtro').replaceWith($('<img src=\'/static/marvinpub/img/loading.gif\'></img>'))">
+         <form action="/pedidos/" method="get" onsubmit="$('#data_hora_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'))">
           <div class="col-md-12">
             <h4 class="font17"><i class="fa fa-calendar-times-o"></i> Visualizar os pedidos a partir de:</h4><br>
           </div>
@@ -150,7 +150,7 @@
           <li class="ui-state-default" data-uid="{{= card_uid}}>
             <div class="header-pedido">
               <div class="cabecalho">
-                <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/marvinpub/img/default_user.png{{/if}}" width="40" height="40" alt="" >
+                <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="" >
                 <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
               </div>
             </div>
@@ -193,7 +193,7 @@
                     {{each mensagem}}
                      {{if typeof cliente != 'undefined'}}
                       <li class="cons">
-                          <img class="media-object img-circle" src="{{if typeof $data.foto_cliente != 'undefined'}}{{= $data.foto_cliente}}{{else}}../../static/marvinpub/img/default_user.png{{/if}}" width="40" height="40" alt="">
+                          <img class="media-object img-circle" src="{{if typeof $data.foto_cliente != 'undefined'}}{{= $data.foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="">
                           <div class="balao">
                             <h4 class="media-heading"> {{= $data.nome_cliente}}</h4>
                             <p>{{= cliente}}</p>
@@ -236,7 +236,7 @@
 {% verbatim %}
          {{if typeof cliente != 'undefined'}}
           <li class="cons">
-              <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/marvinpub/img/default_user.png{{/if}}" width="40" height="40" alt="">
+              <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="">
               <div class="balao">
                 <h4 class="media-heading"> {{= nome_cliente}}</h4>
                 <p>{{= cliente}}</p>

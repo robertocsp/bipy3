@@ -25,7 +25,7 @@ flask_app = Flask(__name__)
 FACEBOOK_GRAPH_URL = "https://graph.facebook.com/v2.7"
 # Ajustar o valor de BASE_DIR conforme necessidade
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-with open(os.path.join(os.path.join(BASE_DIR, 'marvinpub_conf'), 'keys.txt')) as keys_file:
+with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'keys.txt')) as keys_file:
     for line in keys_file:
         key_value_pair = line.strip().split('=')
         if key_value_pair[0] == 'facebook_token':
@@ -406,7 +406,7 @@ def anota_pedido(message, recipient_id):
             app_log.debug('=========================>>>>> 2 ' + item)
             item_pedido = item.strip().split(' ', 1)
             quantidade = [int(qtde) for qtde in [item_pedido[0]] if qtde.isdigit()]
-            if len(quantidade) == 0:
+            if len(quantidade) == 0 or (quantidade[0] > 0 and len(item_pedido) == 1):
                 pedido.append({
                     'descricao': item,
                     'quantidade': 1

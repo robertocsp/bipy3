@@ -1,4 +1,4 @@
-"""marvinpub URL Configuration
+"""bipy3 URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.8/topics/http/urls/
@@ -16,8 +16,8 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from marvinpub.rest import views
-from marvinpub.views import *
+from bipy3.rest import views
+from bipy3.views import *
 from dashboard.views import *
 from pedido.views import *
 

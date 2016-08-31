@@ -1,5 +1,5 @@
 """
-WSGI config for marvinpub project.
+WSGI config for bipy3 project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -14,7 +14,7 @@ import gevent.socket
 import redis.connection
 
 redis.connection.socket = gevent.socket
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "marvinpub.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bipy3.settings")
 
 from ws4redis.uwsgi_runserver import uWSGIWebsocketServer
 

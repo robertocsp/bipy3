@@ -5,7 +5,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework import views
 from rest_framework.response import Response
 
-from marvinpub.websocket import ws
+from bipy3.websocket import ws
 from pedido.models import Pedido, ItemPedido
 from cliente.models import Cliente
 
@@ -171,7 +171,6 @@ class EnviarMensagemView(views.APIView):
                     um_pedido.historico.append({ator: mensagem})
                     um_pedido.save()
                     return um_pedido
-
 
 
 class EnviarMensagemBotView(views.APIView):
