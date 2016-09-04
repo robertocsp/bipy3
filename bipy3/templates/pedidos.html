@@ -73,7 +73,7 @@
             </div>
         </div>
     </div>
-    <div class="dnd">
+    <div class="dnd"><button onclick="notify('white')">teste notificacao</button>
         <div class="linha-btn">
             <select class="form-control status-combo" id="sel1">
               <option value="status" selected="selected">Todos os Status</option>
@@ -145,7 +145,8 @@
 {% endblock %}
 
 {% block scripts %}
-  <script id="template-pedido" type="text/x-jquery-tmpl">
+
+<script id="template-pedido" type="text/x-jquery-tmpl">
 {% verbatim %}
           <li class="ui-state-default" data-uid="{{= card_uid}}>
             <div class="header-pedido">
@@ -463,7 +464,24 @@
             startInterval(input.card_uid);
         }
     }
+
   });
+</script>
+
+<script type="text/javascript">
+    //Notificacao
+    function notify(style) {
+        $.notify({
+            title: 'Novo Pedido Realizado',
+            text: '<strong>Fabio Marques</strong> da <strong>mesa 59</strong><br /> fez um novo pedido',
+            image: "<img class='img-circle' width='50px' src='https://scontent.xx.fbcdn.net/v/t1.0-1/p200x200/12243443_986437741413043_7091711780184954737_n.jpg?oh=e295a08a8f769b82d6416e6c4d3c4510&oe=584A08C2'/>"
+        }, {
+            style: 'metro',
+            className: style,
+            autoHide: false,
+            clickToHide: true
+        });
+    }
 </script>
 
 {% endblock %}
