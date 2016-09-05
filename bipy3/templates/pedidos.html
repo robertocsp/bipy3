@@ -73,7 +73,7 @@
             </div>
         </div>
     </div>
-    <div class="dnd"><button onclick="notify('white')">teste notificacao</button>
+    <div class="dnd"><button onclick="notify('bipy3')">teste notificacao</button>
         <div class="linha-btn">
             <select class="form-control status-combo" id="sel1">
               <option value="status" selected="selected">Todos os Status</option>
@@ -471,17 +471,32 @@
 <script type="text/javascript">
     //Notificacao
     function notify(style) {
+        $.notify.addStyle("bipy3", {
+            html:
+                "<div>" +
+                    "<time data-notify-html='time' />" +
+                    "<div class='image' data-notify-html='image'/>" +
+                    "<div class='text-wrapper'>" +
+                        "<div class='text' data-notify-html='text'/>" +
+                    "</div>" +
+                    "<i class='fa fa-bell icon-push text-laranja'></i>" +
+                "</div>"
+        });
+
         $.notify({
-            title: 'Novo Pedido Realizado',
             text: '<strong>Fabio Marques</strong> da <strong>mesa 59</strong><br /> fez um novo pedido',
-            image: "<img class='img-circle' width='50px' src='https://scontent.xx.fbcdn.net/v/t1.0-1/p200x200/12243443_986437741413043_7091711780184954737_n.jpg?oh=e295a08a8f769b82d6416e6c4d3c4510&oe=584A08C2'/>"
+            image: "<img class='img-circle' width='40px' src='https://scontent.xx.fbcdn.net/v/t1.0-1/p200x200/12243443_986437741413043_7091711780184954737_n.jpg?oh=e295a08a8f769b82d6416e6c4d3c4510&oe=584A08C2'/>",
+            time: '22:57'
         }, {
-            style: 'metro',
+            style: 'bipy3',
             className: style,
             autoHide: false,
+            autoHideDelay: 9000,
             clickToHide: true
         });
+
     }
+
 </script>
 
 {% endblock %}

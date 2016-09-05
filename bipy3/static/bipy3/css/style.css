@@ -623,18 +623,19 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 
 .coluna .detalhe-pedido-icon a.close{
     position: absolute;
-    top: -8px;
+    top: -13px;
     right: -11px;
     background: #fff;
     margin: 0;
     opacity: 1;
-    width: 25px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     text-align: center;
     color: #aaa;
     border: 2px solid #aaa;
     z-index: 100;
     border-radius: 33px;
+    line-height: 27px;
 }
 
 .coluna .detalhe-pedido-icon .lista-pedidos a.close{
@@ -1165,4 +1166,19 @@ h4, h5{
 
 .relacionamento .detalhe-pedido-icon .dialogo {
     top: 360px;
+}
+
+.icon-push{
+    position: absolute;
+    top: 48px;
+    z-index: 10;
+    left: 35px;
+}
+
+.icon-push:before{
+    font-size: 19px;
+}
+
+.ui-datepicker-div{
+    width: 270px;
 }
