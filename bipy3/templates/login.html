@@ -21,10 +21,17 @@
                   <span class="input-group-addon" id="basic-addon1"><span class="fa fa-unlock" aria-hidden="true"></span></span>
                   <input type="password" id="id_senha" name="senha" class="form-control" placeholder="Senha..." aria-describedby="basic-addon1">
                 </div><br />
+                <label>
+                    <select name="loja" class="form-control">
+                        <option selected="selected">Selecione a Loja</option>
+                        <option>Loja 1</option>
+                        <option>Loja 2</option>
+                    </select>
+                </label><br /><br />
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary btn-verde">
+                <button type="submit" class="btn btn-primary btn-verde btn-border-white">
                   <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Entrar
-                </button><br /><br />
+                </button><span class="loading-login">loading...</span><br /><br />
                 <a href="#">Esqueci minha senha</a>
             </form>
         </div>

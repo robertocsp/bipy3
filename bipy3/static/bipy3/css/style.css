@@ -119,7 +119,7 @@ ul, li{
 }
 
 .right-login{
-	background: #d25c5c;
+	background: rgba(75,192,192,1);
 }
 
 .right-login h1{
@@ -155,6 +155,10 @@ ul, li{
     width: 300px;
 }
 
+.no-padding{
+    padding: 0;
+}
+
 .font17{
     font-size: 17px;
 }
@@ -163,6 +167,21 @@ ul, li{
     color: #fff;
     background-color: rgba(75,192,192,1);
     border-color: rgba(75,192,192,1);
+}
+
+.form-login .btn-border-white{
+    border: 1px solid #fff;
+    border-color: #fff !important;
+}
+
+.loading-login{
+    width: 35px;
+    height: 35px;
+    float: right;
+    margin-right: 175px;
+    text-indent: -999em;
+    background: url('../img/loaders2.gif') no-repeat 0 0;
+    background-size: 35px 35px;
 }
 
 .geral p, .geral a, .geral a:hover{

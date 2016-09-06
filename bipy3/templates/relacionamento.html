@@ -13,14 +13,27 @@
         <h4><i class="fa fa-filter"></i> Filtrar</h4><br>
         <div class="form-group">
 
-          <div class="col-md-6">
-            <input type="text" id="ultimo" placeholder="Data do ultimo pedido..." class="form-control"><br>
+          <div class="col-md-4">
+            <input type="text" id="ultimo" placeholder="Ultimo pedido..." class="form-control"><br>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <input type="text" placeholder="Nome do cliente..." class="form-control"><br>
           </div>
+          <div class="col-md-4">
+              <label>
+                  <select name="sexo" class="form-control">
+                      <option selected>Sexo</option>
+                      <option>Masculino</option>
+                      <option>Feminino</option>
+                  </select>
+              </label>
+          </div>
           <div class="col-md-10 label-margin">
-            <label class="col-md-7">Ultima interacao feita ha mais de</label><input type="text" placeholder="" class="col-md-1 dias form-control"><label class="col-md-2">dias</label><br>
+            <label class="col-md-7 font17 no-padding">Ultima interacao feita ha mais de</label><input type="text" placeholder="" class="col-md-1 dias form-control"><label class="col-md-2 font17">dias</label><br>
+          </div>
+
+          <div class="col-md-8"><br><br>
+              <label class="col-md-4 font17 no-padding">Idade entre </label><input type="text" class="col-md-2 dias form-control"><label class="col-md-1 font17"> e </label><input type="text" class="col-md-2 dias form-control"></label>
           </div>
           <div class="col-md-12"><br>
               <button type="submit" class="btn btn-primary btn-verde">
@@ -32,7 +45,7 @@
         <div class="form-group col-md-6">
          <form action="/pedidos/" method="get" onsubmit="$('#data_hora_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'))">
           <div class="col-md-12">
-            <h4 class="font17"><i class="fa fa-comments-o"></i> Enviar mensagem para todos os clientes:</h4><br>
+            <h4 class="font17"><i class="fa fa-comments-o"></i> Enviar mensagem para os clientes selecionados abaixo:</h4><br>
           </div>
           <div class="col-md-12">
               <textarea type="text" value="" placeholder="Digite aqui a mensagem..." class="form-control"></textarea>
