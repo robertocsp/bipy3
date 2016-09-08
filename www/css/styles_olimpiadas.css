@@ -1,0 +1,53 @@
+﻿header{
+    background-image: url('../images/parque_olimpico.jpeg');
+}
+
+body header .color-overlay {
+    background: none;
+}
+
+header .intro-section .intro.titulo-p{
+    background-color: #3B72A2;
+    line-height: 3.6rem;
+    display: inline;
+    padding: 7px 0;
+    opacity: .7;
+}
+
+header .intro-section .intro.titulo-p span{
+    margin: 0 8px;
+}
+
+.nav-trad{
+    margin: 20px -83px 0 0px;
+    float: right;
+}
+
+#kane-navigation .navbar-left{
+    margin-left: 200px;
+}
+
+.text-left{
+    text-align: left;
+}
+
+.nomeservico{
+    color: #989dbb;
+    font-size: 1.25em;
+}
+
+.reserva{
+    font-size: 30px;
+    color: #3B72A2;
+    background: #fff;
+    border-radius: 5px;
+    font-weight: bold;
+    padding: 10px;
+    margin-top: 20px;
+    display: block;
+    width: 200px;
+}
+
+.reserva-en{
+    width: 400px;
+}
