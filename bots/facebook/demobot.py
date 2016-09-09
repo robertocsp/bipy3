@@ -27,6 +27,13 @@ except ImportError:
     from urllib import urlencode
 
 
+logging_handler = RotatingFileHandler(filename='demoindoorbot.log', maxBytes=3*1024*1024, backupCount=2)
+logging_handler.setFormatter(Formatter(logging.BASIC_FORMAT, None))
+app_log = logging.getLogger('root')
+app_log.setLevel(logging.DEBUG)
+app_log.addHandler(logging_handler)
+
+
 def make_celery(app):
     celery = Celery('demobot', broker='amqp://rabbitbot:rabbitbot@localhost/rabbitbotvhost', backend='rpc://')
     celery.conf.update(app.config)
@@ -51,8 +58,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.pa
 with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'keys.txt')) as keys_file:
     for line in keys_file:
         key_value_pair = line.strip().split('=')
-        if key_value_pair[0] == 'facebook_token':
-            TOKEN = key_value_pair[1]
         if key_value_pair[0] == 'super_user_user':
             SUPER_USER_USER = key_value_pair[1]
         if key_value_pair[0] == 'super_user_password':
@@ -61,13 +66,8 @@ FACEBOOK_TOKENS = {}
 with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'facebook_tokens.txt')) as keys_file:
     for line in keys_file:
         key_value_pair = line.strip().split('=')
+        app_log.debug('======>>>>> facebook config ' + key_value_pair[0])
         FACEBOOK_TOKENS[key_value_pair[0]] = key_value_pair[1]
-
-logging_handler = RotatingFileHandler(filename='demoindoorbot.log', maxBytes=3*1024*1024, backupCount=2)
-logging_handler.setFormatter(Formatter(logging.BASIC_FORMAT, None))
-app_log = logging.getLogger('root')
-app_log.setLevel(logging.DEBUG)
-app_log.addHandler(logging_handler)
 
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
@@ -582,19 +582,6 @@ def teste_tarefa_route():
             cache.set('var2', conversa, time=10)
             conversa = cache.get('var2')
             app_log.debug('teste_var2 rota 3:: ' + uid + ':: ' + repr(conversa))
-    resp = Response('success', status=200, mimetype='text/plain')
-    resp.status_code = 200
-    return resp
-
-
-@flask_app.route("/tokens_reload", methods=['GET'])
-def tokens_reload():
-    with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'facebook_tokens.txt')) as keys_file:
-        for line in keys_file:
-            key_value_pair = line.strip().split('=')
-            FACEBOOK_TOKENS[key_value_pair[0]] = key_value_pair[1]
-
-
     resp = Response('success', status=200, mimetype='text/plain')
     resp.status_code = 200
     return resp

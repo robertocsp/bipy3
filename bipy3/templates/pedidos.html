@@ -335,7 +335,7 @@
       //clona e copia o box com o pedido para a coluna do status escolhido
       $destino = $(this).attr("class");
       $(this).closest('li').hide("300");
-      $('#' + $destino).prepend("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
+      $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
       $(this).closest('li').remove();
       $.post('/bipy3/api/rest/status',
              {uid: $(this).find("input").attr("data-uid"), status: $(this).find("input").attr("name")},
