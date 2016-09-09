@@ -1,31 +1,48 @@
+# -*- coding: utf-8 -*-
+
 from bipy3.forms import *
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 
+from loja.models import Loja
 
-#a ideia e fazer um login unico verificando se e marca ou operacao
+
 def login_geral(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
+            if 'loja' not in request.POST or len(request.POST['loja'].strip()) == 0:
+                return render(request, 'login.html',
+                              {"form": form, "success": False, "type": 400, "message": u'Loja é obrigatório.'})
+            id_loja = request.POST['loja'].strip()
+            try:
+                loja = Loja.objects.get(group=id_loja)
+            except Loja.DoesNotExist:
+                return render(request, 'login.html',
+                              {"form": form, "success": False, "type": 400,
+                               "message": u'Loja não encontrada. Entre em contato com o administrador do sistema.'})
             username = request.POST['username']
             senha = request.POST['senha']
             user = authenticate(username=username, password=senha)
             if user is not None:
                 login(request, user)
-                # if user.groups.filter(name='marca').count() != 0:
-                #     marca = Marca.objects.get(user=request.user)
-                #     request.session['marca_id'] = marca.id
+                request.session['id_loja'] = loja.id
+                request.session['id_fb_loja'] = loja.id_loja_facebook
                 if 'next' in request.GET:
                     next = request.GET['next']
                     return HttpResponseRedirect(next)
                 else:
-                    return HttpResponseRedirect('/dashboard/')
+                    return HttpResponseRedirect('/pedidos/')
             else:
-                return render(request, 'login.html', {'form': form, 'error': True})
-        else:
-            raise forms.ValidationError("Algum nome ou id incoerrente com o formulario")
+                return render(request, 'login.html',
+                              {"form": form, "success": False, "type": 403,
+                               "message": u'Usuário e/ou senha inválido(s).'})
+        error_message = u'Usuário e senha são campos obrigatórios.'
+        if 'loja' not in request.POST or len(request.POST['loja'].strip()) == 0:
+            error_message = u'Usuário, senha e loja são campos obrigatórios.'
+        return render(request, 'login.html',
+                      {"form": form, "success": False, "type": 400, "message": error_message})
     else:
         form = LoginForm()
         return render(request, 'login.html', {'form': form, 'error': False})
