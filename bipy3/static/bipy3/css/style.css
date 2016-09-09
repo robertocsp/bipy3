@@ -177,7 +177,7 @@ ul, li{
 .loading-login{
     width: 35px;
     height: 35px;
-    float: right;
+    /*float: right;*/
     margin-right: 175px;
     text-indent: -999em;
     background: url('../img/loaders2.gif') no-repeat 0 0;

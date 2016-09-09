@@ -8,9 +8,10 @@
   <div class="page-header">
     <h1><i class="fa fa-list"></i> Pedidos</h1>
   </div>
+    <form action="/pedidos/" method="post" id="form-filtros-pedido">
     <div class="filtros-pedidos">
        <div class="form-group col-md-6">
-         <form action="/pedidos/" method="get" onsubmit="$('#data_hora_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'))">
+          {% csrf_token %}
           <div class="col-md-12">
             <h4 class="font17"><i class="fa fa-calendar-times-o"></i> Visualizar os pedidos a partir de:</h4><br>
           </div>
@@ -49,31 +50,31 @@
           </div>
 
           <div class="col-md-12">
-              <button id="data_hora_btn_filtro" type="submit" class="btn btn-primary btn-verde">
+              <button id="data_hora_btn_filtro" type="button" class="btn btn-primary btn-verde" onclick="$('#data_hora_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'));$('#form-filtros-pedido').submit();">
                   <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Selecionar Data/Horario
                 </button><br>
           </div>
-         </form>
       </div>
       <div class="col-md-6">
             <h4><i class="fa fa-filter"></i> Filtrar pedidos</h4><br>
             <div class="form-group">
 
               <div class="col-md-6">
-                <input type="text" placeholder="Cliente..." class="form-control"><br>
+                <input type="text" name="nome_cliente_filtro" placeholder="Cliente..." class="form-control" value="{% if filtros.nome_cliente_filtro %}{{filtros.nome_cliente_filtro}}{% endif %}"><br>
               </div>
               <div class="col-md-6">
-                <input type="text" placeholder="Número Pedido..." class="form-control"><br>
+                <input type="text" name="num_pedido_filtro" placeholder="Número Pedido..." class="form-control" value="{% if filtros.num_pedido_filtro %}{{filtros.num_pedido_filtro}}{% endif %}"><br>
               </div>
               <div class="col-md-12">
-                  <button type="submit" class="btn btn-primary btn-verde">
+                  <button type="button" id="outros_btn_filtro" class="btn btn-primary btn-verde" onclick="$('#outros_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'));$('#form-filtros-pedido').submit();">
                     <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filtrar
                   </button>
               </div>
             </div>
         </div>
     </div>
-    <div class="dnd"><button onclick="notify('bipy3')">teste notificacao</button>
+    </form>
+    <div class="dnd">
         <div class="linha-btn">
             <select class="form-control status-combo" id="sel1">
               <option value="status" selected="selected">Todos os Status</option>
@@ -157,13 +158,13 @@
             </div>
             <div class="conteudo-pedido">
               <ul>
-                <li><label class="status-label"><strong>Número do pedido:</strong> {{= numero_pedido}}</label></li>
+                <li><label class="status-label"><strong>N&#186; do pedido:</strong> {{= card_uid}}</label></li>
                 <li class="{{if origem == 'fbmessenger'}}messeger {{/if}}detalhe-pedido-icon">
                   <label class="status-label">
                     <strong>Detalhes:</strong>
-                    <i class="logo open-dialogo"></i>
+                    <i id="{{= card_uid}}_dialogo" class="logo open-dialogo"></i>
                     <i class="fa fa-list-ol open-lista-pedidos"></i>
-                    <i>{{= mesa}}</i>
+                    <i id="{{= card_uid}}_mesa">{{= mesa}}</i>
                   </label>
 
                   <!-- Lista de pedidos-->
@@ -256,25 +257,6 @@
 
 <script type="text/javascript">
   var pedidos_interval = {};
-  function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-  }
-  function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-  }
   function startInterval(card_uid) {
     var intervalId = setInterval(function() {
         minutesPassed = parseInt($('#' + card_uid).attr('data-minutes-passed'));
@@ -289,7 +271,7 @@
   function sendMessageBindClick(card_uid) {
     $("#" + card_uid + "_btn-send").click(function(){
       var $this = $(this);
-      $.post('/marvin/api/rest/mensagem',
+      $.post('/bipy3/api/rest/mensagem',
              {uid: $(this).attr("data-uid"), message: $(this).parent().find("input").val()},
              function(data) {
         console.log(data);
@@ -301,13 +283,6 @@
     });
   }
   $(document).ready(function($) {
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-            }
-        }
-    });
     //drag and drop pedidos
     $( "ul.droptrue" ).sortable({
       connectWith: "ul",
@@ -318,7 +293,7 @@
       handle: ".header-pedido p",
       receive: function( event, ui ) {
         // evento do momento em que o box e "solto" na coluna de destino
-        $.post('/marvin/api/rest/status',
+        $.post('/bipy3/api/rest/status',
                {uid: $(ui.item).attr("data-uid"), status: $(event.target).attr('id')},
                function(data) {
           console.log(data);
@@ -360,9 +335,9 @@
       //clona e copia o box com o pedido para a coluna do status escolhido
       $destino = $(this).attr("class");
       $(this).closest('li').hide("300");
-      $('#' + $destino).prepend("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
+      $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
       $(this).closest('li').remove();
-      $.post('/marvin/api/rest/status',
+      $.post('/bipy3/api/rest/status',
              {uid: $(this).find("input").attr("data-uid"), status: $(this).find("input").attr("name")},
              function(data) {
         console.log(data);
@@ -439,7 +414,7 @@
     });
 
     var ws4redis = WS4Redis({
-        uri: '{{ WEBSOCKET_URI }}1?subscribe-broadcast',
+        uri: '{{ WEBSOCKET_URI }}{{ request.session.id_loja }}?subscribe-broadcast',
         receive_message: receiveMessage,
         heartbeat_msg: {{ WS4REDIS_HEARTBEAT }}
     });
@@ -454,14 +429,39 @@
         console.log('Message from Websocket: ' + msg);
         var input = JSON.parse(msg);
         console.log(input);
-        if(input.origem == 'chat') {
+        if(input.origem === 'chat')
+        {
             $.tmpl($('#template-message'), input).appendTo($('#' + input.uid + '_messages'));
             var objDiv = document.getElementById(input.uid + '_messages');
             objDiv.scrollTop = objDiv.scrollHeight;
-        } else {
-            $.tmpl($('#template-pedido'), input).prependTo($('#solicitado'));
+            var notifyText = '<strong>'+input.nome_cliente+'</strong><br /> enviou uma mensagem';
+            var notifyImage = '../../static/bipy3/img/default_user.png';
+            if (input.foto_cliente)
+            {
+                notifyImage = input.foto_cliente;
+            }
+            notify('bipy3', notifyText, notifyImage, input.uid);
+        }
+        else if(input.origem === 'troca_mesa')
+        {
+            $.each(input.pedidos, function(i, pedido)
+                {
+                    $('#' + pedido.uid + '_mesa').html(pedido.mesa);
+                }
+            );
+        }
+        else
+        {
+            $.tmpl($('#template-pedido'), input).appendTo($('#solicitado'));
             sendMessageBindClick(input.card_uid);
             startInterval(input.card_uid);
+            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong>mesa '+input.mesa+'</strong><br /> fez um novo pedido';
+            var notifyImage = '../../static/bipy3/img/default_user.png';
+            if (input.foto_cliente)
+            {
+                notifyImage = input.foto_cliente;
+            }
+            notify('bipy3', notifyText, notifyImage);
         }
     }
 
@@ -470,33 +470,52 @@
 
 <script type="text/javascript">
     //Notificacao
-    function notify(style) {
-        $.notify.addStyle("bipy3", {
-            html:
-                "<div>" +
-                    "<time data-notify-html='time' />" +
-                    "<div class='image' data-notify-html='image'/>" +
-                    "<div class='text-wrapper'>" +
-                        "<div class='text' data-notify-html='text'/>" +
-                    "</div>" +
-                    "<i class='fa fa-bell icon-push text-laranja'></i>" +
-                "</div>"
-        });
-
-        $.notify({
-            text: '<strong>Fabio Marques</strong> da <strong>mesa 59</strong><br /> fez um novo pedido',
-            image: "<img class='img-circle' width='40px' src='https://scontent.xx.fbcdn.net/v/t1.0-1/p200x200/12243443_986437741413043_7091711780184954737_n.jpg?oh=e295a08a8f769b82d6416e6c4d3c4510&oe=584A08C2'/>",
-            time: '22:57'
-        }, {
-            style: 'bipy3',
-            className: style,
+    $.notify.addStyle("bipy3", {
+        html:
+            "<div>" +
+                "<span data-notify-html='uidchat' />" +
+                "<time data-notify-html='time' />" +
+                "<div class='image' data-notify-html='image'/>" +
+                "<div class='text-wrapper'>" +
+                    "<div class='text' data-notify-html='text'/>" +
+                "</div>" +
+                "<i class='fa fa-bell icon-push text-laranja'></i>" +
+            "</div>"
+    });
+    function notify(style, notifyText, notifyImage, uidchat) {
+        var notifyTime = new Date();
+        var notifyParams = {
+            text: notifyText,
+            image: "<img class='img-circle' width='40px' src='"+notifyImage+"'/>",
+            time: notifyTime.getHours()+':'+notifyTime.getMinutes()
+        };
+        if (uidchat)
+        {
+            notifyParams.uidchat = $('<input type="hidden" name="uidchat" value="'+uidchat+'" />');
+        }
+        $.notify(notifyParams, {
+            style: style,
+            className: 'bipy3',
             autoHide: false,
             autoHideDelay: 9000,
-            clickToHide: true
+            clickToHide: true,
+            order: 'fifo'
         });
 
     }
-
+    $(function() {
+		$(document).on("notify-hide", ".notifyjs-wrapper", function(e) {
+			var uidInput = $(this).find('input');
+			if (uidInput[0])
+			{
+			    var uid = uidInput.val();
+			    $('#'+uid+'_dialogo').parent('.status-label').parent(".detalhe-pedido-icon").find('div.dialogo').show();
+                $('.bg').show();
+                var objDiv = document.getElementById(uid + '_messages');
+                objDiv.scrollTop = objDiv.scrollHeight;
+			}
+		});
+	});
 </script>
 
 {% endblock %}

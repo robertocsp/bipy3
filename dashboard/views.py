@@ -35,6 +35,7 @@ def historico_pedidos(request):
 def cadastro(request):
     return render(request, 'cadastro.html')
 
+
 @login_required(login_url='/')
 def relacionamento(request):
     return render(request, 'relacionamento.html')

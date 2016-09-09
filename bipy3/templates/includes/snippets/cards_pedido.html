@@ -12,13 +12,13 @@
     </div>
     <div class="conteudo-pedido">
       <ul>
-        <li><label class="status-label"><strong>Número do pedido:</strong> {{ pedido.numero }}</label></li>
+        <li><label class="status-label"><strong>N&#186; pedido:</strong> {{ card_uid }}</label></li>
         <li class="{% if pedido.origem == 'fbmessenger' %}messeger {% endif %}detalhe-pedido-icon">
           <label class="status-label">
             <strong>Detalhes:</strong>
-            <i class="logo open-dialogo"></i>
+            <i id="{{ card_uid }}_dialogo" class="logo open-dialogo"></i>
             <i class="fa fa-list-ol open-lista-pedidos"></i>
-            <i>{{ pedido.mesa }}</i>
+            <i id="{{ card_uid }}_mesa">{{ pedido.mesa }}</i>
           </label>
 
           <!-- Lista de pedidos-->
