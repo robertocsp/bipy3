@@ -186,7 +186,7 @@
 
                   <!-- inicio dialogo bot -->
                     <div class="content-dialog">
-                  <div class="dialogo {{if origem == 'fbmessenger'}}messeger{{else}}telegram{{/if}}">
+                  <div class="centraliza-popup dialogo {{if origem == 'fbmessenger'}}messeger{{else}}telegram{{/if}}">
                     <a href="javascript:void(0);" class="close">X</a>
                     <div class="cabecalho-chat">
                       <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}_1" data-minutes-passed="0">0 minutos</span></span></p>
@@ -271,6 +271,7 @@
   function sendMessageBindClick(card_uid) {
     $("#" + card_uid + "_btn-send").click(function(){
       var $this = $(this);
+      $this.hide();
       $.post('/bipy3/api/rest/mensagem',
              {uid: $(this).attr("data-uid"), message: $(this).parent().find("input").val()},
              function(data) {
@@ -279,6 +280,9 @@
         $this.parent().find("input").val('');
         var objDiv = document.getElementById($this.attr("data-uid") + '_messages');
         objDiv.scrollTop = objDiv.scrollHeight;
+      })
+      .always(function () {
+        $this.show();
       });
     });
   }
@@ -484,10 +488,16 @@
     });
     function notify(style, notifyText, notifyImage, uidchat) {
         var notifyTime = new Date();
+        var horas = notifyTime.getHours()+'';
+        if (horas.length === 1)
+            horas = '0'+horas;
+        var minutos = notifyTime.getMinutes()+'';
+        if (minutos.length === 1)
+            minutos = '0'+minutos;
         var notifyParams = {
             text: notifyText,
             image: "<img class='img-circle' width='40px' src='"+notifyImage+"'/>",
-            time: notifyTime.getHours()+':'+notifyTime.getMinutes()
+            time: horas+':'+minutos
         };
         if (uidchat)
         {

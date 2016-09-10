@@ -27,7 +27,7 @@ except ImportError:
     from urllib import urlencode
 
 
-logging_handler = RotatingFileHandler(filename='demoindoorbot.log', maxBytes=3*1024*1024, backupCount=2)
+logging_handler = RotatingFileHandler(filename='/var/log/bot/demoindoorbot.log', maxBytes=5*1024*1024, backupCount=2)
 logging_handler.setFormatter(Formatter(logging.BASIC_FORMAT, None))
 app_log = logging.getLogger('root')
 app_log.setLevel(logging.DEBUG)

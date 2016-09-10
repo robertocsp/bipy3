@@ -244,6 +244,15 @@ footer p{
 
 /*Pedidos*/
 /*Nova página com DnD*/
+.centraliza-popup {
+    position: fixed !important;
+    top: 0px !important;
+    bottom: 0px !important;
+    left: 0px !important;
+    right: 0px !important;
+    margin: auto !important;
+}
+
 .dnd{
     float: left;
     width: 100%;

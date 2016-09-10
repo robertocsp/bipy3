@@ -36,7 +36,7 @@
           </div>
           <!-- inicio dialogo bot -->
             <div class="content-dialog">
-          <div class="dialogo {% if pedido.origem == 'fbmessenger' %}messeger{% else %}telegram{% endif %}">
+          <div class="centraliza-popup dialogo {% if pedido.origem == 'fbmessenger' %}messeger{% else %}telegram{% endif %}">
             <a href="javascript:void(0);" class="close">X</a>
             <div class="cabecalho-chat">
               <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span id="{{ card_uid }}_1" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
