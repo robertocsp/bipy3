@@ -261,12 +261,13 @@ def get_quickreply_menu(conversa):
             'title': u'Novo pedido',
             'payload': 'menu_novo_pedido'
         })
-    menu.append(
-        {
-            'content_type': 'text',
-            'title': u'Trocar mesa',
-            'payload': 'menu_trocar_mesa'
-        })
+    if mesa_definida:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Trocar mesa',
+                'payload': 'menu_trocar_mesa'
+            })
     if possui_itens_pedido and mesa_definida and pedido_andamento:
         menu.append(
             {
@@ -395,6 +396,7 @@ def get_mensagem(id_mensagem, **args):
         'anotado1':   Template(u'Por favor, escolha uma das opções que lhe apresento abaixo.'),
         'mesa2':      Template(u'Por favor, digite o número de sua mesa.'),
         'mesa3':      Template(u'Legal, providenciarei que seus pedidos sejam enviados para sua nova mesa $arg1.'),
+        'mesa4':      Template(u'Mesa anterior igual a atual.'),
         'pedido3':    Template(u'Por favor, pode falar, ou melhor, digitar. :)'),
         'rever':      Template(u'Digite o número entre parênteses seguido da nova quantidade e descrição para editar o '
                                u'item. Por exemplo: 1 2 águas sem gelo'),
@@ -416,7 +418,14 @@ def define_mesa(message, conversa):
     mesa = [int(s) for s in message.split(' ', 0) if s.isdigit()]
     if len(mesa) == 1:
         conversa['nao_entendidas'] = 0
-        conversa['mesa'] = mesa[0]
+        if conversa['mesa'] is None:
+            conversa['mesa'] = []
+            conversa['mesa'].append('')
+        elif len(conversa['mesa']) == 2:
+            conversa['mesa'][1] = conversa['mesa'][0]
+        elif len(conversa['mesa']) == 1:
+            conversa['mesa'].append(conversa['mesa'][0])
+        conversa['mesa'][0] = mesa[0]
         return True
     else:
         conversa['nao_entendidas'] += 1
@@ -470,6 +479,8 @@ def editar_pedido(message, conversa):
 
 
 def enviar_pedido(sender_id, loja_id, conversa):
+    if conversa['mesa'] is None:
+        return
     data = {}
     pass
     data['id_loja'] = loja_id
@@ -481,7 +492,7 @@ def enviar_pedido(sender_id, loja_id, conversa):
         data['foto_cliente'] = conversa['usuario']['profile_pic']
     data['mensagem'] = conversa['conversa']
     data['itens_pedido'] = conversa['itens_pedido']
-    data['mesa'] = conversa['mesa']
+    data['mesa'] = conversa['mesa'][0]
     url = 'http://localhost:8888/bipy3/api/rest/pedido'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
@@ -515,7 +526,9 @@ def troca_mesa_dashboard(sender_id, loja_id, conversa):
     pass
     data['id_loja'] = loja_id
     data['id_cliente'] = sender_id
-    data['mesa'] = conversa['mesa']
+    data['mesa'] = conversa['mesa'][0]
+    if len(conversa['mesa']) == 2:
+        data['mesa_anterior'] = conversa['mesa'][1]
     url = 'http://localhost:8888/bipy3/api/rest/troca_mesa'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
@@ -1141,13 +1154,27 @@ def passo_rever_pedido(message, sender_id, loja_id, conversa):
 def passo_trocar_mesa(message, sender_id, loja_id, conversa):
     conversa['conversa'].append({'cliente': message})
     if define_mesa(message, conversa):
-        troca_mesa_dashboard(sender_id, loja_id, conversa)
         conversa['passo'] = 2
+        if len(conversa['mesa']) == 2 and conversa['mesa'][0] == conversa['mesa'][1]:
+            try:
+                bot1 = get_mensagem('mesa4')
+                bot2 = get_mensagem('auxilio1')
+                r = chain(send_text_message.si(sender_id, loja_id, bot1),
+                          send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_menu(conversa),
+                                                     icon=None))()
+                r.get()
+                conversa['conversa'].append({'bot': bot1})
+                conversa['conversa'].append({'bot': bot2})
+            except TimeLimitExceeded:
+                app_log.error(u'ERROR:passo_trocar_mesa 2!!! Mais de 7 segundos para ter retorno do'
+                              u' facebook. TimeLimitExceeded.')
+            return
+        troca_mesa_dashboard(sender_id, loja_id, conversa)
         set_variaveis(conversa,
                       itens_pedido=(False, None),
                       datetime_pedido=(False, None),
                       conversa_conversa=(False, None))
-        bot1 = get_mensagem('mesa3', arg1=conversa['mesa'])
+        bot1 = get_mensagem('mesa3', arg1=conversa['mesa'][0])
         bot2 = get_mensagem('auxilio1')
         try:
             r = chain(send_text_message.si(sender_id, loja_id, bot1),

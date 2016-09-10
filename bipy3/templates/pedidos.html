@@ -453,6 +453,16 @@
                     $('#' + pedido.uid + '_mesa').html(pedido.mesa);
                 }
             );
+            if (input.mesa_anterior !== undefined)
+            {
+                var notifyText = '<strong>'+input.nome_cliente+'</strong><br /> trocou da mesa '+input.mesa_anterior+' para '+input.mesa;
+                var notifyImage = '../../static/bipy3/img/default_user.png';
+                if (input.foto_cliente)
+                {
+                    notifyImage = input.foto_cliente;
+                }
+                notify('bipy3', notifyText, notifyImage);
+            }
         }
         else
         {

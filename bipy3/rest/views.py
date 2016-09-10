@@ -283,12 +283,17 @@ class TrocarMesaView(views.APIView):
             Q(data__gt=data_corte.date()) | Q(data=data_corte.date(), hora__gte=data_corte.time()))
         if pedidos:
             pedidos_payload = []
+            mesa = request.data.get('mesa')
             for pedido in pedidos:
-                pedido.mesa = request.data.get('mesa')
+                pedido.mesa = mesa
                 pedido.save()
                 pedidos_payload.append({'uid': pedido.data.strftime('%Y%m%d') + repr(int(pedido.numero)),
-                                        'mesa': pedido.mesa})
+                                        'mesa': mesa})
             websocket = ws.Websocket()
-            payload = {'origem': 'troca_mesa', 'pedidos': pedidos_payload}
+            payload = {'origem': 'troca_mesa', 'pedidos': pedidos_payload, 'nome_cliente': cliente.nome,
+                       'foto_cliente': cliente.foto, 'mesa': mesa}
+            mesa_anterior = request.data.get('mesa_anterior', None)
+            if mesa_anterior:
+                payload['mesa_anterior'] = mesa_anterior
             websocket.publicar_mensagem(loja.id, json.dumps(payload))
         return Response({"success": True})
