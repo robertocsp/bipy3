@@ -289,11 +289,32 @@ class TrocarMesaView(views.APIView):
                 pedido.save()
                 pedidos_payload.append({'uid': pedido.data.strftime('%Y%m%d') + repr(int(pedido.numero)),
                                         'mesa': mesa})
-            websocket = ws.Websocket()
             payload = {'origem': 'troca_mesa', 'pedidos': pedidos_payload, 'nome_cliente': cliente.nome,
                        'foto_cliente': cliente.foto, 'mesa': mesa}
             mesa_anterior = request.data.get('mesa_anterior', None)
             if mesa_anterior:
                 payload['mesa_anterior'] = mesa_anterior
+            websocket = ws.Websocket()
             websocket.publicar_mensagem(loja.id, json.dumps(payload))
+        return Response({"success": True})
+
+
+class PedirCardapioView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
+        except Loja.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
+                         repr(request.data.get('id_loja')))
+            return Response({"success": False})
+        payload = {'origem': 'cardapio', 'nome_cliente': request.data.get('nome_cliente'),
+                   'mesa': request.data.get('mesa')}
+        foto = request.data.get('foto_cliente', None)
+        if foto:
+            payload['foto_cliente'] = foto
+        websocket = ws.Websocket()
+        websocket.publicar_mensagem(loja.id, json.dumps(payload))
         return Response({"success": True})

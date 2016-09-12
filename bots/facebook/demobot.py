@@ -74,6 +74,7 @@ agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
 EXPIRACAO_CACHE_CONVERSA = 60 * 60 * 2  # 2 horas
 SEM_NOME = ''  # TODO se der algum problema no facebook que "nome" usar
 ROBOT_ICON = u'\U0001f4bb'
+# ULTIMO PASSO = 21
 
 
 class GraphAPIError(Exception):
@@ -258,16 +259,15 @@ def get_quickreply_menu(conversa):
     menu.append(
         {
             'content_type': 'text',
+            'title': u'Pedir Cardápio',
+            'payload': 'pedir_cardapio'
+        })
+    menu.append(
+        {
+            'content_type': 'text',
             'title': u'Novo pedido',
             'payload': 'menu_novo_pedido'
         })
-    if mesa_definida:
-        menu.append(
-            {
-                'content_type': 'text',
-                'title': u'Trocar mesa',
-                'payload': 'menu_trocar_mesa'
-            })
     if possui_itens_pedido and mesa_definida and pedido_andamento:
         menu.append(
             {
@@ -288,12 +288,21 @@ def get_quickreply_menu(conversa):
                 'title': u'+ itens ao pedido',
                 'payload': 'pedir_mais'
             })
+    '''
     if possui_itens_pedido and mesa_definida and pedido_andamento:
         menu.append(
             {
                 'content_type': 'text',
                 'title': u'Cancelar pedido',
                 'payload': 'menu_cancelar_pedido'
+            })
+    '''
+    if mesa_definida:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Trocar mesa',
+                'payload': 'menu_trocar_mesa'
             })
     menu.append(
         {
@@ -375,12 +384,11 @@ def get_mensagem(id_mensagem, **args):
         'mesa':       Template(u'Por favor, digite o número de sua mesa para iniciarmos seu atendimento.'),
         'encerrar':   Template(u'Perfeito, caso queira me pedir algo é só digitar menu e escolher a opção '
                                u'"Novo pedido".'),
-        'pedido':     Template(u'Excelente, veja o nosso cardápio e digite aqui o que deseja.'),
-        # 'pedido1':    Template(u'Pode pedir quantos produtos quiser, colocando-os um por linha OU separando-os com
-        # uum ; (ponto e vírgula). Ah, quanto mais detalhado o texto melhor. ;)'),
-        'pedido1':    Template(u'Ah, quanto mais detalhado o texto melhor. ;)'),
-        'pedido2':    Template(u'Veja um exemplo: 1 água com gelo sem limão'),
-
+        # 'pedido':     Template(u'Excelente, veja o nosso cardápio e digite aqui o que deseja.'),
+        # 'pedido1':    Template(u'Ah, quanto mais detalhado o texto melhor. ;)'),
+        # 'pedido2':    Template(u'Veja um exemplo: 1 água com gelo sem limão'),
+        'pedido':     Template(u'Excelente, digite aqui o que deseja, quanto mais detalhado melhor! ;)'),
+        'pedido1':    Template(u'Exemplo: 1 água com gelo sem limão'),
         'mesa1':      Template(u'Mil desculpas, mas não consegui identificar o número da sua mesa. Por favor, você '
                                u'poderia digitar novamente o número da sua mesa, só que desta vez utilizando somente '
                                u'números.'),
@@ -398,10 +406,10 @@ def get_mensagem(id_mensagem, **args):
         'mesa3':      Template(u'Legal, providenciarei que seus pedidos sejam enviados para sua nova mesa $arg1.'),
         'mesa4':      Template(u'Mesa anterior igual a atual.'),
         'pedido3':    Template(u'Por favor, pode falar, ou melhor, digitar. :)'),
-        'rever':      Template(u'Digite o número entre parênteses seguido da nova quantidade e descrição para editar o '
-                               u'item. Por exemplo: 1 2 águas sem gelo'),
-        'rever1':     Template(u'Desculpe, mas não consegui editar o item do seu pedido, coloque o número entre '
-                               u'parênteses seguido da quantidade e descrição. Exemplo:\n$arg1 $arg2 $arg3'),
+        'rever':      Template(u'Digite o número entre parênteses seguido da quantidade e, se precisar, descrição. '
+                               u'Para remover o item, coloque quantidade 0.'),
+        'rever1':     Template(u'Desculpe, mas não consegui editar o item do seu pedido. Coloque o número entre '
+                               u'parênteses seguido da quantidade e, se precisar, descrição.'),
         'rever2':     Template(u'Não foram encontrados pedidos em aberto. Como posso auxiliá-lo(a)?'),
         'auxilio':    Template(u'Em que posso ajudá-lo(a)?'),
         'auxilio1':   Template(u'Em que posso ajudá-lo(a) agora?'),
@@ -410,6 +418,7 @@ def get_mensagem(id_mensagem, **args):
         'desenv':     Template(u'Função em desenvolvimento...'),
         'finalizar':  Template(u'Segue, acima, seu pedido para conferência. Confirma o envio?'),
         'dashboard2': Template(u'Contato finalizado. Irei retomar de onde paramos.'),
+        'cardapio':   Template(u'Já levaremos o cardápio para você. Como posso ajudá-lo(a) agora?'),
     }
     return mensagens[id_mensagem].substitute(args)
 
@@ -463,18 +472,22 @@ def anota_pedido(message, conversa):
 
 def editar_pedido(message, conversa):
     item_pedido = message.strip().split(' ', 2)
-    if len(item_pedido) != 2 and len(item_pedido) != 3:
+    if len(item_pedido) < 2:
         return False
     i = [int(qtde) for qtde in [item_pedido[0]] if qtde.isdigit()]
-    quantidade = [int(qtde) for qtde in [item_pedido[1]] if qtde.isdigit()]
-    if len(i) != 1 or len(quantidade) != 1:
+    if len(i) != 1:
         return False
-    if quantidade[0] > 0:
-        if len(item_pedido) == 3:
-            conversa['itens_pedido'][i[0] - 1]['descricao'] = item_pedido[2]
-        conversa['itens_pedido'][i[0] - 1]['quantidade'] = quantidade[0]
+    quantidade = [int(qtde) for qtde in [item_pedido[1]] if qtde.isdigit()]
+    if len(quantidade) == 1:
+        if quantidade[0] > 0:
+            if len(item_pedido) == 3:
+                conversa['itens_pedido'][i[0] - 1]['descricao'] = item_pedido[2]
+            conversa['itens_pedido'][i[0] - 1]['quantidade'] = quantidade[0]
+        else:
+            del conversa['itens_pedido'][i[0] - 1]
     else:
-        del conversa['itens_pedido'][i[0] - 1]
+        conversa['itens_pedido'][i[0] - 1]['descricao'] = item_pedido[1]
+        conversa['itens_pedido'][i[0] - 1]['quantidade'] = 1
     return True
 
 
@@ -486,10 +499,8 @@ def enviar_pedido(sender_id, loja_id, conversa):
     data['id_loja'] = loja_id
     data['origem'] = 'fbmessenger'
     data['id_cliente'] = sender_id
-    data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name'] \
-        if conversa['usuario'] is not None else SEM_NOME
-    if conversa['usuario'] is not None:
-        data['foto_cliente'] = conversa['usuario']['profile_pic']
+    data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name']
+    data['foto_cliente'] = conversa['usuario']['profile_pic']
     data['mensagem'] = conversa['conversa']
     data['itens_pedido'] = conversa['itens_pedido']
     data['mesa'] = conversa['mesa'][0]
@@ -508,10 +519,8 @@ def resposta_dashboard(message=None, sender_id=None, loja_id=None, conversa=None
         pass
         data['id_loja'] = loja_id
         data['origem'] = 'chat'
-        data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name'] \
-            if conversa['usuario'] is not None else SEM_NOME
-        if conversa['usuario'] is not None:
-            data['foto_cliente'] = conversa['usuario']['profile_pic']
+        data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name']
+        data['foto_cliente'] = conversa['usuario']['profile_pic']
         data['cliente'] = message
         data['uid'] = conversa['uid']
         url = 'http://localhost:8888/bipy3/api/rest/mensagem_bot'
@@ -530,6 +539,20 @@ def troca_mesa_dashboard(sender_id, loja_id, conversa):
     if len(conversa['mesa']) == 2:
         data['mesa_anterior'] = conversa['mesa'][1]
     url = 'http://localhost:8888/bipy3/api/rest/troca_mesa'
+    headers = {'content-type': 'application/json',
+               'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    app_log.debug(repr(response))
+
+
+def cardapio_dashboard(loja_id, conversa):
+    data = {}
+    pass
+    data['id_loja'] = loja_id
+    data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name']
+    data['foto_cliente'] = conversa['usuario']['profile_pic']
+    data['mesa'] = conversa['mesa'][0]
+    url = 'http://localhost:8888/bipy3/api/rest/pede_cardapio'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -603,7 +626,7 @@ def teste_tarefa_route():
 @contextmanager
 def sender_lock(sender_id):
     app_log.debug('lock acquire:: ' + sender_id)
-    lock = cache.add(sender_id + 'lock', True, time=10)  # tempo de vida do lock é de 10 segundos, no caso de um erro.
+    lock = cache.add(sender_id + 'lock', True, time=15)  # tempo de vida do lock é de 15 segundos, no caso de um erro.
     app_log.debug('lock:: ' + repr(lock) + ' :: ' + sender_id)
     yield lock
     if lock:
@@ -633,7 +656,9 @@ def webhook():
                 app_log.debug('sender_id:: ' + sender_id)
                 app_log.debug('loja_id:: ' + loja_id)
             if sender_id is None or loja_id is None:
-                pass
+                resp = Response(u'sender e/ou recipient não encontrado', status=200, mimetype='text/plain')
+                resp.status_code = 200
+                return resp
             else:
                 with sender_lock(sender_id) as lock:
                     if lock:
@@ -641,12 +666,15 @@ def webhook():
                         conversa = cache.get(sender_id)
                         app_log.debug('alguma conversa no cache:: ' + repr(conversa))
                         if conversa is not None:
-                            if conversa['usuario'] is None:
-                                conversa['usuario'] = pega_usuario(sender_id)
                             cache.set(sender_id, conversa, time=EXPIRACAO_CACHE_CONVERSA)
                             app_log.debug('conversa:: ' + repr(conversa))
                         else:
                             user = pega_usuario(sender_id, loja_id)
+                            if not user:
+                                resp = Response(u'não foi possível recuperar o usuário do facebook', status=200,
+                                                mimetype='text/plain')
+                                resp.status_code = 200
+                                return resp
                             conversa = {
                                 'passo': 0,
                                 'usuario': user,
@@ -698,6 +726,25 @@ def webhook():
                                 elif conversa['passo'] == 8:
                                     conversa['passo'] = 10
                                     passo_tres(message, sender_id, loja_id, conversa)
+                                elif conversa['passo'] == 18:
+                                    if u'nao' in unicodedata.normalize('NFKD', message).\
+                                            encode('ASCII', 'ignore').lower():
+                                        conversa['passo'] = 21
+                                        passo_menu(message, sender_id, loja_id, conversa)
+                                    elif u'sim' in unicodedata.normalize('NFKD', message).\
+                                            encode('ASCII', 'ignore').lower() or \
+                                         u'pode' in unicodedata.normalize('NFKD', message).\
+                                            encode('ASCII', 'ignore').lower() or \
+                                         u'confirm' in unicodedata.normalize('NFKD', message).\
+                                            encode('ASCII', 'ignore').lower():
+                                        conversa['passo'] = 0
+                                        passo_finalizar_enviar(message, sender_id, loja_id, conversa)
+                                    elif u'rever' in unicodedata.normalize('NFKD', message).\
+                                            encode('ASCII', 'ignore').lower():
+                                        conversa['passo'] = 16
+                                        passo_rever_pedido_2(message, sender_id, loja_id, conversa)
+                                elif conversa['passo'] == 19:
+                                    passo_mesa_cardapio(message, sender_id, loja_id, conversa)
                                 elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower()\
                                         in agradecimentos:
                                     conversa['passo'] = 11
@@ -742,8 +789,9 @@ def webhook():
                                 elif payload == 'finalizar_enviar':
                                     conversa['passo'] = 0
                                     passo_finalizar_enviar(message, sender_id, loja_id, conversa)
-                                elif payload == 'menu_finalizar_contato':
-                                    passo_finalizar_contato(sender_id, loja_id, conversa)
+                                elif payload == 'pedir_cardapio':
+                                    # passos 19 e 20 definidos dentro do método
+                                    passo_pedir_cardapio(message, sender_id, loja_id, conversa)
                         elif x.get('dashboard'):
                             conversa['suspensa'] += 1
                             conversa['uid'] = x['dashboard']['uid']
@@ -762,40 +810,34 @@ def webhook():
 
 def pega_usuario(sender_id, loja_id):
     retries = 0
+    user = None
     while retries < 1:
         try:
             app_log.debug('pega_usuario 1:: ')
-            user = get_object.delay(sender_id, loja_id)
+            user = get_object.delay(sender_id, loja_id).get()
             app_log.debug('pega_usuario 2:: ')
-            user = user.get()
-            app_log.debug('pega_usuario 3:: ')
             break
         except SoftTimeLimitExceeded:
-            app_log.debug('pega_usuario 4:: ')
             retries += 1
-            user = None
-            continue
+            app_log.debug('pega_usuario 3:: ')
         except Exception as e:
             retries += 1
-            app_log.debug('pega_usuario 6:: '+repr(e))
+            app_log.debug('pega_usuario 4:: '+repr(e))
     app_log.debug('pega_usuario 5:: ')
     return user
 
 
 def passo_finalizar_contato(sender_id, loja_id, conversa):
-    if conversa['passo'] == 0 or conversa['passo'] == 1 or \
-            conversa['passo'] == 2 or conversa['passo'] == 5:
+    if conversa['passo'] == 0 or conversa['passo'] == 1 or conversa['passo'] == 2 or conversa['passo'] == 5 \
+            or conversa['passo'] == 20 or conversa['passo'] == 21:
         passo_menu(None, sender_id, loja_id, conversa)
-    elif conversa['passo'] == 3 or \
-            conversa['passo'] == 15:
+    elif conversa['passo'] == 3 or conversa['passo'] == 15:
         passo_trocar_mesa_2(None, sender_id, loja_id, conversa)
-    elif conversa['passo'] == 4 or \
-            conversa['passo'] == 16:
+    elif conversa['passo'] == 4 or conversa['passo'] == 16:
         passo_rever_pedido_2(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 7 or conversa['passo'] == 13:
         passo_novo_pedido(None, sender_id, loja_id, conversa)
-    elif conversa['passo'] == 6 or conversa['passo'] == 9 or \
-            conversa['passo'] == 14 or conversa['passo'] == 17:
+    elif conversa['passo'] == 6 or conversa['passo'] == 9 or conversa['passo'] == 14 or conversa['passo'] == 17:
         mensagem_pedido(sender_id, loja_id, conversa)
     elif conversa['passo'] == 8:
         bot = get_mensagem('anotado', arg1=conversa['usuario']['first_name'])
@@ -810,7 +852,66 @@ def passo_finalizar_contato(sender_id, loja_id, conversa):
         passo_tres(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 18:
         passo_finalizar_pedido(None, sender_id, loja_id, conversa)
+    elif conversa['passo'] == 19:
+        passo_pedir_cardapio(None, sender_id, loja_id, conversa)
     conversa['suspensa'] = 0
+
+
+def passo_pedir_cardapio(message, sender_id, loja_id, conversa):
+    set_variaveis(conversa,
+                  itens_pedido=(False, None),
+                  datetime_pedido=(False, None),
+                  conversa_conversa=(False, None))
+    if message:
+        conversa['conversa'].append({'cliente': message})
+    if conversa['mesa'] is None:
+        conversa['passo'] = 19
+        mensagem_mesa(conversa, loja_id, sender_id)
+    else:
+        conversa['passo'] = 20
+        mensagem_cardapio(sender_id, loja_id, conversa)
+
+
+def mensagem_cardapio(sender_id, loja_id, conversa):
+    cardapio_dashboard(loja_id, conversa)
+    bot = get_mensagem('cardapio')
+    try:
+        r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+        r.get()
+        conversa['conversa'].append({'bot': bot})
+    except TimeLimitExceeded:
+        app_log.error(u'ERROR:mensagem_cardapio!!! Mais de 7 segundos para ter retorno do'
+                      u' facebook. TimeLimitExceeded.')
+
+
+def passo_mesa_cardapio(message, sender_id, loja_id, conversa):
+    conversa['conversa'].append({'cliente': message})
+    if define_mesa(message, conversa):
+        conversa['passo'] = 20
+        set_variaveis(conversa,
+                      itens_pedido=(False, None),
+                      datetime_pedido=(False, None),
+                      conversa_conversa=(False, None))
+        mensagem_cardapio(sender_id, loja_id, conversa)
+    else:
+        if conversa['nao_entendidas'] > 1:
+            bot = get_mensagem('robo')
+            try:
+                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+                r.get()
+                conversa['conversa'].append({'bot': bot})
+            except TimeLimitExceeded:
+                app_log.error(u'ERROR:passo_mesa_cardapio:robo!!! Mais de 7 segundos para ter retorno do'
+                              u' facebook. TimeLimitExceeded.')
+        else:
+            bot = get_mensagem('mesa1')
+            try:
+                r = send_text_message.delay(sender_id, loja_id, bot)
+                r.get()
+                conversa['conversa'].append({'bot': bot})
+            except TimeLimitExceeded:
+                app_log.error(u'ERROR:passo_mesa_cardapio:mesa1!!! Mais de 7 segundos para ter retorno do'
+                              u' facebook. TimeLimitExceeded.')
 
 
 def passo_finalizar_enviar(message, sender_id, loja_id, conversa):
@@ -965,19 +1066,23 @@ def passo_novo_pedido(message, sender_id, loja_id, conversa):
     set_variaveis(conversa, datetime_pedido=(True, datetime.datetime.utcnow()))
     if message:
         conversa['conversa'].append({'cliente': message})
-    if conversa['mesa'] is None:
-        conversa['passo'] = 13
-        bot = get_mensagem('mesa')
-        try:
-            r = send_text_message.delay(sender_id, loja_id, bot)
-            r.get()
-            conversa['conversa'].append({'bot': bot})
-        except TimeLimitExceeded:
-            app_log.error(u'ERROR:passo_novo_pedido!!! Mais de 7 segundos para ter retorno do'
-                          u' facebook. TimeLimitExceeded.')
-    else:
-        conversa['passo'] = 14
-        mensagem_pedido(sender_id, loja_id, conversa)
+        if conversa['mesa'] is None:
+            conversa['passo'] = 13
+            mensagem_mesa(conversa, loja_id, sender_id)
+        else:
+            conversa['passo'] = 14
+            mensagem_pedido(sender_id, loja_id, conversa)
+
+
+def mensagem_mesa(conversa, loja_id, sender_id):
+    bot = get_mensagem('mesa')
+    try:
+        r = send_text_message.delay(sender_id, loja_id, bot)
+        r.get()
+        conversa['conversa'].append({'bot': bot})
+    except TimeLimitExceeded:
+        app_log.error(u'ERROR:mensagem_mesa!!! Mais de 7 segundos para ter retorno do'
+                      u' facebook. TimeLimitExceeded.')
 
 
 def passo_nao_entendido(message, sender_id, loja_id, conversa):
@@ -1094,17 +1199,14 @@ def passo_um(message, sender_id, loja_id, conversa):
 
 
 def mensagem_pedido(sender_id, loja_id, conversa):
-    bot1 = get_mensagem('pedido')
-    bot2 = get_mensagem('pedido1')
-    bot3 = get_mensagem('pedido2')
+    bot = get_mensagem('pedido')
+    bot1 = get_mensagem('pedido1')
     try:
-        r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                  send_text_message.si(sender_id, loja_id, bot2, icon=None),
-                  send_text_message.si(sender_id, loja_id, bot3, icon=None))()
+        r = chain(send_text_message.si(sender_id, loja_id, bot),
+                  send_text_message.si(sender_id, loja_id, bot1, icon=None))()
         r.get()
+        conversa['conversa'].append({'bot': bot})
         conversa['conversa'].append({'bot': bot1})
-        conversa['conversa'].append({'bot': bot2})
-        conversa['conversa'].append({'bot': bot3})
     except TimeLimitExceeded:
         app_log.error(u'ERROR:mensagem_pedido!!! Mais de 7 segundos para ter retorno do facebook. TimeLimitExceeded.')
 
@@ -1124,10 +1226,7 @@ def passo_rever_pedido(message, sender_id, loja_id, conversa):
                 app_log.error(u'ERROR:passo_rever_pedido!!! Mais de 7 segundos para ter retorno do'
                               u' facebook. TimeLimitExceeded.')
         else:
-            bot = get_mensagem('rever1', arg1='1',
-                               arg2=repr(conversa
-                                         ['itens_pedido'][0]['quantidade'] + 2),
-                               arg3=conversa['itens_pedido'][0]['descricao'])
+            bot = get_mensagem('rever1')
             try:
                 r = send_text_message.delay(sender_id, loja_id, bot)
                 r.get()

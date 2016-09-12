@@ -464,7 +464,17 @@
                 notify('bipy3', notifyText, notifyImage);
             }
         }
-        else
+        else if(input.origem === 'cardapio')
+        {
+            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong>mesa '+input.mesa+'</strong><br /> solicitou o cardápio';
+            var notifyImage = '../../static/bipy3/img/default_user.png';
+            if (input.foto_cliente)
+            {
+                notifyImage = input.foto_cliente;
+            }
+            notify('bipy3', notifyText, notifyImage);
+        }
+        else if(input.origem === 'fbmessenger')
         {
             $.tmpl($('#template-pedido'), input).appendTo($('#solicitado'));
             sendMessageBindClick(input.card_uid);
