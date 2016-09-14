@@ -47,7 +47,7 @@
           <ul class="nav navbar-nav">
             <!--<li class="{% block  Dashboard %}{% endblock %}"><a href="/home">Dashboard <span class="sr-only">(current)</span></a></li>-->
             <!--<li class="{% block  upload %}{% endblock %}"><a href="/upload">Carregar Cardápio</a>-->
-            <li class="{% block  pedidos %}{% endblock %}"><a href="/pedidos">Pedidos <span class="badge">8 em aberto</span></a></li>
+            <li class="{% block  pedidos %}{% endblock %}"><a href="/pedidos">Pedidos</a></li>
             <!--<li class="{% block  historico %}{% endblock %}"><a href="/historico">Histórico de pedidos</a></li>-->
             <li class="{% block  relacionamento %}{% endblock %}"><a href="/relacionamento">Relacionamento com Clientes</a></li>
           </ul>
@@ -55,7 +55,7 @@
             <li class="dropdown user">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                  <img src="../static/bipy3/img/default_user.png" class="img-circle" alt="Cinque Terre" width="30" height="30">
-                Olá, Bar Demonstração Indoor <span class="caret"></span></a>
+                Olá, {% if request.user.is_authenticated %}{{ request.user.first_name }}{% endif %} <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="/cadastro"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Editar informações</a></li>
                 <li role="separator" class="divider"></li>
@@ -66,6 +66,8 @@
         </div>
       </div>
     </nav>
+
+    {{ request.session.nome_loja }}
 
     {% block conteudo %}Conteudo pagina{% endblock %}
 

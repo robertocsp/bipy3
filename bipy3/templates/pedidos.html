@@ -281,6 +281,13 @@
         var objDiv = document.getElementById($this.attr("data-uid") + '_messages');
         objDiv.scrollTop = objDiv.scrollHeight;
       })
+      .fail(function(data) {
+        if (data.status === 403)
+        {
+            alert('Sessão inválida. Realize o login novamente.');
+            window.location.href = '/?next='+window.location.pathname;
+        }
+      })
       .always(function () {
         $this.show();
       });
@@ -301,6 +308,13 @@
                {uid: $(ui.item).attr("data-uid"), status: $(event.target).attr('id')},
                function(data) {
           console.log(data);
+        })
+        .fail(function(data) {
+          if (data.status === 403)
+          {
+            alert('Sessão inválida. Realize o login novamente.');
+            window.location.href = '/?next='+window.location.pathname;
+          }
         });
       }
     });
@@ -344,7 +358,15 @@
       $.post('/bipy3/api/rest/status',
              {uid: $(this).find("input").attr("data-uid"), status: $(this).find("input").attr("name")},
              function(data) {
-        console.log(data);
+               console.log(data);
+             }
+      )
+      .fail(function(data) {
+        if (data.status === 403)
+        {
+            alert('Sessão inválida. Realize o login novamente.');
+            window.location.href = '/?next='+window.location.pathname;
+        }
       });
     });
 

@@ -29,6 +29,7 @@ def login_geral(request):
                 login(request, user)
                 request.session['id_loja'] = loja.id
                 request.session['id_fb_loja'] = loja.id_loja_facebook
+                request.session['nome_loja'] = loja.nome
                 if 'next' in request.GET:
                     next = request.GET['next']
                     return HttpResponseRedirect(next)

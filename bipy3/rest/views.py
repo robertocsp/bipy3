@@ -44,9 +44,12 @@ class LoginView(views.APIView):
                         login(request, user)
                         request.session['id_loja'] = loja.id
                         request.session['id_fb_loja'] = loja.id_loja_facebook
+                        request.session['nome_loja'] = loja.nome
                         redirect = '/pedidos/'
                         if 'next' in request.POST:
-                            redirect = '/' + request.POST['next']
+                            redirect = request.POST['next']
+                            if redirect[0] != '/':
+                                redirect = '/' + redirect
                         return Response({"success": True, "redirect": redirect})
                     except Loja.DoesNotExist:
                         logout(request)
@@ -146,11 +149,14 @@ class StatusPedidoView(views.APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        if 'id_loja' not in request.session:
+            return Response({"success": False, "type": 403, "message": u'Sessão inválida.'},
+                            status=status.HTTP_403_FORBIDDEN)
         uid = request.data.get('uid')
-        status = request.data.get('status')
+        status_loja = request.data.get('status')
         id_loja = request.session['id_loja']
         logger.debug('-=-=-=-=-=-=-=- uid: ' + repr(uid))
-        logger.debug('-=-=-=-=-=-=-=- status: ' + repr(status))
+        logger.debug('-=-=-=-=-=-=-=- status: ' + repr(status_loja))
         logger.debug('-=-=-=-=-=-=-=- id_loja: ' + repr(id_loja))
         data_pedido = datetime.strptime(uid[:8], '%Y%m%d')
         try:
@@ -159,15 +165,15 @@ class StatusPedidoView(views.APIView):
             return Response({"success": False})
         except Pedido.MultipleObjectsReturned:
             return Response({"success": False})
-        if status == 'solicitado':
+        if status_loja == 'solicitado':
             pedido.status = 'solicitado'
-        elif status == 'em-processo':
+        elif status_loja == 'em-processo':
             pedido.status = 'emprocessamento'
-        elif status == 'concluido':
+        elif status_loja == 'concluido':
             pedido.status = 'concluido'
-        elif status == 'entregue':
+        elif status_loja == 'entregue':
             pedido.status = 'entregue'
-        elif status == 'cancelado':
+        elif status_loja == 'cancelado':
             pedido.status = 'cancelado'
         pedido.save()
         return Response({"success": True})
@@ -178,6 +184,9 @@ class EnviarMensagemView(views.APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        if 'id_loja' not in request.session:
+            return Response({"success": False, "type": 403, "message": u'Sessão inválida.'},
+                            status=status.HTTP_403_FORBIDDEN)
         uid = request.data.get('uid')
         numero = int(uid[8:])
         data_pedido = datetime.strptime(uid[:8], '%Y%m%d')
