@@ -472,6 +472,7 @@
         {
             $.each(input.pedidos, function(i, pedido)
                 {
+                    $('#' + pedido.uid + '_notificacao_mesa').html('mesa '+pedido.mesa);
                     $('#' + pedido.uid + '_mesa').html(pedido.mesa);
                 }
             );
@@ -496,12 +497,22 @@
             }
             notify('bipy3', notifyText, notifyImage);
         }
+        else if(input.origem === 'garcom')
+        {
+            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong>mesa '+input.mesa+'</strong><br /> chamou o garçom';
+            var notifyImage = '../../static/bipy3/img/default_user.png';
+            if (input.foto_cliente)
+            {
+                notifyImage = input.foto_cliente;
+            }
+            notify('bipy3', notifyText, notifyImage);
+        }
         else if(input.origem === 'fbmessenger')
         {
             $.tmpl($('#template-pedido'), input).appendTo($('#solicitado'));
             sendMessageBindClick(input.card_uid);
             startInterval(input.card_uid);
-            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong>mesa '+input.mesa+'</strong><br /> fez um novo pedido';
+            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong id="'+input.card_uid+'_notificacao_mesa">mesa '+input.mesa+'</strong><br /> fez um novo pedido';
             var notifyImage = '../../static/bipy3/img/default_user.png';
             if (input.foto_cliente)
             {

@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^bipy3/api/rest/mensagem_bot[/]?$', views.EnviarMensagemBotView.as_view(), name='enviar_mensagem_bot_view'),
     url(r'^bipy3/api/rest/troca_mesa[/]?$', views.TrocarMesaView.as_view(), name='trocar_mesa_view'),
     url(r'^bipy3/api/rest/pede_cardapio[/]?$', views.PedirCardapioView.as_view(), name='pedir_cardapio_view'),
+    url(r'^bipy3/api/rest/pede_garcom[/]?$', views.ChamarGarcomView.as_view(), name='chamar_garcom_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^upload/$', upload, name='upload'),
     url(r'^relacionamento/$', relacionamento, name='relacionamento')]

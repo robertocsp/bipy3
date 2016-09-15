@@ -98,6 +98,8 @@ class EnviarPedidoView(views.APIView):
         request.data['card_uid'] = data_pedido.strftime('%Y%m%d') + repr(numero_pedido)
         logger.debug('-=-=-=-=-=-=-=- num pedido 3: ' + repr(request.data['numero_pedido']))
         if loja:
+            del request.data['id_loja']
+            del request.data['id_cliente']
             websocket = ws.Websocket()
             websocket.publicar_mensagem(loja.id, json.dumps(request.data))
             return Response({"success": True})
@@ -251,6 +253,7 @@ class EnviarMensagemBotView(views.APIView):
         data_pedido = datetime.strptime(uid[:8], '%Y%m%d')
         self.atualiza_historico(data_pedido, int(uid[8:]), 'cliente', request.data.get('cliente'), loja.id)
         if loja:
+            del request.data['id_loja']
             websocket = ws.Websocket()
             websocket.publicar_mensagem(loja.id, json.dumps(request.data))
             return Response({"success": True})
@@ -320,6 +323,27 @@ class PedirCardapioView(views.APIView):
                          repr(request.data.get('id_loja')))
             return Response({"success": False})
         payload = {'origem': 'cardapio', 'nome_cliente': request.data.get('nome_cliente'),
+                   'mesa': request.data.get('mesa')}
+        foto = request.data.get('foto_cliente', None)
+        if foto:
+            payload['foto_cliente'] = foto
+        websocket = ws.Websocket()
+        websocket.publicar_mensagem(loja.id, json.dumps(payload))
+        return Response({"success": True})
+
+
+class ChamarGarcomView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
+        except Loja.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
+                         repr(request.data.get('id_loja')))
+            return Response({"success": False})
+        payload = {'origem': 'garcom', 'nome_cliente': request.data.get('nome_cliente'),
                    'mesa': request.data.get('mesa')}
         foto = request.data.get('foto_cliente', None)
         if foto:

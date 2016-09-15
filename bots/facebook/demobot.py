@@ -73,6 +73,16 @@ saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
 EXPIRACAO_CACHE_CONVERSA = 60 * 60 * 2  # 2 horas
 SEM_NOME = ''  # TODO se der algum problema no facebook que "nome" usar
+POSTBACK_MAP = {
+    'menu_novo_pedido': u'Novo pedido',
+    'pedir_cardapio': u'Pedir cardápio',
+    'chamar_garcom': u'Chamar garçom',
+    'menu_trocar_mesa': u'Número da mesa',
+    'pedir_conta': u'Pedir a conta',
+    'finalizar_pedido': u'Enviar pedido',
+    'pedir_mais': u'+ itens ao pedido',
+    'voltar_menu': u'Voltar ao menu',
+}
 ROBOT_ICON = u'\U0001f4bb'
 # ULTIMO PASSO = 21
 
@@ -243,79 +253,103 @@ def send_quickreply_message(sender_id, loja_id, text, quick_replies, icon=ROBOT_
     return post(loja_id, json=payload)
 
 
-def get_quickreply_menu(conversa):
+@celery_app.task(time_limit=7)
+def send_generic_message(sender_id, loja_id, elements):
+    payload = {
+        'recipient': {
+            'id': sender_id
+        },
+        'message': {
+            'attachment': {
+                'type': 'template',
+                'payload': {
+                    'template_type': 'generic',
+                    'elements': elements
+                }
+            }
+        }
+    }
+    return post(loja_id, json=payload)
+
+
+def get_elements_menu(conversa):
     menu = []
     possui_itens_pedido = (len(conversa['itens_pedido']) > 0)
     mesa_definida = (conversa['mesa'] is not None)
     pedido_andamento = (conversa['datahora_inicio_pedido'] is not None)
+    if possui_itens_pedido and mesa_definida and pedido_andamento:
+        menu.append(
+            {
+                'title': u'Envie seu pedido',
+                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/enviar_pedido.png',
+                'subtitle': u'Envie seu pedido para iniciarmos seu preparo.',
+                'buttons': [
+                    {
+                        'type': 'postback',
+                        'title': u'Enviar pedido',
+                        'payload': 'finalizar_pedido'
+                    }
+                ]
+            })
+    if mesa_definida and pedido_andamento:
+        menu.append(
+            {
+                'title': u'Adicione itens ao pedido',
+                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/add_itens_pedido.png',
+                'subtitle': u'Adicione itens ao pedido que você está montando.',
+                'buttons': [
+                    {
+                        'type': 'postback',
+                        'title': u'+ itens ao pedido',
+                        'payload': 'pedir_mais'
+                    }
+                ]
+            })
+    menu.append(
+        {
+            'title': u'Realize um novo pedido',
+            'image_url': 'http://sistema.bipy3.com/static/bipy3/img/novo_pedido.png',
+            'subtitle': u'Monte um novo pedido por aqui, é bem fácil.',
+            'buttons': [
+                {
+                    'type': 'postback',
+                    'title': u'Novo pedido',
+                    'payload': 'menu_novo_pedido'
+                }
+            ]
+        })
+    menu.append(
+        {
+            'title': u'Peça o cardápio',
+            'image_url': 'http://sistema.bipy3.com/static/bipy3/img/pedir_cardapio.png',
+            'subtitle': u'Peça nosso cardápio para auxiliá-lo(a) em seu pedido.',
+            'buttons': [
+                {
+                    'type': 'postback',
+                    'title': u'Pedir cardápio',
+                    'payload': 'pedir_cardapio'
+                }
+            ]
+        })
+    menu.append(
+        {
+            'title': u'Chame o garçom',
+            'image_url': 'http://sistema.bipy3.com/static/bipy3/img/chamar_garcom.png',
+            'subtitle': u'Precisando de ajuda, pode deixar que peço para ele(a) ir aí.',
+            'buttons': [
+                {
+                    'type': 'postback',
+                    'title': u'Chamar garçom',
+                    'payload': 'chamar_garcom'
+                }
+            ]
+        })
     '''
     menu.append(
         {
             'content_type': 'text',
             'title': u'Ajuda',
             'payload': 'menu_ajuda'
-        })
-    '''
-    menu.append(
-        {
-            'content_type': 'text',
-            'title': u'Pedir Cardápio',
-            'payload': 'pedir_cardapio'
-        })
-    menu.append(
-        {
-            'content_type': 'text',
-            'title': u'Novo pedido',
-            'payload': 'menu_novo_pedido'
-        })
-    if possui_itens_pedido and mesa_definida and pedido_andamento:
-        menu.append(
-            {
-                'content_type': 'text',
-                'title': u'Enviar pedido',
-                'payload': 'finalizar_pedido'
-            })
-        menu.append(
-            {
-                'content_type': 'text',
-                'title': u'Rever pedido',
-                'payload': 'menu_rever_pedido'
-            })
-    if mesa_definida and pedido_andamento:
-        menu.append(
-            {
-                'content_type': 'text',
-                'title': u'+ itens ao pedido',
-                'payload': 'pedir_mais'
-            })
-    '''
-    if possui_itens_pedido and mesa_definida and pedido_andamento:
-        menu.append(
-            {
-                'content_type': 'text',
-                'title': u'Cancelar pedido',
-                'payload': 'menu_cancelar_pedido'
-            })
-    '''
-    if mesa_definida:
-        menu.append(
-            {
-                'content_type': 'text',
-                'title': u'Trocar mesa',
-                'payload': 'menu_trocar_mesa'
-            })
-    menu.append(
-        {
-            'content_type': 'text',
-            'title': u'Nada por enquanto',
-            'payload': 'menu_nada_fazer'
-        })
-    '''
-    menu.append(
-        {
-            'content_type': 'text',
-            'title': u'Fechar a conta',
-            'payload': 'menu_fechar_conta'
         })
     '''
     return menu
@@ -325,13 +359,18 @@ def get_quickreply_pedido():
     return [
         {
             'content_type': 'text',
+            'title': u'Enviar pedido',
+            'payload': 'finalizar_pedido'
+        },
+        {
+            'content_type': 'text',
             'title': u'Pedir mais coisas',
             'payload': 'pedir_mais'
         },
         {
             'content_type': 'text',
-            'title': u'Enviar pedido',
-            'payload': 'finalizar_pedido'
+            'title': u'Editar pedido',
+            'payload': 'menu_rever_pedido'
         }
     ]
 
@@ -340,13 +379,23 @@ def get_quickreply_finalizar_pedido():
     return [
         {
             'content_type': 'text',
-            'title': u'Enviar',
+            'title': u'Enviar pedido',
             'payload': 'finalizar_enviar'
         },
         {
             'content_type': 'text',
-            'title': u'Rever',
-            'payload': 'menu_rever_pedido'
+            'title': u'Começar novo pedido',
+            'payload': 'menu_novo_pedido'
+        }
+    ]
+
+
+def get_quickreply_voltar_menu():
+    return [
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
         }
     ]
 
@@ -378,31 +427,26 @@ def get_buttons_forma_pgto():
 
 def get_mensagem(id_mensagem, **args):
     mensagens = {
-        'ola':        Template(u'Olá, $arg1, me chamo Marvin tudo bem?'),
+        'ola':        Template(u'Olá, $arg1, como posso ajudá-lo(a)?'),
+        'ola1':       Template(u'Que bom tê-lo(a) conosco, $arg1, seja muito bem-vindo(a) a uma nova experiência de '
+                               u'atendimento.'),
         'menu':       Template(u'Digite a palavra menu para saber em como posso ajudá-lo(a). '
                                u'Você poderá digitá-la novamente a qualquer momento.'),
-        'mesa':       Template(u'Por favor, digite o número de sua mesa para iniciarmos seu atendimento.'),
-        'encerrar':   Template(u'Perfeito, caso queira me pedir algo é só digitar menu e escolher a opção '
-                               u'"Novo pedido".'),
-        # 'pedido':     Template(u'Excelente, veja o nosso cardápio e digite aqui o que deseja.'),
-        # 'pedido1':    Template(u'Ah, quanto mais detalhado o texto melhor. ;)'),
-        # 'pedido2':    Template(u'Veja um exemplo: 1 água com gelo sem limão'),
+        'mesa':       Template(u'Por favor, digite o número de sua mesa.'),
         'pedido':     Template(u'Excelente, digite aqui o que deseja, quanto mais detalhado melhor! ;)'),
         'pedido1':    Template(u'Exemplo: 1 água com gelo sem limão'),
         'mesa1':      Template(u'Mil desculpas, mas não consegui identificar o número da sua mesa. Por favor, você '
-                               u'poderia digitar novamente o número da sua mesa, só que desta vez utilizando somente '
-                               u'números.'),
+                               u'poderia digitar novamente, só que desta vez utilizando somente números.'),
         'anotado':    Template(u'Anotado.\n$arg1, deseja mais alguma coisa ou posso enviar seu pedido?'),
+        'anotado1':   Template(u'Pedido atualizado.\nDeseja mais alguma coisa ou posso enviar seu pedido?'),
         'qtde':       Template(u'$arg1\nPerdoe-me, mas não consegui identificar a quantidade do(s) seguinte(s) '
                                u'item(ns) acima.'),
         'qtde1':      Template(u'Peço, por favor, que reenvie sua última mensagem corrigindo-os.'),
-        'enviar':     Template(u'Ok, seu pedido já já estará aí.\nCaso queira mais alguma coisa digite menu e escolha '
-                               u'a opção "Novo pedido".'),
+        'enviar':     Template(u'Maravilha, já já seu pedido estará aí.\nPosso ajudá-lo(a) em algo mais?'),
         'agradeco':   Template(u'Eu que agradeço.\nQualquer coisa é só digitar menu e escolher a opção "Novo pedido".'),
         'robo':       Template(u'Desculpe por não entender, afinal, sou um robô. :)\nVocê gostaria de? '
                                u'Escolha uma das opções abaixo.'),
-        'anotado1':   Template(u'Por favor, escolha uma das opções que lhe apresento abaixo.'),
-        'mesa2':      Template(u'Por favor, digite o número de sua mesa.'),
+        'anotado2':   Template(u'Por favor, escolha uma das opções que lhe apresento abaixo.'),
         'mesa3':      Template(u'Legal, providenciarei que seus pedidos sejam enviados para sua nova mesa $arg1.'),
         'mesa4':      Template(u'Mesa anterior igual a atual.'),
         'pedido3':    Template(u'Por favor, pode falar, ou melhor, digitar. :)'),
@@ -410,15 +454,13 @@ def get_mensagem(id_mensagem, **args):
                                u'Para remover o item, coloque quantidade 0.'),
         'rever1':     Template(u'Desculpe, mas não consegui editar o item do seu pedido. Coloque o número entre '
                                u'parênteses seguido da quantidade e, se precisar, descrição.'),
-        'rever2':     Template(u'Não foram encontrados pedidos em aberto. Como posso auxiliá-lo(a)?'),
+        'rever2':     Template(u'Não existe um pedido sendo montado no momento. Como posso auxiliá-lo(a)?'),
         'auxilio':    Template(u'Em que posso ajudá-lo(a)?'),
         'auxilio1':   Template(u'Em que posso ajudá-lo(a) agora?'),
-        'dashboard':  Template(u'$arg1, vou dar uma pausa em nossa conversa, pois tem uma mensagem lá de dentro para '
-                               u'você. Para finalizar este contato digite menu e escolha a opção "Finalizar contato".'),
         'desenv':     Template(u'Função em desenvolvimento...'),
         'finalizar':  Template(u'Segue, acima, seu pedido para conferência. Confirma o envio?'),
-        'dashboard2': Template(u'Contato finalizado. Irei retomar de onde paramos.'),
-        'cardapio':   Template(u'Já levaremos o cardápio para você. Como posso ajudá-lo(a) agora?'),
+        'cardapio':   Template(u'Já levaremos o cardápio para você. Em que posso ajudá-lo(a) agora?'),
+        'garcom':     Template(u'Perfeito, já chamei e logo logo ele(a) estará aí. Como posso ajudá-lo(a) agora?'),
     }
     return mensagens[id_mensagem].substitute(args)
 
@@ -545,14 +587,14 @@ def troca_mesa_dashboard(sender_id, loja_id, conversa):
     app_log.debug(repr(response))
 
 
-def cardapio_dashboard(loja_id, conversa):
+def notificacao_dashboard(loja_id, conversa, metodo_api):
     data = {}
     pass
     data['id_loja'] = loja_id
     data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name']
     data['foto_cliente'] = conversa['usuario']['profile_pic']
     data['mesa'] = conversa['mesa'][0]
-    url = 'http://localhost:8888/bipy3/api/rest/pede_cardapio'
+    url = 'http://localhost:8888/bipy3/api/rest/pede_'+metodo_api
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -688,8 +730,8 @@ def webhook():
                             }
                             app_log.debug('usuario:: ' + repr(user))
 
-                        if x.get('message'):
-                            if x['message'].get('text') and not x['message'].get('quick_reply'):
+                        if x.get('message') or x.get('postback'):
+                            if x.get('message') and x['message'].get('text') and not x['message'].get('quick_reply'):
                                 message = x['message']['text'].strip()
                                 app_log.debug('message: '+message)
                                 if conversa['suspensa'] > 0:
@@ -739,12 +781,14 @@ def webhook():
                                             encode('ASCII', 'ignore').lower():
                                         conversa['passo'] = 0
                                         passo_finalizar_enviar(message, sender_id, loja_id, conversa)
-                                    elif u'rever' in unicodedata.normalize('NFKD', message).\
+                                    elif u'editar' in unicodedata.normalize('NFKD', message).\
                                             encode('ASCII', 'ignore').lower():
                                         conversa['passo'] = 16
                                         passo_rever_pedido_2(message, sender_id, loja_id, conversa)
                                 elif conversa['passo'] == 19:
-                                    passo_mesa_cardapio(message, sender_id, loja_id, conversa)
+                                    passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'cardapio', 20)
+                                elif conversa['passo'] == 22:
+                                    passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'garcom', 23)
                                 elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower()\
                                         in agradecimentos:
                                     conversa['passo'] = 11
@@ -752,9 +796,15 @@ def webhook():
                                 else:
                                     conversa['passo'] = 12
                                     passo_nao_entendido(message, sender_id, loja_id, conversa)
-                            elif x['message'].get('quick_reply') and x['message']['quick_reply'].get('payload'):
-                                payload = x['message']['quick_reply']['payload']
-                                message = x['message']['text']
+                            elif ((x.get('message') and x['message'].get('quick_reply') and
+                                   x['message']['quick_reply'].get('payload')) or
+                                  (x.get('postback') and x['postback'].get('payload'))):
+                                if x.get('message'):
+                                    payload = x['message']['quick_reply']['payload']
+                                    message = x['message']['text']
+                                else:
+                                    payload = x['postback'].get('payload')
+                                    message = POSTBACK_MAP[payload]
                                 app_log.debug(payload)
                                 if conversa['suspensa'] > 0:
                                     resposta_dashboard(message=message, sender_id=sender_id, loja_id=loja_id,
@@ -762,18 +812,13 @@ def webhook():
                                 elif payload == 'menu_novo_pedido':
                                     # passos 13 e 14 definidos dentro do método
                                     passo_novo_pedido(message, sender_id, loja_id, conversa)
-                                elif payload == 'menu_cancelar_pedido':
-                                    conversa['passo'] = 0
-                                    passo_cancelar_pedido(sender_id, loja_id, conversa)
                                 elif payload == 'menu_trocar_mesa':
                                     conversa['passo'] = 15
                                     passo_trocar_mesa_2(message, sender_id, loja_id, conversa)
-                                elif payload == 'menu_nada_fazer':
-                                    passo_nada_fazer(message, sender_id, loja_id, conversa)
                                 elif payload == 'menu_rever_pedido':
                                     conversa['passo'] = 16
                                     passo_rever_pedido_2(message, sender_id, loja_id, conversa)
-                                elif payload == 'menu_ajuda' or payload == 'menu_fechar_conta':
+                                elif payload == 'pedir_conta':
                                     try:
                                         r = send_text_message.delay(sender_id, loja_id, get_mensagem('desenv'))
                                         r.get()
@@ -792,6 +837,12 @@ def webhook():
                                 elif payload == 'pedir_cardapio':
                                     # passos 19 e 20 definidos dentro do método
                                     passo_pedir_cardapio(message, sender_id, loja_id, conversa)
+                                elif payload == 'chamar_garcom':
+                                    # passos 22 e 23 definidos dentro do método
+                                    passo_chamar_garcom(message, sender_id, loja_id, conversa)
+                                elif payload == 'voltar_menu':
+                                    conversa['passo'] = 1
+                                    passo_menu(message, sender_id, loja_id, conversa)
                         elif x.get('dashboard'):
                             conversa['suspensa'] += 1
                             conversa['uid'] = x['dashboard']['uid']
@@ -857,6 +908,21 @@ def passo_finalizar_contato(sender_id, loja_id, conversa):
     conversa['suspensa'] = 0
 
 
+def passo_chamar_garcom(message, sender_id, loja_id, conversa):
+    set_variaveis(conversa,
+                  itens_pedido=(False, None),
+                  datetime_pedido=(False, None),
+                  conversa_conversa=(False, None))
+    if message:
+        conversa['conversa'].append({'cliente': message})
+    if conversa['mesa'] is None:
+        conversa['passo'] = 22
+        mensagem_mesa(conversa, loja_id, sender_id)
+    else:
+        conversa['passo'] = 23
+        mensagem_sucesso(sender_id, loja_id, conversa, 'garcom')
+
+
 def passo_pedir_cardapio(message, sender_id, loja_id, conversa):
     set_variaveis(conversa,
                   itens_pedido=(False, None),
@@ -869,14 +935,15 @@ def passo_pedir_cardapio(message, sender_id, loja_id, conversa):
         mensagem_mesa(conversa, loja_id, sender_id)
     else:
         conversa['passo'] = 20
-        mensagem_cardapio(sender_id, loja_id, conversa)
+        mensagem_sucesso(sender_id, loja_id, conversa, 'cardapio')
 
 
-def mensagem_cardapio(sender_id, loja_id, conversa):
-    cardapio_dashboard(loja_id, conversa)
-    bot = get_mensagem('cardapio')
+def mensagem_sucesso(sender_id, loja_id, conversa, mensagem):
+    notificacao_dashboard(loja_id, conversa, mensagem)
+    bot = get_mensagem(mensagem)
     try:
-        r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+        r = chain(send_text_message.si(sender_id, loja_id, bot),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
         r.get()
         conversa['conversa'].append({'bot': bot})
     except TimeLimitExceeded:
@@ -884,20 +951,21 @@ def mensagem_cardapio(sender_id, loja_id, conversa):
                       u' facebook. TimeLimitExceeded.')
 
 
-def passo_mesa_cardapio(message, sender_id, loja_id, conversa):
+def passo_mesa_dependencia(message, sender_id, loja_id, conversa, mensagem, passo):
     conversa['conversa'].append({'cliente': message})
     if define_mesa(message, conversa):
-        conversa['passo'] = 20
+        conversa['passo'] = passo
         set_variaveis(conversa,
                       itens_pedido=(False, None),
                       datetime_pedido=(False, None),
                       conversa_conversa=(False, None))
-        mensagem_cardapio(sender_id, loja_id, conversa)
+        mensagem_sucesso(sender_id, loja_id, conversa, mensagem)
     else:
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
             try:
-                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+                r = chain(send_text_message.si(sender_id, loja_id, bot),
+                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
                 r.get()
                 conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
@@ -906,7 +974,7 @@ def passo_mesa_cardapio(message, sender_id, loja_id, conversa):
         else:
             bot = get_mensagem('mesa1')
             try:
-                r = send_text_message.delay(sender_id, loja_id, bot)
+                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
                 r.get()
                 conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
@@ -919,7 +987,8 @@ def passo_finalizar_enviar(message, sender_id, loja_id, conversa):
     enviar_pedido(sender_id, loja_id, conversa)
     set_variaveis(conversa)
     try:
-        r = send_text_message.delay(sender_id, loja_id, get_mensagem('enviar'))
+        r = chain(send_text_message.si(sender_id, loja_id, get_mensagem('enviar')),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
         r.get()
     except TimeLimitExceeded:
         app_log.error(u'ERROR:passo_finalizar_enviar!!! Mais de 7 segundos para ter retorno do'
@@ -952,7 +1021,8 @@ def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
     else:
         bot = get_mensagem('rever2')
         try:
-            r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+            r = chain(send_text_message.si(sender_id, loja_id, bot),
+                      send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
             r.get()
             conversa['conversa'].append({'bot': bot})
         except TimeLimitExceeded:
@@ -968,7 +1038,7 @@ def passo_pedir_mais(message, sender_id, loja_id, conversa):
                   conversa_conversa=(False, None))
     bot = get_mensagem('pedido3')
     try:
-        r = send_text_message.delay(sender_id, loja_id, bot)
+        r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
         r.get()
         conversa['conversa'].append({'bot': bot})
     except TimeLimitExceeded:
@@ -995,7 +1065,7 @@ def passo_rever_pedido_2(message, sender_id, loja_id, conversa):
         bot2 = pedidos
         try:
             r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                      send_text_message.si(sender_id, loja_id, bot2, icon=None))()
+                      send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_voltar_menu(), icon=None))()
             r.get()
             conversa['conversa'].append({'bot': bot1})
             conversa['conversa'].append({'bot': bot2})
@@ -1005,7 +1075,8 @@ def passo_rever_pedido_2(message, sender_id, loja_id, conversa):
     else:
         bot = get_mensagem('rever2')
         try:
-            r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+            r = chain(send_text_message.si(sender_id, loja_id, bot),
+                      send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
             r.get()
             conversa['conversa'].append({'bot': bot})
             # TODO ?pegar os pedidos em aberto do servidor? pode ser complicado, pois o pedido já pode ter ido, é melhor
@@ -1015,22 +1086,6 @@ def passo_rever_pedido_2(message, sender_id, loja_id, conversa):
                           u' facebook. TimeLimitExceeded.')
 
 
-def passo_nada_fazer(message, sender_id, loja_id, conversa):
-    conversa['conversa'].append({'cliente': message})
-    set_variaveis(conversa,
-                  itens_pedido=(False, None),
-                  datetime_pedido=(False, None),
-                  conversa_conversa=(False, None))
-    bot = get_mensagem('encerrar')
-    try:
-        r = send_text_message.delay(sender_id, loja_id, bot)
-        r.get()
-        conversa['conversa'].append({'bot': bot})
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_nada_fazer!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
-
-
 def passo_trocar_mesa_2(message, sender_id, loja_id, conversa):
     if message:
         conversa['conversa'].append({'cliente': message})
@@ -1038,24 +1093,7 @@ def passo_trocar_mesa_2(message, sender_id, loja_id, conversa):
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None),
                   conversa_conversa=(False, None))
-    bot = get_mensagem('mesa2')
-    try:
-        r = send_text_message.delay(sender_id, loja_id, bot)
-        r.get()
-        conversa['conversa'].append({'bot': bot})
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_trocar_mesa_2!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
-
-
-def passo_cancelar_pedido(sender_id, loja_id, conversa):
-    set_variaveis(conversa)
-    try:
-        r = send_text_message.delay(sender_id, loja_id, get_mensagem('encerrar'))
-        r.get()
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_cancelar_pedido!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    mensagem_mesa(conversa, loja_id, sender_id)
 
 
 def passo_novo_pedido(message, sender_id, loja_id, conversa):
@@ -1077,7 +1115,7 @@ def passo_novo_pedido(message, sender_id, loja_id, conversa):
 def mensagem_mesa(conversa, loja_id, sender_id):
     bot = get_mensagem('mesa')
     try:
-        r = send_text_message.delay(sender_id, loja_id, bot)
+        r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
         r.get()
         conversa['conversa'].append({'bot': bot})
     except TimeLimitExceeded:
@@ -1089,7 +1127,8 @@ def passo_nao_entendido(message, sender_id, loja_id, conversa):
     conversa['conversa'].append({'cliente': message})
     bot = get_mensagem('robo')
     try:
-        r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+        r = chain(send_text_message.si(sender_id, loja_id, bot),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
         r.get()
         conversa['conversa'].append({'bot': bot})
     except TimeLimitExceeded:
@@ -1101,7 +1140,8 @@ def passo_agradecimento(message, sender_id, loja_id, conversa):
     conversa['conversa'].append({'cliente': message})
     bot = get_mensagem('agradeco')
     try:
-        r = send_text_message.delay(sender_id, loja_id, bot)
+        r = chain(send_text_message.si(sender_id, loja_id, bot),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
         r.get()
         conversa['conversa'].append({'bot': bot})
     except TimeLimitExceeded:
@@ -1113,7 +1153,7 @@ def passo_tres(message, sender_id, loja_id, conversa):
     if message:
         conversa['conversa'].append({'cliente': message})
     conversa['nao_entendidas'] += 1
-    bot = get_mensagem('anotado1')
+    bot = get_mensagem('anotado2')
     try:
         r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
         r.get()
@@ -1146,7 +1186,8 @@ def passo_dois(message, sender_id, loja_id, conversa):
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
             try:
-                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+                r = chain(send_text_message.si(sender_id, loja_id, bot),
+                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
                 r.get()
                 conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
@@ -1157,7 +1198,8 @@ def passo_dois(message, sender_id, loja_id, conversa):
             bot2 = get_mensagem('qtde1')
             try:
                 r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                          send_text_message.si(sender_id, loja_id, bot2, icon=None))()
+                          send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_voltar_menu(),
+                                                     icon=None))()
                 r.get()
                 conversa['conversa'].append({'bot': bot1})
                 conversa['conversa'].append({'bot': bot2})
@@ -1181,7 +1223,8 @@ def passo_um(message, sender_id, loja_id, conversa):
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
             try:
-                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+                r = chain(send_text_message.si(sender_id, loja_id, bot),
+                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
                 r.get()
                 conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
@@ -1190,7 +1233,7 @@ def passo_um(message, sender_id, loja_id, conversa):
         else:
             bot = get_mensagem('mesa1')
             try:
-                r = send_text_message.delay(sender_id, loja_id, bot)
+                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
                 r.get()
                 conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
@@ -1203,7 +1246,7 @@ def mensagem_pedido(sender_id, loja_id, conversa):
     bot1 = get_mensagem('pedido1')
     try:
         r = chain(send_text_message.si(sender_id, loja_id, bot),
-                  send_text_message.si(sender_id, loja_id, bot1, icon=None))()
+                  send_quickreply_message.si(sender_id, loja_id, bot1, get_quickreply_voltar_menu(), icon=None))()
         r.get()
         conversa['conversa'].append({'bot': bot})
         conversa['conversa'].append({'bot': bot1})
@@ -1219,7 +1262,8 @@ def passo_rever_pedido(message, sender_id, loja_id, conversa):
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
             try:
-                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+                r = chain(send_text_message.si(sender_id, loja_id, bot),
+                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
                 r.get()
                 conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
@@ -1228,7 +1272,7 @@ def passo_rever_pedido(message, sender_id, loja_id, conversa):
         else:
             bot = get_mensagem('rever1')
             try:
-                r = send_text_message.delay(sender_id, loja_id, bot)
+                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
                 r.get()
                 conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
@@ -1240,9 +1284,9 @@ def passo_rever_pedido(message, sender_id, loja_id, conversa):
                       itens_pedido=(False, None),
                       datetime_pedido=(False, None),
                       conversa_conversa=(False, None))
-        bot = get_mensagem('auxilio1')
+        bot = get_mensagem('anotado1')
         try:
-            r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+            r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
             r.get()
             conversa['conversa'].append({'bot': bot})
         except TimeLimitExceeded:
@@ -1256,14 +1300,11 @@ def passo_trocar_mesa(message, sender_id, loja_id, conversa):
         conversa['passo'] = 2
         if len(conversa['mesa']) == 2 and conversa['mesa'][0] == conversa['mesa'][1]:
             try:
-                bot1 = get_mensagem('mesa4')
-                bot2 = get_mensagem('auxilio1')
-                r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                          send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_menu(conversa),
-                                                     icon=None))()
+                bot = get_mensagem('mesa4')
+                r = chain(send_text_message.si(sender_id, loja_id, bot),
+                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
                 r.get()
-                conversa['conversa'].append({'bot': bot1})
-                conversa['conversa'].append({'bot': bot2})
+                conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
                 app_log.error(u'ERROR:passo_trocar_mesa 2!!! Mais de 7 segundos para ter retorno do'
                               u' facebook. TimeLimitExceeded.')
@@ -1273,14 +1314,12 @@ def passo_trocar_mesa(message, sender_id, loja_id, conversa):
                       itens_pedido=(False, None),
                       datetime_pedido=(False, None),
                       conversa_conversa=(False, None))
-        bot1 = get_mensagem('mesa3', arg1=conversa['mesa'][0])
-        bot2 = get_mensagem('auxilio1')
+        bot = get_mensagem('mesa3', arg1=conversa['mesa'][0])
         try:
-            r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                      send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_menu(conversa), icon=None))()
+            r = chain(send_text_message.si(sender_id, loja_id, bot),
+                      send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
             r.get()
-            conversa['conversa'].append({'bot': bot1})
-            conversa['conversa'].append({'bot': bot2})
+            conversa['conversa'].append({'bot': bot})
         except TimeLimitExceeded:
             app_log.error(u'ERROR:passo_trocar_mesa!!! Mais de 7 segundos para ter retorno do'
                           u' facebook. TimeLimitExceeded.')
@@ -1289,7 +1328,8 @@ def passo_trocar_mesa(message, sender_id, loja_id, conversa):
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
             try:
-                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+                r = chain(send_text_message.si(sender_id, loja_id, bot),
+                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
                 r.get()
                 conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
@@ -1298,7 +1338,7 @@ def passo_trocar_mesa(message, sender_id, loja_id, conversa):
         else:
             bot = get_mensagem('mesa1')
             try:
-                r = send_text_message.delay(sender_id, loja_id, bot)
+                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
                 r.get()
                 conversa['conversa'].append({'bot': bot})
             except TimeLimitExceeded:
@@ -1309,26 +1349,20 @@ def passo_trocar_mesa(message, sender_id, loja_id, conversa):
 def passo_menu(message, sender_id, loja_id, conversa):
     if message:
         conversa['conversa'].append({'cliente': message})
-    bot = get_mensagem('auxilio')
     try:
-        r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_menu(conversa))
+        r = send_generic_message.delay(sender_id, loja_id, get_elements_menu(conversa))
         r.get()
-        conversa['conversa'].append({'bot': bot})
     except TimeLimitExceeded:
         app_log.error(u'ERROR:passo_menu!!! Mais de 7 segundos para ter retorno do'
                       u' facebook. TimeLimitExceeded.')
 
 
 def passo_ola(message, sender_id, loja_id, conversa):
-    conversa['conversa'].append({'cliente': message})
     bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
-    bot2 = get_mensagem('menu')
     try:
         r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                  send_text_message.si(sender_id, loja_id, bot2, icon=None))()
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
         r.get()
-        conversa['conversa'].append({'bot': bot1})
-        conversa['conversa'].append({'bot': bot2})
     except TimeLimitExceeded:
         app_log.error(u'ERROR:passo_ola!!! Mais de 7 segundos para ter retorno do'
                       u' facebook. TimeLimitExceeded.')
