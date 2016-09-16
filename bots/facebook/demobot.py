@@ -218,8 +218,8 @@ def send_button_message(sender_id, loja_id, text, buttons):
     return post(loja_id, json=payload)
 
 
-@celery_app.task(time_limit=7)
-def send_text_message(sender_id, loja_id, text, icon=ROBOT_ICON):
+@celery_app.task(bind=True, soft_time_limit=7)
+def send_text_message(self, sender_id, loja_id, text, icon=ROBOT_ICON):
     if icon:
         payload_text = icon + ': ' + text
     else:
@@ -235,8 +235,8 @@ def send_text_message(sender_id, loja_id, text, icon=ROBOT_ICON):
     return post(loja_id, json=payload)
 
 
-@celery_app.task(time_limit=7)
-def send_quickreply_message(sender_id, loja_id, text, quick_replies, icon=ROBOT_ICON):
+@celery_app.task(bind=True, soft_time_limit=7)
+def send_quickreply_message(self, sender_id, loja_id, text, quick_replies, icon=ROBOT_ICON):
     if icon:
         payload_text = icon + ': ' + text
     else:
@@ -253,8 +253,8 @@ def send_quickreply_message(sender_id, loja_id, text, quick_replies, icon=ROBOT_
     return post(loja_id, json=payload)
 
 
-@celery_app.task(time_limit=7)
-def send_generic_message(sender_id, loja_id, elements):
+@celery_app.task(bind=True, soft_time_limit=7)
+def send_generic_message(self, sender_id, loja_id, elements):
     payload = {
         'recipient': {
             'id': sender_id
@@ -533,7 +533,8 @@ def editar_pedido(message, conversa):
     return True
 
 
-def enviar_pedido(sender_id, loja_id, conversa):
+@celery_app.task(bind=True, soft_time_limit=20)
+def enviar_pedido(self, sender_id, loja_id, conversa):
     if conversa['mesa'] is None:
         return
     data = {}
@@ -557,22 +558,28 @@ def resposta_dashboard(message=None, sender_id=None, loja_id=None, conversa=None
     if unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() == u'menu':
         passo_finalizar_contato(sender_id, loja_id, conversa)
     else:
-        data = {}
-        pass
-        data['id_loja'] = loja_id
-        data['origem'] = 'chat'
-        data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name']
-        data['foto_cliente'] = conversa['usuario']['profile_pic']
-        data['cliente'] = message
-        data['uid'] = conversa['uid']
-        url = 'http://localhost:8888/bipy3/api/rest/mensagem_bot'
-        headers = {'content-type': 'application/json',
-                   'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
-        response = requests.post(url, data=json.dumps(data), headers=headers)
-        app_log.debug(repr(response))
+        envia_resposta.delay(conversa, loja_id, message)
 
 
-def troca_mesa_dashboard(sender_id, loja_id, conversa):
+@celery_app.task(bind=True, soft_time_limit=20)
+def envia_resposta(self, conversa, loja_id, message):
+    data = {}
+    pass
+    data['id_loja'] = loja_id
+    data['origem'] = 'chat'
+    data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name']
+    data['foto_cliente'] = conversa['usuario']['profile_pic']
+    data['cliente'] = message
+    data['uid'] = conversa['uid']
+    url = 'http://localhost:8888/bipy3/api/rest/mensagem_bot'
+    headers = {'content-type': 'application/json',
+               'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    app_log.debug(repr(response))
+
+
+@celery_app.task(bind=True, soft_time_limit=20)
+def troca_mesa_dashboard(self, sender_id, loja_id, conversa):
     data = {}
     pass
     data['id_loja'] = loja_id
@@ -587,7 +594,8 @@ def troca_mesa_dashboard(sender_id, loja_id, conversa):
     app_log.debug(repr(response))
 
 
-def notificacao_dashboard(loja_id, conversa, metodo_api):
+@celery_app.task(bind=True, soft_time_limit=20)
+def notificacao_dashboard(self, loja_id, conversa, metodo_api):
     data = {}
     pass
     data['id_loja'] = loja_id
@@ -620,48 +628,30 @@ def ping(path):
                                mimetype='text/plain')
 
 
-@celery_app.task(time_limit=1)
-def teste_tarefa():
-    while 1:
-        app_log.debug('teste_var tarefa:: ' + repr(cache.get('var')))
-        app_log.debug('teste_var2 tarefa:: ' + repr(cache.get('var2')))
+@celery_app.task(bind=True, soft_time_limit=1, default_retry_delay=0, max_retries=3)
+def teste_tarefa(self):
+    try:
+        app_log.debug('>>> tarefa iniciada ::')
         time.sleep(4)
-        app_log.debug('teste_var2 tarefa:: acordei!!!')
-        cache.set('var', cache.get('var') + 1)
-        var2 = cache.get('var2')
-        if var2 is None:
-            app_log.debug('var2 is none:: ')
-        if cache.get('var') > 10:
-            break
+        app_log.debug('>>> tarefa concluida ::')
+    except SoftTimeLimitExceeded as exc:
+        raise self.retry(exc=exc)
+
+
+@celery_app.task(bind=True)
+def error_handler(self, uuid):
+    result = self.app.AsyncResult(uuid)
+    app_log.debug('Task {0} raised exception: {1!r}\n{2!r}'.format(
+          uuid, result.result, result.traceback))
 
 
 @flask_app.route("/teste_tarefa", methods=['GET', 'POST'])
 def teste_tarefa_route():
-    uid = request.args.get('uid')
-    uid = '1'
-    cache.set('var', 0)  # timeout em segundos, sem timeout nunca expira
-    cache.add('var2', {
-        'itens_pedido': [],
-    }, time=10)
-    try:
-        r = teste_tarefa.delay()
-        r.get()
-    except TimeLimitExceeded:
-        app_log.debug('teste_var2 rota :: nao vai acordar, deu ruim')
-
-    with sender_lock(uid) as lock:
-        if lock:
-            conversa = cache.get('var2')
-            app_log.debug('teste_var2 rota 1:: ' + uid + ':: ' + repr(conversa))
-            if uid == '2':
-                conversa = None
-            conversa['itens_pedido'] += [uid]
-            app_log.debug('teste_var2 rota 2:: ' + uid + ':: ' + repr(conversa))
-            cache.set('var2', conversa, time=10)
-            conversa = cache.get('var2')
-            app_log.debug('teste_var2 rota 3:: ' + uid + ':: ' + repr(conversa))
+    app_log.debug('>>> inicio requisicao ::')
+    teste_tarefa.apply_async((), link_error=error_handler.s())
     resp = Response('success', status=200, mimetype='text/plain')
     resp.status_code = 200
+    app_log.debug('>>> fim requisicao ::')
     return resp
 
 
@@ -819,12 +809,7 @@ def webhook():
                                     conversa['passo'] = 16
                                     passo_rever_pedido_2(message, sender_id, loja_id, conversa)
                                 elif payload == 'pedir_conta':
-                                    try:
-                                        r = send_text_message.delay(sender_id, loja_id, get_mensagem('desenv'))
-                                        r.get()
-                                    except TimeLimitExceeded:
-                                        app_log.error(u'ERROR:mensagem_pedido!!! Mais de 7 segundos para ter retorno do'
-                                                      u' facebook. TimeLimitExceeded.')
+                                    send_text_message.delay(sender_id, loja_id, get_mensagem('desenv'))
                                 elif payload == 'pedir_mais':
                                     conversa['passo'] = 17
                                     passo_pedir_mais(message, sender_id, loja_id, conversa)
@@ -846,13 +831,7 @@ def webhook():
                         elif x.get('dashboard'):
                             conversa['suspensa'] += 1
                             conversa['uid'] = x['dashboard']['uid']
-                            try:
-                                r = send_text_message.delay(sender_id, loja_id, x['dashboard']['message'],
-                                                            icon=u'\U0001f464')
-                                r.get()
-                            except TimeLimitExceeded:
-                                app_log.error(u'ERROR:mensagem dashboard!!! Mais de 7 segundos para ter retorno do'
-                                              u' facebook. TimeLimitExceeded.')
+                            send_text_message.delay(sender_id, loja_id, x['dashboard']['message'], icon=u'\U0001f464')
                         cache.set(sender_id, conversa, time=EXPIRACAO_CACHE_CONVERSA)
         resp = Response('success', status=200, mimetype='text/plain')
         resp.status_code = 200
@@ -892,12 +871,7 @@ def passo_finalizar_contato(sender_id, loja_id, conversa):
         mensagem_pedido(sender_id, loja_id, conversa)
     elif conversa['passo'] == 8:
         bot = get_mensagem('anotado', arg1=conversa['usuario']['first_name'])
-        try:
-            r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
-            r.get()
-        except TimeLimitExceeded:
-            app_log.error(u'ERROR:quick reply pedido!!! Mais de 7 segundos para ter retorno do'
-                          u' facebook. TimeLimitExceeded.')
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
         conversa['conversa'].append({'bot': bot})
     elif conversa['passo'] == 10:
         passo_tres(None, sender_id, loja_id, conversa)
@@ -939,16 +913,11 @@ def passo_pedir_cardapio(message, sender_id, loja_id, conversa):
 
 
 def mensagem_sucesso(sender_id, loja_id, conversa, mensagem):
-    notificacao_dashboard(loja_id, conversa, mensagem)
+    notificacao_dashboard.apply_async((loja_id, conversa, mensagem))
     bot = get_mensagem(mensagem)
-    try:
-        r = chain(send_text_message.si(sender_id, loja_id, bot),
-                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-        r.get()
-        conversa['conversa'].append({'bot': bot})
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:mensagem_cardapio!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
+                                                                                 get_elements_menu(conversa)))()
+    conversa['conversa'].append({'bot': bot})
 
 
 def passo_mesa_dependencia(message, sender_id, loja_id, conversa, mensagem, passo):
@@ -963,36 +932,21 @@ def passo_mesa_dependencia(message, sender_id, loja_id, conversa, mensagem, pass
     else:
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
-            try:
-                r = chain(send_text_message.si(sender_id, loja_id, bot),
-                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_mesa_cardapio:robo!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
+                                                                                         get_elements_menu(conversa)))()
+            conversa['conversa'].append({'bot': bot})
         else:
             bot = get_mensagem('mesa1')
-            try:
-                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_mesa_cardapio:mesa1!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+            conversa['conversa'].append({'bot': bot})
 
 
 def passo_finalizar_enviar(message, sender_id, loja_id, conversa):
     conversa['conversa'].append({'cliente': message})
-    enviar_pedido(sender_id, loja_id, conversa)
+    enviar_pedido.delay(sender_id, loja_id, conversa)
     set_variaveis(conversa)
-    try:
-        r = chain(send_text_message.si(sender_id, loja_id, get_mensagem('enviar')),
-                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-        r.get()
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_finalizar_enviar!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    chain(send_text_message.si(sender_id, loja_id, get_mensagem('enviar')),
+          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
@@ -1008,26 +962,15 @@ def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
             pedidos += repr(item['quantidade']) + ' ' + item['descricao']
         bot1 = pedidos
         bot2 = get_mensagem('finalizar')
-        try:
-            r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                      send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_finalizar_pedido(),
-                                                 icon=None))()
-            r.get()
-            conversa['conversa'].append({'bot': bot1})
-            conversa['conversa'].append({'bot': bot2})
-        except TimeLimitExceeded:
-            app_log.error(u'ERROR:passo_finalizar_pedido!!! Mais de 7 segundos para ter retorno do'
-                          u' facebook. TimeLimitExceeded.')
+        chain(send_text_message.si(sender_id, loja_id, bot1),
+              send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_finalizar_pedido(), icon=None))()
+        conversa['conversa'].append({'bot': bot1})
+        conversa['conversa'].append({'bot': bot2})
     else:
         bot = get_mensagem('rever2')
-        try:
-            r = chain(send_text_message.si(sender_id, loja_id, bot),
-                      send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-            r.get()
-            conversa['conversa'].append({'bot': bot})
-        except TimeLimitExceeded:
-            app_log.error(u'ERROR:passo_finalizar_pedido!!! Mais de 7 segundos para ter retorno do'
-                          u' facebook. TimeLimitExceeded.')
+        chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
+                                                                                     get_elements_menu(conversa)))()
+        conversa['conversa'].append({'bot': bot})
 
 
 def passo_pedir_mais(message, sender_id, loja_id, conversa):
@@ -1037,13 +980,8 @@ def passo_pedir_mais(message, sender_id, loja_id, conversa):
                   datetime_pedido=(False, None),
                   conversa_conversa=(False, None))
     bot = get_mensagem('pedido3')
-    try:
-        r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
-        r.get()
-        conversa['conversa'].append({'bot': bot})
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_pedir_mais!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+    conversa['conversa'].append({'bot': bot})
 
 
 def passo_rever_pedido_2(message, sender_id, loja_id, conversa):
@@ -1063,27 +1001,17 @@ def passo_rever_pedido_2(message, sender_id, loja_id, conversa):
                       conversa_conversa=(False, None))
         bot1 = get_mensagem('rever')
         bot2 = pedidos
-        try:
-            r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                      send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_voltar_menu(), icon=None))()
-            r.get()
-            conversa['conversa'].append({'bot': bot1})
-            conversa['conversa'].append({'bot': bot2})
-        except TimeLimitExceeded:
-            app_log.error(u'ERROR:passo_rever_pedido_2!!! Mais de 7 segundos para ter retorno do'
-                          u' facebook. TimeLimitExceeded.')
+        chain(send_text_message.si(sender_id, loja_id, bot1),
+              send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_voltar_menu(), icon=None))()
+        conversa['conversa'].append({'bot': bot1})
+        conversa['conversa'].append({'bot': bot2})
     else:
         bot = get_mensagem('rever2')
-        try:
-            r = chain(send_text_message.si(sender_id, loja_id, bot),
+        chain(send_text_message.si(sender_id, loja_id, bot),
                       send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-            r.get()
-            conversa['conversa'].append({'bot': bot})
-            # TODO ?pegar os pedidos em aberto do servidor? pode ser complicado, pois o pedido já pode ter ido, é melhor
-            # TODO deixar isso manualmente.
-        except TimeLimitExceeded:
-            app_log.error(u'ERROR:passo_rever_pedido_2!!! Mais de 7 segundos para ter retorno do'
-                          u' facebook. TimeLimitExceeded.')
+        conversa['conversa'].append({'bot': bot})
+        # TODO ?pegar os pedidos em aberto do servidor? pode ser complicado, pois o pedido já pode ter ido, é melhor
+        # TODO deixar isso manualmente.
 
 
 def passo_trocar_mesa_2(message, sender_id, loja_id, conversa):
@@ -1114,39 +1042,24 @@ def passo_novo_pedido(message, sender_id, loja_id, conversa):
 
 def mensagem_mesa(conversa, loja_id, sender_id):
     bot = get_mensagem('mesa')
-    try:
-        r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
-        r.get()
-        conversa['conversa'].append({'bot': bot})
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:mensagem_mesa!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+    conversa['conversa'].append({'bot': bot})
 
 
 def passo_nao_entendido(message, sender_id, loja_id, conversa):
     conversa['conversa'].append({'cliente': message})
     bot = get_mensagem('robo')
-    try:
-        r = chain(send_text_message.si(sender_id, loja_id, bot),
-                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-        r.get()
-        conversa['conversa'].append({'bot': bot})
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_nao_entendido!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
+                                                                                 get_elements_menu(conversa)))()
+    conversa['conversa'].append({'bot': bot})
 
 
 def passo_agradecimento(message, sender_id, loja_id, conversa):
     conversa['conversa'].append({'cliente': message})
     bot = get_mensagem('agradeco')
-    try:
-        r = chain(send_text_message.si(sender_id, loja_id, bot),
-                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-        r.get()
-        conversa['conversa'].append({'bot': bot})
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_agradecimento!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
+                                                                                 get_elements_menu(conversa)))()
+    conversa['conversa'].append({'bot': bot})
 
 
 def passo_tres(message, sender_id, loja_id, conversa):
@@ -1154,13 +1067,8 @@ def passo_tres(message, sender_id, loja_id, conversa):
         conversa['conversa'].append({'cliente': message})
     conversa['nao_entendidas'] += 1
     bot = get_mensagem('anotado2')
-    try:
-        r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
-        r.get()
-        conversa['conversa'].append({'bot': bot})
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_tres!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
+    conversa['conversa'].append({'bot': bot})
 
 
 def passo_dois(message, sender_id, loja_id, conversa):
@@ -1173,39 +1081,23 @@ def passo_dois(message, sender_id, loja_id, conversa):
                       datetime_pedido=(False, None),
                       conversa_conversa=(False, None))
         bot = get_mensagem('anotado', arg1=conversa['usuario']['first_name'])
-        try:
-            r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
-            r.get()
-            conversa['conversa'].append({'bot': bot})
-        except TimeLimitExceeded:
-            app_log.error(u'ERROR:passo_dois!!! Mais de 7 segundos para ter retorno do'
-                          u' facebook. TimeLimitExceeded.')
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
+        conversa['conversa'].append({'bot': bot})
     else:
         conversa['passo'] = 9
         conversa['nao_entendidas'] += 1
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
-            try:
-                r = chain(send_text_message.si(sender_id, loja_id, bot),
-                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_dois!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
+                                                                                         get_elements_menu(conversa)))()
+            conversa['conversa'].append({'bot': bot})
         else:
             bot1 = get_mensagem('qtde', arg1=is_pedido_anotado)
             bot2 = get_mensagem('qtde1')
-            try:
-                r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                          send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_voltar_menu(),
-                                                     icon=None))()
-                r.get()
-                conversa['conversa'].append({'bot': bot1})
-                conversa['conversa'].append({'bot': bot2})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_dois!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            chain(send_text_message.si(sender_id, loja_id, bot1),
+                  send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_voltar_menu(), icon=None))()
+            conversa['conversa'].append({'bot': bot1})
+            conversa['conversa'].append({'bot': bot2})
 
 
 def passo_um(message, sender_id, loja_id, conversa):
@@ -1222,36 +1114,22 @@ def passo_um(message, sender_id, loja_id, conversa):
         conversa['passo'] = 7
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
-            try:
-                r = chain(send_text_message.si(sender_id, loja_id, bot),
-                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_um!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
+                                                                                         get_elements_menu(conversa)))()
+            conversa['conversa'].append({'bot': bot})
         else:
             bot = get_mensagem('mesa1')
-            try:
-                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_um!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+            conversa['conversa'].append({'bot': bot})
 
 
 def mensagem_pedido(sender_id, loja_id, conversa):
     bot = get_mensagem('pedido')
     bot1 = get_mensagem('pedido1')
-    try:
-        r = chain(send_text_message.si(sender_id, loja_id, bot),
-                  send_quickreply_message.si(sender_id, loja_id, bot1, get_quickreply_voltar_menu(), icon=None))()
-        r.get()
-        conversa['conversa'].append({'bot': bot})
-        conversa['conversa'].append({'bot': bot1})
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:mensagem_pedido!!! Mais de 7 segundos para ter retorno do facebook. TimeLimitExceeded.')
+    chain(send_text_message.si(sender_id, loja_id, bot),
+          send_quickreply_message.si(sender_id, loja_id, bot1, get_quickreply_voltar_menu(), icon=None))()
+    conversa['conversa'].append({'bot': bot})
+    conversa['conversa'].append({'bot': bot1})
 
 
 def passo_rever_pedido(message, sender_id, loja_id, conversa):
@@ -1261,23 +1139,13 @@ def passo_rever_pedido(message, sender_id, loja_id, conversa):
         conversa['nao_entendidas'] += 1
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
-            try:
-                r = chain(send_text_message.si(sender_id, loja_id, bot),
-                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_rever_pedido!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            chain(send_text_message.si(sender_id, loja_id, bot),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+            conversa['conversa'].append({'bot': bot})
         else:
             bot = get_mensagem('rever1')
-            try:
-                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_rever_pedido!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+            conversa['conversa'].append({'bot': bot})
     else:
         conversa['passo'] = 5
         set_variaveis(conversa,
@@ -1285,13 +1153,8 @@ def passo_rever_pedido(message, sender_id, loja_id, conversa):
                       datetime_pedido=(False, None),
                       conversa_conversa=(False, None))
         bot = get_mensagem('anotado1')
-        try:
-            r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
-            r.get()
-            conversa['conversa'].append({'bot': bot})
-        except TimeLimitExceeded:
-            app_log.error(u'ERROR:passo_rever_pedido!!! Mais de 7 segundos para ter retorno do'
-                          u' facebook. TimeLimitExceeded.')
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
+        conversa['conversa'].append({'bot': bot})
 
 
 def passo_trocar_mesa(message, sender_id, loja_id, conversa):
@@ -1299,73 +1162,43 @@ def passo_trocar_mesa(message, sender_id, loja_id, conversa):
     if define_mesa(message, conversa):
         conversa['passo'] = 2
         if len(conversa['mesa']) == 2 and conversa['mesa'][0] == conversa['mesa'][1]:
-            try:
-                bot = get_mensagem('mesa4')
-                r = chain(send_text_message.si(sender_id, loja_id, bot),
-                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_trocar_mesa 2!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            bot = get_mensagem('mesa4')
+            chain(send_text_message.si(sender_id, loja_id, bot),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+            conversa['conversa'].append({'bot': bot})
             return
-        troca_mesa_dashboard(sender_id, loja_id, conversa)
+        troca_mesa_dashboard.delay(sender_id, loja_id, conversa)
         set_variaveis(conversa,
                       itens_pedido=(False, None),
                       datetime_pedido=(False, None),
                       conversa_conversa=(False, None))
         bot = get_mensagem('mesa3', arg1=conversa['mesa'][0])
-        try:
-            r = chain(send_text_message.si(sender_id, loja_id, bot),
-                      send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-            r.get()
-            conversa['conversa'].append({'bot': bot})
-        except TimeLimitExceeded:
-            app_log.error(u'ERROR:passo_trocar_mesa!!! Mais de 7 segundos para ter retorno do'
-                          u' facebook. TimeLimitExceeded.')
+        chain(send_text_message.si(sender_id, loja_id, bot),
+              send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+        conversa['conversa'].append({'bot': bot})
     else:
         conversa['passo'] = 3
         if conversa['nao_entendidas'] > 1:
             bot = get_mensagem('robo')
-            try:
-                r = chain(send_text_message.si(sender_id, loja_id, bot),
-                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_trocar_mesa!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            chain(send_text_message.si(sender_id, loja_id, bot),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+            conversa['conversa'].append({'bot': bot})
         else:
             bot = get_mensagem('mesa1')
-            try:
-                r = send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
-                r.get()
-                conversa['conversa'].append({'bot': bot})
-            except TimeLimitExceeded:
-                app_log.error(u'ERROR:passo_trocar_mesa!!! Mais de 7 segundos para ter retorno do'
-                              u' facebook. TimeLimitExceeded.')
+            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+            conversa['conversa'].append({'bot': bot})
 
 
 def passo_menu(message, sender_id, loja_id, conversa):
     if message:
         conversa['conversa'].append({'cliente': message})
-    try:
-        r = send_generic_message.delay(sender_id, loja_id, get_elements_menu(conversa))
-        r.get()
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_menu!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    send_generic_message.delay(sender_id, loja_id, get_elements_menu(conversa))
 
 
 def passo_ola(message, sender_id, loja_id, conversa):
     bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
-    try:
-        r = chain(send_text_message.si(sender_id, loja_id, bot1),
-                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-        r.get()
-    except TimeLimitExceeded:
-        app_log.error(u'ERROR:passo_ola!!! Mais de 7 segundos para ter retorno do'
-                      u' facebook. TimeLimitExceeded.')
+    chain(send_text_message.si(sender_id, loja_id, bot1),
+          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 if __name__ == "__main__":
