@@ -10,70 +10,29 @@
   </div>
     <form action="/pedidos/" method="post" id="form-filtros-pedido">
     <div class="filtros-pedidos">
-       <div class="form-group col-md-6">
-          {% csrf_token %}
-          <div class="col-md-12">
-            <h4 class="font17"><i class="fa fa-calendar-times-o"></i> Visualizar os pedidos a partir de:</h4><br>
-          </div>
-          <div class="col-md-6">
-              <input type="text" name="data_filtro" value="{% if filtros.data_filtro %}{{filtros.data_filtro}}{% endif %}" placeholder="selecione a data..." id="pedido-de" class="form-control">
-          </div>
-          <div class="col-md-6">
-            <label>
-              <select name="hora_filtro" class="form-control">
-                  <option value="00:00" {% if filtros.hora_filtro and filtros.hora_filtro = '00:00' %}selected="selected"{% endif %}>00:00</option>
-                  <option value="01:00" {% if filtros.hora_filtro and filtros.hora_filtro = '01:00' %}selected="selected"{% endif %}>01:00</option>
-                  <option value="02:00" {% if filtros.hora_filtro and filtros.hora_filtro = '02:00' %}selected="selected"{% endif %}>02:00</option>
-                  <option value="03:00" {% if filtros.hora_filtro and filtros.hora_filtro = '03:00' %}selected="selected"{% endif %}>03:00</option>
-                  <option value="04:00" {% if filtros.hora_filtro and filtros.hora_filtro = '04:00' %}selected="selected"{% endif %}>04:00</option>
-                  <option value="05:00" {% if filtros.hora_filtro and filtros.hora_filtro = '05:00' %}selected="selected"{% endif %}>05:00</option>
-                  <option value="06:00" {% if filtros.hora_filtro and filtros.hora_filtro = '06:00' %}selected="selected"{% endif %}>06:00</option>
-                  <option value="07:00" {% if filtros.hora_filtro and filtros.hora_filtro = '07:00' %}selected="selected"{% endif %}>07:00</option>
-                  <option value="08:00" {% if filtros.hora_filtro and filtros.hora_filtro = '08:00' %}selected="selected"{% endif %}>08:00</option>
-                  <option value="09:00" {% if filtros.hora_filtro and filtros.hora_filtro = '09:00' %}selected="selected"{% endif %}>09:00</option>
-                  <option value="10:00" {% if filtros.hora_filtro and filtros.hora_filtro = '10:00' %}selected="selected"{% endif %}>10:00</option>
-                  <option value="11:00" {% if filtros.hora_filtro and filtros.hora_filtro = '11:00' %}selected="selected"{% endif %}>11:00</option>
-                  <option value="12:00" {% if filtros.hora_filtro and filtros.hora_filtro = '12:00' %}selected="selected"{% endif %}>12:00</option>
-                  <option value="13:00" {% if filtros.hora_filtro and filtros.hora_filtro = '13:00' %}selected="selected"{% endif %}>13:00</option>
-                  <option value="14:00" {% if filtros.hora_filtro and filtros.hora_filtro = '14:00' %}selected="selected"{% endif %}>14:00</option>
-                  <option value="15:00" {% if filtros.hora_filtro and filtros.hora_filtro = '15:00' %}selected="selected"{% endif %}>15:00</option>
-                  <option value="16:00" {% if filtros.hora_filtro and filtros.hora_filtro = '16:00' %}selected="selected"{% endif %}>16:00</option>
-                  <option value="17:00" {% if filtros.hora_filtro and filtros.hora_filtro = '17:00' %}selected="selected"{% endif %}>17:00</option>
-                  <option value="18:00" {% if filtros.hora_filtro and filtros.hora_filtro = '18:00' %}selected="selected"{% endif %}>18:00</option>
-                  <option value="19:00" {% if filtros.hora_filtro and filtros.hora_filtro = '19:00' %}selected="selected"{% endif %}>19:00</option>
-                  <option value="20:00" {% if filtros.hora_filtro and filtros.hora_filtro = '20:00' %}selected="selected"{% endif %}>20:00</option>
-                  <option value="21:00" {% if filtros.hora_filtro and filtros.hora_filtro = '21:00' %}selected="selected"{% endif %}>21:00</option>
-                  <option value="22:00" {% if filtros.hora_filtro and filtros.hora_filtro = '22:00' %}selected="selected"{% endif %}>22:00</option>
-                  <option value="23:00" {% if filtros.hora_filtro and filtros.hora_filtro = '23:00' %}selected="selected"{% endif %}>23:00</option>
-              </select><br>
-            </label>
-          </div>
-
-          <div class="col-md-12">
-              <button id="data_hora_btn_filtro" type="button" class="btn btn-primary btn-verde" onclick="$('#data_hora_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'));$('#form-filtros-pedido').submit();">
-                  <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Selecionar Data/Horario
-                </button><br>
-          </div>
-      </div>
       <div class="col-md-6">
             <h4><i class="fa fa-filter"></i> Filtrar pedidos</h4><br>
             <div class="form-group">
 
               <div class="col-md-6">
-                <input type="text" name="nome_cliente_filtro" placeholder="Cliente..." class="form-control" value="{% if filtros.nome_cliente_filtro %}{{filtros.nome_cliente_filtro}}{% endif %}"><br>
+                <input type="text" name="nome_cliente_filtro" id="campo-nome" placeholder="Cliente..." class="field-filter form-control" value="{% if filtros.nome_cliente_filtro %}{{filtros.nome_cliente_filtro}}{% endif %}"><br>
               </div>
               <div class="col-md-6">
-                <input type="text" name="num_pedido_filtro" placeholder="Número Pedido..." class="form-control" value="{% if filtros.num_pedido_filtro %}{{filtros.num_pedido_filtro}}{% endif %}"><br>
+                <input type="text" name="num_pedido_filtro" id="campo-pedido" placeholder="Número Pedido..." class="field-filter form-control" value="{% if filtros.num_pedido_filtro %}{{filtros.num_pedido_filtro}}{% endif %}"><br>
               </div>
               <div class="col-md-12">
                   <button type="button" id="outros_btn_filtro" class="btn btn-primary btn-verde" onclick="$('#outros_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'));$('#form-filtros-pedido').submit();">
                     <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filtrar
+                  </button>
+                  <button type="button" id="btn_limpar" class="btn btn-primary btn-verde">
+                    <span class="glyphicon glyphicon-erase" aria-hidden="true"></span> Limpar campos
                   </button>
               </div>
             </div>
         </div>
     </div>
     </form>
+    <h4 class="font22"><i class="fa fa-calendar-times-o"></i> Pedidos das ultimas 24 horas:</h4><br>
     <div class="dnd">
         <div class="linha-btn">
             <select class="form-control status-combo" id="sel1">
@@ -172,11 +131,19 @@
                   <div class="lista-pedidos">
                     <a href="javascript:void(0);" class="close">X</a>
                     <div class="bs-example">
+                        <a href="javascript:void(0);" class="list-group-item">
+                            <div class="header-pedido">
+                              <div class="cabecalho">
+                                <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="" >
+                                <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
+                              </div>
+                            </div>
+                        </a>
                         <div class="list-group">
                             {{each itens_pedido}}
                             <!-- Item pedido-->
                             <a href="javascript:void(0);" class="list-group-item">
-                                {{= descricao}}<span class="badge">{{= quantidade}}</span>
+                                {{= quantidade}} {{= descricao}}
                             </a>
                             <!--Fim item-->
                             {{/each}}
@@ -186,7 +153,7 @@
 
                   <!-- inicio dialogo bot -->
                     <div class="content-dialog">
-                  <div class="centraliza-popup dialogo {{if origem == 'fbmessenger'}}messeger{{else}}telegram{{/if}}">
+                  <div class="dialogo {{if origem == 'fbmessenger'}}messeger{{else}}telegram{{/if}}">
                     <a href="javascript:void(0);" class="close">X</a>
                     <div class="cabecalho-chat">
                       <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}_1" data-minutes-passed="0">0 minutos</span></span></p>
@@ -339,6 +306,12 @@
         $('.bg').show();
     });
 
+    // Abrir dialogo de dentro da lista de pedidos
+    $('.coluna').on('click', '.lista-pedidos .open-dialogo', function() {
+        $('.lista-pedidos').hide();
+        $(this).closest(".detalhe-pedido-icon").find('div.dialogo').show();
+    });
+
     // Abrir lista de pedidos
     $('.coluna').on('click', '.open-lista-pedidos', function() {
         $(this).parent('.status-label').parent(".detalhe-pedido-icon").find("div.lista-pedidos").show();
@@ -346,7 +319,34 @@
     });
 
     // Troca de colunas no clique dos botoes de status
-    $('.coluna').on('click', '.status-list label', function() {
+    $('.coluna').on('click', '.status-list-detalhe-del label', function() {
+      $(this).parent(".status-list").find("input").prop("checked", false);
+      $(this).find("input").prop("checked", true);
+
+      //clona e copia o box com o pedido para a coluna do status escolhido
+      $destino = $(this).attr("class");
+      $(this).closest('li').hide("300");
+      $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
+      $(this).closest('li').remove();
+      $.post('/bipy3/api/rest/status',
+             {uid: $(this).find("input").attr("data-uid"), status: $(this).find("input").attr("name")},
+             function(data) {
+               console.log(data);
+             }
+      )
+      .fail(function(data) {
+        if (data.status === 403)
+        {
+            alert('Sessão inválida. Realize o login novamente.');
+            window.location.href = '/?next='+window.location.pathname;
+        }
+      });
+    });
+
+    // Troca de colunas no clique dos botoes de status dentro da lista de itens
+    $('.coluna').on('click', '.status-list-detalhe label', function() {
+      $("div.lista-pedidos").hide();
+      $(".bg").hide();
       $(this).parent(".status-list").find("input").prop("checked", false);
       $(this).find("input").prop("checked", true);
 
@@ -402,6 +402,11 @@
         $('.coluna').animate({
           width: "19.2%"
         }, 1500 );
+    });
+
+    // Botao limpar
+    $('#btn_limpar').click(function(){
+        $('#campo-nome, #campo-pedido').val('');
     });
 
     //Expandir area das colunas

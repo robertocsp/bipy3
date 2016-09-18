@@ -1,0 +1,389 @@
+{% extends "includes/layout.html" %}
+
+{% block  historico %}active{% endblock %}
+
+{% block conteudo %}
+
+<div class="container hist">
+  <div class="page-header">
+    <h1><i class="fa fa-calendar-o"></i> Histórico de Pedidos</h1>
+  </div>
+  <div class="filtros-pedidos col-md-12">
+    <h4><i class="fa fa-filter"></i> Filtrar pedidos</h4><br>
+    <div class="form-group">
+      <div class="col-md-4">
+        <select class="form-control" id="sel1">
+          <option>Status Pedido</option>
+          <option>Solicitado</option>
+          <option>Em processo</option>
+          <option>Concluído</option>
+          <option>Enregue</option>
+          <option>Cancelado</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <input type="text" placeholder="Cliente..." class="form-control">
+      </div>
+      <div class="col-md-4">
+        <input type="text" placeholder="Número Pedido..." class="form-control">
+      </div>
+      <br><br>
+        <div class="col-md-7">
+          <br><label><i class="fa fa-calendar-check-o"></i>  Período:</label><br>
+          <label><input type="text" id="pedido-de" placeholder="De..." class="form-control date"> <input type="text" id="pedido-ate" placeholder="Até..." class="form-control date"></label>
+        </div>
+    </div>
+  </div>
+     <div class="infos">
+       <label class="status-label"><i class="fa fa-tags"></i> Status</label>
+       <label class="data"><i class="fa fa-calendar"></i> Data</label>
+       <label class="hora"><i class="fa fa-tachometer"></i> Hora</label>
+       <label class="cliente"><i class="fa fa-user-md"></i> Cliente</label>
+       <label class="pedido-title"><i class="fa fa-map"></i> Pedido</label>
+       <label class="origem"><i class="fa fa-globe"></i> Origem</label>
+    </div>
+    <div class="pedidos pizzaria">
+      <div id="accordion">
+
+          <!-- Início pedido-->
+
+          <!-- Informações-->
+          <h3 class="info">
+             <label class="status-label text-verde"><i class="fa fa-thumbs-o-up fa-2x"></i> Entregue</label>
+             <label class="data"> 17 de Maio de 2016</label>
+             <label class="hora">21:38</label>
+             <label class="cliente">Fábio Marques (21-99202-4832)</label>
+             <label class="pedido-title">1002002</label>
+             <label class="telegram"><i class="fa fa-send"></i> Telegram</label>
+          </h3>
+
+          <!-- Detalhe -->
+          <div class="detalhe">
+              <div class="col-md-6 detalhe-left">
+
+                <!-- Lista de pedidos -->
+                 <div class="lista-pedidos"><br>
+                    <h4><i class="fa fa-list-ol"></i> Itens do pedido</h4>
+                    <div class="bs-example">
+                        <div class="list-group">
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                </span> Pizza <span class="badge">2</span>
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 Coca-cola <span class="badge">1</span>
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 Sobremesa <span class="badge">3</span>
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 Cerveja <span class="badge">6</span>
+                            </a>
+                        </div>
+                    </div>
+                 </div>
+                 <!-- Fim lista de pedido -->
+              </div>
+              <div class="col-md-6"><br>
+                <h4><i class="fa fa-comments-o"></i> Chat</h4>
+
+                <!-- Inicio dialogo -->
+                <div class="dialogo telegram">
+                  <div class="cabecalho-chat">
+                    <p>Fábio Marques<br> <span class="ultimo">Último pedido feito há 3 dias</span><p>
+                  </div>
+                  <ul>
+                    <li>
+                      <span>Enviado 12 de maio às 19:32</span>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>Olá</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Olá, Fábio! Digite o número de sua mesa para iniciarmos o seu atendimento.</p>
+                        </div>
+                    </li>
+                     <li class="cons">
+                        <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>15</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li>
+                      <span>Enviado 12 de maio às 19:33</span>
+                    </li>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Excelente! Veja o nosso cardápio e digite aqui o que deseja. Ah, quanto mais detalhado melhor :)</p>
+                        </div>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>1 chope escuro 300 ml</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Mais alguma coisa?</p>
+                        </div>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="img/perfil.jpg" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>não</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li>
+                      <span>Enviado 12 de maio às 19:34</span>
+                    </li>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Ok, seu pedido já está indo.</p>
+                        </div>
+                    </li>
+                  </ul>
+                  <br><br>
+                </div>
+
+                <!-- Fim Dialogo -->
+              </div>
+            </div>
+
+            <!-- Fim pedido-->
+
+            <!-- Início Pedido-->
+
+            <!-- Informações-->
+            <h3 class="info">
+               <label class="status-label text-red"><i class="fa fa-thumbs-o-down fa-2x"></i> Cancelado</label>
+               <label class="data"> 17 de Maio de 2016</label>
+               <label class="hora">21:55</label>
+               <label class="cliente">Roberto Pereira (21-81202-4832)</label>
+               <label class="pedido-title">1002039</label>
+               <label class="telegram"><i class="fa fa-facebook"></i> Messenger</label>
+            </h3>
+
+            <!-- Detalhe -->
+            <div class="detalhe">
+              <div class="col-md-6 detalhe-left">
+
+                 <!-- Lista de pedido -->
+                 <div class="lista-pedidos"><br>
+                    <h4><i class="fa fa-list-ol"></i> Itens do pedido</h4>
+                    <div class="bs-example">
+                        <div class="list-group">
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                </span> Pizza <span class="badge">2</span>
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 Coca-cola <span class="badge">1</span>
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 Sobremesa <span class="badge">3</span>
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 Cerveja <span class="badge">6</span>
+                            </a>
+                        </div>
+                    </div>
+                 </div>
+
+                 <!-- Fim lista de pedido -->
+
+              </div>
+
+              <!-- Inicio dialogo -->
+
+              <div class="col-md-6"><br>
+                <h4><i class="fa fa-comments-o"></i> Chat</h4>
+                <div class="dialogo messeger">
+                  <div class="cabecalho-chat">
+                    <p>Fábio Marques<br> <span class="ultimo">Último pedido feito há 3 dias</span><p>
+                  </div>
+                  <ul>
+                    <li>
+                      <span>Enviado 12 de maio às 19:32</span>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>Olá</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Olá, Fábio! Digite o número de sua mesa para iniciarmos o seu atendimento.</p>
+                        </div>
+                    </li>
+                     <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>15</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Excelente! Veja o nosso cardápio e digite aqui o que deseja. Ah, quanto mais detalhado melhor :)</p>
+                        </div>
+                    </li>
+                    <li>
+                      <span>Enviado 12 de maio às 19:33</span>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>1 chope escuro 300 ml</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Mais alguma coisa?</p>
+                        </div>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>não</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li>
+                      <span>Enviado 12 de maio às 19:34</span>
+                    </li>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Ok, seu pedido já está indo.</p>
+                        </div>
+                    </li>
+                  </ul>
+                  <br><br>
+                </div>
+              </div>
+
+              <!-- Fim dialogo -->
+
+            </div>
+
+          <!--final pedido-->
+
+          <!-- Início pedido-->
+            <h3 class="info">
+               <label class="status-label text-verde"><i class="fa fa-thumbs-o-up fa-2x "></i> Entregue</label>
+               <label class="data"> 17 de Maio de 2016</label>
+               <label class="hora">22:05</label>
+               <label class="cliente">Gustavo Guly (21-9999-7766)</label>
+               <label class="pedido-title">1003445</label>
+               <label class="messenger"><i class="fa fa-send"></i> Telegram</label>
+            </h3>
+           <div class="detalhe">
+           </div>
+
+          <!--final pedido-->
+
+          <!-- Início pedido-->
+            <h3 class="info">
+               <label class="status-label text-azul"><i class="fa fa-hand-grab-o fa-2x"></i> Em processo</label>
+               <label class="data"> 17 de Maio de 2016</label>
+               <label class="hora">23:01</label>
+               <label class="cliente">Rodrigo Failace (21-96202-4832)</label>
+               <label class="pedido-title">1002099</label>
+               <label class="telegram"><i class="fa fa-send"></i> Telegram</label>
+            </h3>
+            <div class="detalhe">
+            </div>
+
+          <!--final pedido-->
+
+          <!-- Início pedido-->
+            <h3 class="info">
+               <label class="status-label text-laranja"><i class="fa fa-hand-paper-o fa-2x"></i> Solicitado</label>
+               <label class="data"> 17 de Maio de 2016</label>
+               <label class="hora">23:55</label>
+               <label class="cliente">Gelurmérsio (21-81202-4832)</label>
+               <label class="pedido-title">1002039</label>
+               <label class="messenger"><i class="fa fa-facebook"></i> Messenger</label>
+            </h3>
+            <div class="detalhe">
+            </div>
+          <!--final pedido-->
+        </div>
+    </div>
+
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="text/javascript">
+      $(document).ready(function($) {
+
+        $('#accordion').find('h3').click(function(){
+          $(this).next().slideToggle('slow');
+
+          $(".detalhe").not($(this).next()).slideUp('slow');
+
+          var topo = $(this).offset().top + -50;
+          $("body").animate({scrollTop : topo }, 800);
+        });
+
+        $('#pedido-de, #pedido-ate').datepicker({
+            language: 'pt-BR'
+        });
+
+      });
+
+    </script>
+
+{% endblock %}

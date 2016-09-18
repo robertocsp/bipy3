@@ -41,14 +41,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/"><img src="../static/bipy3/img/logo-header.png" /></a>
+          <a class="navbar-brand" href="/"><img src="../static/bipy3/img/logo-header.png" /> <span class="nome-loja">/ {{ request.session.nome_loja }}</span></a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <!--<li class="{% block  Dashboard %}{% endblock %}"><a href="/home">Dashboard <span class="sr-only">(current)</span></a></li>-->
             <!--<li class="{% block  upload %}{% endblock %}"><a href="/upload">Carregar Cardápio</a>-->
             <li class="{% block  pedidos %}{% endblock %}"><a href="/pedidos">Pedidos</a></li>
-            <!--<li class="{% block  historico %}{% endblock %}"><a href="/historico">Histórico de pedidos</a></li>-->
+            <li class="{% block  historico %}{% endblock %}"><a href="/historico">Histórico de pedidos</a></li>
             <li class="{% block  relacionamento %}{% endblock %}"><a href="/relacionamento">Relacionamento com Clientes</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
@@ -67,9 +67,13 @@
       </div>
     </nav>
 
-    {{ request.session.nome_loja }}
-
     {% block conteudo %}Conteudo pagina{% endblock %}
+
+    <div class="footer">
+      <div class="container">
+        <p>©Copyright Bipy3 2016. Todos os direitos reservados. <br /><a href="http://bipy3.com/termos.html">Termos e condições de uso</a></p>
+      </div>
+    </div>
 
     {% block scripts %} Scripst inline {% endblock %}
 

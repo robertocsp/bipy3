@@ -11,14 +11,14 @@
       </div>
     </div>
     <div class="conteudo-pedido">
-      <ul>
-        <li><label class="status-label"><strong>N&#186; pedido:</strong> {{ card_uid }}</label></li>
-        <li class="{% if pedido.origem == 'fbmessenger' %}messeger {% endif %}detalhe-pedido-icon">
-          <label class="status-label">
-            <strong>Detalhes:</strong>
+      <div class="detalhe-conteudo">
+        <div><label class="status-label"><strong><i class="fa fa-barcode"></i> Pedido:</strong> {{ card_uid }}</label></div>
+        <div><label class="status-label"><strong><i class="fa fa-tag"></i> Mesa:</strong> {{ pedido.mesa }}</label></div>
+        <div class="{% if pedido.origem == 'fbmessenger' %}messeger {% endif %}detalhe-pedido-icon">
+          <label class="interacao status-label">
+            <strong><i class="fa fa-desktop"></i> Interação:</strong>
             <i id="{{ card_uid }}_dialogo" class="logo open-dialogo"></i>
-            <i class="fa fa-list-ol open-lista-pedidos"></i>
-            <i id="{{ card_uid }}_mesa">{{ pedido.mesa }}</i>
+            <i class="fa fa-wpforms open-lista-pedidos"></i>
           </label>
 
           <!-- Lista de pedidos-->
@@ -26,11 +26,45 @@
             <a href="javascript:void(0);" class="close">X</a>
             <div class="bs-example">
                 <div class="list-group">
+                    <a href="javascript:void(0);" class="list-group-item">
+                       <div class="cabecalho">
+                            <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/bipy3/img/default_user.png{% endif %}" width="40" height="40" alt="" >
+                            <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span id="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
+                       </div>
+                    </a>
+                    <a href="javascript:void(0);" class="list-group-item border-4 detalhes-itens">
+                        <label class="status-label">
+                            <strong>Detalhes:</strong>
+                            <i id="{{ card_uid }}_dialogo" class="logo open-dialogo"></i>
+                            <i class="fa fa-wpforms open-lista-pedidos"></i>
+                            <i id="{{ card_uid }}_mesa" class="mesa-numero">{{ pedido.mesa }}</i>
+                        </label>
+                        <span class="border">border</span>
+                    </a>
                     {% for item in pedido.itens.all %}
                     <a href="javascript:void(0);" class="list-group-item">
-                        {{ item.produto }}<span class="badge">{{ item.quantidade }}</span>
+                        {{ item.quantidade }} {{ item.produto }}
                     </a>
                     {% endfor %}
+                    <a href="javascript:void(0);" class="list-group-item">
+                       <div class="status-list status-list-detalhe">
+                        <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid="{{ card_uid }}"/>
+                            <i class="fa fa-hand-paper-o"></i>
+                        </label>
+                        <label class="em-processo"><input type="radio" name="em-processo" data-uid="{{ card_uid }}"/>
+                            <i class="fa fa-hand-grab-o"></i>
+                        </label>
+                        <label class="concluido"><input type="radio" name="concluido" data-uid="{{ card_uid }}"/>
+                            <i class="fa fa-hand-pointer-o"></i>
+                        </label>
+                        <label class="entregue"><input type="radio" name="entregue" data-uid="{{ card_uid }}"/>
+                            <i class="fa fa-thumbs-o-up"></i>
+                        </label>
+                        <label class="cancelado"><input type="radio" name="cancelado" data-uid="{{ card_uid }}"/>
+                            <i class="fa fa-thumbs-o-down"></i>
+                        </label>
+                      </div>
+                    </a>
                 </div>
             </div>
           </div>
@@ -69,11 +103,11 @@
             </div>
           </div>
          </div>
-        </li>
-      </ul>
+        </div>
+      </div>
     </div>
     <div class="footer-pedido">
-      <div class="status-list">
+      <div class="status-list status-list-detalhe-del">
         <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid="{{ card_uid }}"/>
             <i class="fa fa-hand-paper-o"></i>
         </label>

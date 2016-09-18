@@ -68,15 +68,14 @@ ul, li{
 }
 
 .navbar-header a{
-    width: 225px;
+    width: 310px;
 }
 
 .navbar-header a span{
     display: block;
     float: left;
-    font-family: 'copa';
-    /*color: #fff;*/
-    font-size: 33px;
+    font-size: 20px;
+    font-weight: 400;
 }
 
 .navbar-header a img{
@@ -163,6 +162,10 @@ ul, li{
     font-size: 17px;
 }
 
+.font22{
+    font-size: 22px;
+}
+
 .form-login .btn-primary, .form-login .btn-primary:hover, .filtros-pedidos .btn-primary.btn-verde, .filtros-pedidos .btn-primary.btn-verde:hover{
     color: #fff;
     background-color: rgba(75,192,192,1);
@@ -194,6 +197,18 @@ footer{
     bottom: 0;
     width: 100%;
     right: 0;
+}
+
+.footer{
+    width: 100%;
+    clear: both;
+    border-top: 1px solid #cecece;
+    text-align: center;
+    padding: 30px;
+}
+
+.footer p{
+    color: #aaa;
 }
 
 footer p{
@@ -242,17 +257,6 @@ footer p{
 	font-size: 13px;
 }
 
-/*Pedidos*/
-/*Nova página com DnD*/
-.centraliza-popup {
-    position: fixed !important;
-    top: 0px !important;
-    bottom: 0px !important;
-    left: 0px !important;
-    right: 0px !important;
-    margin: auto !important;
-}
-
 .dnd{
     float: left;
     width: 100%;
@@ -286,7 +290,7 @@ footer p{
     margin: 0 0 20px 12px;
     border-radius: 5px;
     float: left;
-    height: 170px;
+    height: 190px;
 }
 
 .col-active .expandi{
@@ -409,6 +413,17 @@ footer p{
     padding-top: 3px;
 }
 
+.status-list.status-list-detalhe{
+    float: none;
+    width: 100%;
+    padding-top: 0px;
+    height: 30px;
+}
+
+.status-list-detalhe label i{
+    font-size: 26px;
+}
+
 .status-list label{
     float: left;
     width: 20%;
@@ -512,29 +527,46 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 
 }
 
-.coluna .detalhe-pedido-icon .status-label i{
+.coluna .detalhe-pedido-icon .status-label i.open-dialogo{
     float: left;
     display: block;
     width: 30px;
-    text-align: center;
-    font-size: 18px;
-    border: 2px solid #cecece;
-    border-radius: 29px;
     margin-right: 7px;
-    color: #cecece;
     height: 30px;
+}
+
+.coluna .detalhe-pedido-icon .lista-pedidos .status-label i.open-dialogo{
+    margin-top: 5px;
+}
+
+.coluna .detalhe-pedido-icon .detalhes-itens .status-label i{
+    font-size: 21px;
+    margin-right: 10px;
+}
+
+.coluna .detalhe-pedido-icon .detalhes-itens .status-label i.fa-wpforms{
+    font-size: 27px;
+    padding-top: 1px;
+}
+
+.coluna .detalhe-pedido-icon .detalhes-itens .status-label i.mesa-numero{
+    font-size: 27px;
+    padding-top: 1px;
+    text-decoration: underline;
+    font-weight: bold;
 }
 
 .coluna .detalhe-pedido-icon .status-label i.logo{
     border: 0;
 }
 
-.coluna .detalhe-pedido-icon .status-label i:last-child{
+.coluna .detalhe-pedido-icon .status-label.interacao i.open-lista-pedidos{
     margin-right: 0px;
-    font-size: 18px;
-    line-height: 18px;
+    font-size: 27px;
+    line-height: 16px;
     text-align: center;
     width: 32px;
+    border: 0;
 }
 
 .coluna .detalhe-pedido-icon .status-label i.fa-send:before {
@@ -551,6 +583,10 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     margin: 4px 10px 0 0;
 }
 
+.coluna .detalhe-pedido-icon .lista-pedidos strong {
+    margin: 11px 10px 0 0;
+}
+
 .coluna .footer-pedido a.itens-pedido:first-child{
     margin-left: 42px;
 }
@@ -563,7 +599,11 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     float: left;
     width: 100%;
     border-bottom: 1px solid #dedede;
-    height: 80px;
+    height: 100px;
+}
+
+.coluna .detalhe-conteudo{
+    padding: 10px 0px 0px 10px;
 }
 
 .content-dialog{
@@ -590,12 +630,26 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     width: 300px;
 }
 
+.list-group-item:last-child{
+    border-top-width: 4px;
+}
+
+.list-group-item.border-4{
+    border-bottom-width: 4px;
+}
+
 /*fim nova página*/
 
-.dialogo{
+.conteudo-pedido .content-dialog .dialogo{
 	width: 360px;
 	height: 475px;
 	padding: 0;
+	position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
 
 .pedidos .detalhe .dialogo{
@@ -634,11 +688,15 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 
 .detalhe-pedido-icon .lista-pedidos{
     display: none;
-    right: -190px;
-    position: relative;
-    height: auto;
+    width: 300px;
+    height: 400px;
     z-index: 100;
-    top: -54px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
 
 #cancelado .detalhe-pedido-icon .lista-pedidos {
@@ -653,22 +711,32 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     position: absolute;
     top: -13px;
     right: -11px;
-    background: #fff;
     margin: 0;
-    opacity: 1;
     width: 30px;
     height: 30px;
-    text-align: center;
-    color: #aaa;
-    border: 2px solid #aaa;
     z-index: 100;
-    border-radius: 33px;
-    line-height: 27px;
+    background: url(../img/fechar.png) no-repeat 0 0;
+    background-size: 30px 30px;
+    opacity: 1;
+    text-indent: -999em;
 }
 
-.coluna .detalhe-pedido-icon .lista-pedidos a.close{
-    top: -12px;
-    right: -127px;
+.lista-pedidos .list-group .list-group-item:first-child{
+    height: 52px;
+    padding: 0px;
+}
+
+.border{
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 14px 14px 14px;
+    border-color: transparent transparent #ddd transparent;
+    display: block;
+    position: absolute;
+    text-indent: -999em;
+    left: 127px;
+    top: 51px;
 }
 
 .bg{
@@ -1026,6 +1094,7 @@ h4, h5{
     border-bottom: 1px solid #eee;
     margin-bottom: 40px;
     float: left;
+    width: 100%;
 }
 
 .pedidos{
