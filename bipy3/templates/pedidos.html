@@ -4,11 +4,14 @@
 
 {% block conteudo %}
 
+{% load pedido_tags %}
+
 <div class="container">
   <div class="page-header">
     <h1><i class="fa fa-list"></i> Pedidos</h1>
   </div>
     <form action="/pedidos/" method="post" id="form-filtros-pedido">
+    {% csrf_token %}
     <div class="filtros-pedidos">
       <div class="col-md-6">
             <h4><i class="fa fa-filter"></i> Filtrar pedidos</h4><br>
@@ -108,97 +111,131 @@
 
 <script id="template-pedido" type="text/x-jquery-tmpl">
 {% verbatim %}
-          <li class="ui-state-default" data-uid="{{= card_uid}}>
-            <div class="header-pedido">
-              <div class="cabecalho">
-                <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="" >
-                <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
-              </div>
-            </div>
-            <div class="conteudo-pedido">
-              <ul>
-                <li><label class="status-label"><strong>N&#186; do pedido:</strong> {{= card_uid}}</label></li>
-                <li class="{{if origem == 'fbmessenger'}}messeger {{/if}}detalhe-pedido-icon">
-                  <label class="status-label">
-                    <strong>Detalhes:</strong>
-                    <i id="{{= card_uid}}_dialogo" class="logo open-dialogo"></i>
-                    <i class="fa fa-list-ol open-lista-pedidos"></i>
-                    <i id="{{= card_uid}}_mesa">{{= mesa}}</i>
-                  </label>
+  <li class="ui-state-default" data-uid="{{= card_uid }}">
+    <div class="header-pedido">
+      <div class="cabecalho">
+        <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="">
+        <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span class="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
+      </div>
+    </div>
+    <div class="conteudo-pedido">
+      <div class="detalhe-conteudo">
+        <div><label class="status-label"><strong><i class="fa fa-barcode"></i> Pedido:</strong> {{= card_uid }}</label></div>
+        <div><label class="status-label"><strong><i class="fa fa-tag"></i> Mesa:</strong> <span class="{{= card_uid }}_mesa">{{= mesa }}</span></label></div>
+        <div class="{{if origem == 'fbmessenger'}}messeger {{/if}}detalhe-pedido-icon">
+          <label class="interacao status-label">
+            <strong><i class="fa fa-desktop"></i> Interação:</strong>
+            <i class="logo open-dialogo {{= card_uid }}_dialogo"></i>
+            <i class="fa fa-wpforms open-lista-pedidos"></i>
+          </label>
 
-                  <!-- Lista de pedidos-->
-
-                  <div class="lista-pedidos">
-                    <a href="javascript:void(0);" class="close">X</a>
-                    <div class="bs-example">
-                        <a href="javascript:void(0);" class="list-group-item">
-                            <div class="header-pedido">
-                              <div class="cabecalho">
-                                <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="" >
-                                <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
-                              </div>
-                            </div>
-                        </a>
-                        <div class="list-group">
-                            {{each itens_pedido}}
-                            <!-- Item pedido-->
-                            <a href="javascript:void(0);" class="list-group-item">
-                                {{= quantidade}} {{= descricao}}
-                            </a>
-                            <!--Fim item-->
-                            {{/each}}
-                        </div>
-                    </div>
-                  </div>
-
-                  <!-- inicio dialogo bot -->
-                    <div class="content-dialog">
-                  <div class="dialogo {{if origem == 'fbmessenger'}}messeger{{else}}telegram{{/if}}">
-                    <a href="javascript:void(0);" class="close">X</a>
-                    <div class="cabecalho-chat">
-                      <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}_1" data-minutes-passed="0">0 minutos</span></span></p>
-                    </div>
-                    <ul id="{{= card_uid}}_messages">
-                    {{each mensagem}}
-                     {{if typeof cliente != 'undefined'}}
-                      <li class="cons">
-                          <img class="media-object img-circle" src="{{if typeof $data.foto_cliente != 'undefined'}}{{= $data.foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> {{= $data.nome_cliente}}</h4>
-                            <p>{{= cliente}}</p>
-                          </div>
-                      </li>
-                     {{else typeof bot != 'undefined'}}
-                      <li class="est">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>{{= bot}}</p>
-                          </div>
-                      </li>
-                     {{/if}}
+          <!-- Lista de pedidos-->
+          <div class="lista-pedidos">
+            <a href="javascript:void(0);" class="close">X</a>
+            <div class="bs-example">
+                <div class="list-group">
+                    <a href="javascript:void(0);" class="list-group-item">
+                       <div class="cabecalho">
+                            <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="" >
+                            <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span class="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
+                       </div>
+                    </a>
+                    <a href="javascript:void(0);" class="list-group-item border-4 detalhes-itens">
+                        <label class="status-label">
+                            <strong>Detalhes:</strong>
+                            <i class="logo open-dialogo {{= card_uid }}_dialogo"></i>
+                            <i class="fa fa-wpforms open-lista-pedidos"></i>
+                            <i class="mesa-numero {{= card_uid }}_mesa">{{= mesa }}</i>
+                        </label>
+                        <span class="border">border</span>
+                    </a>
+                    {{each itens_pedido}}
+                    <!-- Item pedido-->
+                    <a href="javascript:void(0);" class="list-group-item">
+                        {{= quantidade}} {{= descricao}}
+                    </a>
+                    <!--Fim item-->
                     {{/each}}
-                    </ul>
-                    <div class="box-teclado">
-                      <label>
-                        <input type="text" placeholder="Mensagem..." name="texto">
-                      </label>
-                      <i class="btn-send" id="{{= card_uid}}_btn-send" data-uid="{{= card_uid}}">Enviar</i>
-                    </div>
+                    <a href="javascript:void(0);" class="list-group-item">
+                       <div class="status-list status-list-detalhe">
+                        <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid="{{= card_uid }}"/>
+                            <i class="fa fa-hand-paper-o"></i>
+                        </label>
+                        <label class="em-processo"><input type="radio" name="em-processo" data-uid="{{= card_uid }}"/>
+                            <i class="fa fa-hand-grab-o"></i>
+                        </label>
+                        <label class="concluido"><input type="radio" name="concluido" data-uid="{{= card_uid }}"/>
+                            <i class="fa fa-hand-pointer-o"></i>
+                        </label>
+                        <label class="entregue"><input type="radio" name="entregue" data-uid="{{= card_uid }}"/>
+                            <i class="fa fa-thumbs-o-up"></i>
+                        </label>
+                        <label class="cancelado"><input type="radio" name="cancelado" data-uid="{{= card_uid }}"/>
+                            <i class="fa fa-thumbs-o-down"></i>
+                        </label>
+                      </div>
+                    </a>
+                </div>
+            </div>
+          </div>
+          <!-- inicio dialogo bot -->
+         <div class="content-dialog">
+          <div class="dialogo {{if origem == 'fbmessenger'}}messeger {{/if}}">
+            <a href="javascript:void(0);" class="close">X</a>
+            <div class="cabecalho-chat">
+              <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span class="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
+            </div>
+            <ul id="{{= card_uid }}_messages">
+            {{each mensagem}}
+             {{if typeof cliente != 'undefined'}}
+              <li class="cons">
+                  <img class="media-object img-circle" src="{{if typeof $data.foto_cliente != 'undefined'}}{{= $data.foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="">
+                  <div class="balao">
+                    <h4 class="media-heading"> {{= $data.nome_cliente}}</h4>
+                    <p>{{= cliente}}</p>
                   </div>
-                 </div>
-                </li>
-              </ul>
+              </li>
+             {{else typeof bot != 'undefined'}}
+              <li class="est">
+                  <div class="balao">
+                    <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                    <p>{{= bot}}</p>
+                  </div>
+              </li>
+             {{/if}}
+            {{/each}}
+            </ul>
+            <div class="box-teclado">
+              <label>
+                <input type="text" placeholder="Mensagem..." name="texto">
+              </label>
+              <i class="btn-send" id="{{= card_uid }}_btn-send" data-uid="{{= card_uid }}">Enviar</i>
             </div>
-            <div class="footer-pedido">
-              <div class="status-list">
-                <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid="{{= card_uid}}"/><i class="fa fa-hand-paper-o"></i></label>
-                <label class="em-processo"><input type="radio" name="em-processo" data-uid="{{= card_uid}}"/><i class="fa fa-hand-grab-o"></i></label>
-                <label class="concluido"><input type="radio" name="concluido" data-uid="{{= card_uid}}"/><i class="fa fa-hand-pointer-o"></i></label>
-                <label class="entregue"><input type="radio" name="entregue" data-uid="{{= card_uid}}"/><i class="fa fa-thumbs-o-up"></i></label>
-                <label class="cancelado"><input type="radio" name="cancelado" data-uid="{{= card_uid}}"/><i class="fa fa-thumbs-o-down"></i></label>
-              </div>
-            </div>
-          </li>
+          </div>
+         </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-pedido">
+      <div class="status-list status-list-detalhe-del">
+        <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid="{{= card_uid }}"/>
+            <i class="fa fa-hand-paper-o"></i>
+        </label>
+        <label class="em-processo"><input type="radio" name="em-processo" data-uid="{{= card_uid }}"/>
+            <i class="fa fa-hand-grab-o"></i>
+        </label>
+        <label class="concluido"><input type="radio" name="concluido" data-uid="{{= card_uid }}"/>
+            <i class="fa fa-hand-pointer-o"></i>
+        </label>
+        <label class="entregue"><input type="radio" name="entregue" data-uid="{{= card_uid }}"/>
+            <i class="fa fa-thumbs-o-up"></i>
+        </label>
+        <label class="cancelado"><input type="radio" name="cancelado" data-uid="{{= card_uid }}"/>
+            <i class="fa fa-thumbs-o-down"></i>
+        </label>
+      </div>
+    </div>
+  </li>
 {% endverbatim %}
  </script>
  <script id="template-message" type="text/x-jquery-tmpl">
@@ -226,12 +263,10 @@
   var pedidos_interval = {};
   function startInterval(card_uid) {
     var intervalId = setInterval(function() {
-        minutesPassed = parseInt($('#' + card_uid).attr('data-minutes-passed'));
+        minutesPassed = parseInt($('.' + card_uid).attr('data-minutes-passed'));
         minutesPassed += 1;
-        $('#' + card_uid).attr('data-minutes-passed', minutesPassed);
-        $('#' + card_uid).html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
-        $('#' + card_uid + '_1').attr('data-minutes-passed', minutesPassed);
-        $('#' + card_uid + '_1').html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
+        $('.' + card_uid).attr('data-minutes-passed', minutesPassed);
+        $('.' + card_uid).html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
     }, 60000);
     pedidos_interval[card_uid] = intervalId;
   }
@@ -471,14 +506,18 @@
             {
                 notifyImage = input.foto_cliente;
             }
-            notify('bipy3', notifyText, notifyImage, input.uid);
+            notify('bipy3', notifyText, notifyImage, input.uid, input.notificacao_uuid);
         }
         else if(input.origem === 'troca_mesa')
         {
             $.each(input.pedidos, function(i, pedido)
                 {
-                    $('#' + pedido.uid + '_notificacao_mesa').html('mesa '+pedido.mesa);
-                    $('#' + pedido.uid + '_mesa').html(pedido.mesa);
+                    $('.' + pedido.uid + '_mesa').html(pedido.mesa);
+                }
+            );
+            $.each(input.notificacoes, function(i, notificacao)
+                {
+                    $('.' + notificacao.notificacao_uuid + '_notificacao_mesa').html('mesa '+input.mesa);
                 }
             );
             if (input.mesa_anterior !== undefined)
@@ -489,41 +528,51 @@
                 {
                     notifyImage = input.foto_cliente;
                 }
-                notify('bipy3', notifyText, notifyImage);
+                notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
             }
         }
         else if(input.origem === 'cardapio')
         {
-            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong>mesa '+input.mesa+'</strong><br /> solicitou o cardápio';
+            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong class="'+input.notificacao_uuid+'_notificacao_mesa">mesa '+input.mesa+'</strong><br /> solicitou o cardápio';
             var notifyImage = '../../static/bipy3/img/default_user.png';
             if (input.foto_cliente)
             {
                 notifyImage = input.foto_cliente;
             }
-            notify('bipy3', notifyText, notifyImage);
+            notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
+        }
+        else if(input.origem === 'conta')
+        {
+            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong class="'+input.notificacao_uuid+'_notificacao_mesa">mesa '+input.mesa+'</strong><br /> pediu a conta';
+            var notifyImage = '../../static/bipy3/img/default_user.png';
+            if (input.foto_cliente)
+            {
+                notifyImage = input.foto_cliente;
+            }
+            notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
         }
         else if(input.origem === 'garcom')
         {
-            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong>mesa '+input.mesa+'</strong><br /> chamou o garçom';
+            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong class="'+input.notificacao_uuid+'_notificacao_mesa">mesa '+input.mesa+'</strong><br /> chamou o garçom';
             var notifyImage = '../../static/bipy3/img/default_user.png';
             if (input.foto_cliente)
             {
                 notifyImage = input.foto_cliente;
             }
-            notify('bipy3', notifyText, notifyImage);
+            notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
         }
         else if(input.origem === 'fbmessenger')
         {
             $.tmpl($('#template-pedido'), input).appendTo($('#solicitado'));
             sendMessageBindClick(input.card_uid);
             startInterval(input.card_uid);
-            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong id="'+input.card_uid+'_notificacao_mesa">mesa '+input.mesa+'</strong><br /> fez um novo pedido';
+            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong class="'+input.notificacao_uuid+'_notificacao_mesa">mesa '+input.mesa+'</strong><br /> fez um novo pedido';
             var notifyImage = '../../static/bipy3/img/default_user.png';
             if (input.foto_cliente)
             {
                 notifyImage = input.foto_cliente;
             }
-            notify('bipy3', notifyText, notifyImage);
+            notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
         }
     }
 
@@ -535,6 +584,7 @@
     $.notify.addStyle("bipy3", {
         html:
             "<div>" +
+                "<span data-notify-html='notifyUUID' />" +
                 "<span data-notify-html='uidchat' />" +
                 "<time data-notify-html='time' />" +
                 "<div class='image' data-notify-html='image'/>" +
@@ -544,23 +594,28 @@
                 "<i class='fa fa-bell icon-push text-laranja'></i>" +
             "</div>"
     });
-    function notify(style, notifyText, notifyImage, uidchat) {
-        var notifyTime = new Date();
-        var horas = notifyTime.getHours()+'';
-        if (horas.length === 1)
-            horas = '0'+horas;
-        var minutos = notifyTime.getMinutes()+'';
-        if (minutos.length === 1)
-            minutos = '0'+minutos;
+    function notify(style, notifyText, notifyImage, uidchat, notifyUUID, notifyTime) {
+        if (!notifyTime)
+        {
+            notifyTime = new Date();
+            var horas = notifyTime.getHours()+'';
+            if (horas.length === 1)
+                horas = '0'+horas;
+            var minutos = notifyTime.getMinutes()+'';
+            if (minutos.length === 1)
+                minutos = '0'+minutos;
+            notifyTime = horas+':'+minutos;
+        }
         var notifyParams = {
             text: notifyText,
             image: "<img class='img-circle' width='40px' src='"+notifyImage+"'/>",
-            time: horas+':'+minutos
+            time: notifyTime
         };
         if (uidchat)
         {
             notifyParams.uidchat = $('<input type="hidden" name="uidchat" value="'+uidchat+'" />');
         }
+        notifyParams.notifyUUID = $('<input type="hidden" name="notifyUUID" value="'+notifyUUID+'" />');
         $.notify(notifyParams, {
             style: style,
             className: 'bipy3',
@@ -573,16 +628,80 @@
     }
     $(function() {
 		$(document).on("notify-hide", ".notifyjs-wrapper", function(e) {
-			var uidInput = $(this).find('input');
+			var notifyUUID = $(this).find('input[name="notifyUUID"]');
+			if (notifyUUID[0])
+			{
+              $.post('/bipy3/api/rest/notificacao_lida',
+                     {notificacao_uuid: notifyUUID.val()},
+                     function(data) {
+                       console.log(data);
+                     }
+              )
+              .fail(function(data) {
+                if (data.status === 403)
+                {
+                    alert('Sessão inválida. Realize o login novamente.');
+                    window.location.href = '/?next='+window.location.pathname;
+                }
+              });
+			}
+			var uidInput = $(this).find('input[name="uidchat"]');
 			if (uidInput[0])
 			{
 			    var uid = uidInput.val();
-			    $('#'+uid+'_dialogo').parent('.status-label').parent(".detalhe-pedido-icon").find('div.dialogo').show();
+			    $('.'+uid+'_dialogo').parent('.status-label').parent(".detalhe-pedido-icon").find('div.dialogo').show();
                 $('.bg').show();
                 var objDiv = document.getElementById(uid + '_messages');
                 objDiv.scrollTop = objDiv.scrollHeight;
 			}
 		});
+		{% if notificacoes %}
+		{% for notificacao in notificacoes %}
+            {% if notificacao.info.origem == 'chat' %}
+                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong><br /> enviou uma mensagem';
+                var notifyImage = '../../static/bipy3/img/default_user.png';
+                {% if 'foto_cliente' in notificacao.info %}
+                    notifyImage = '{{notificacao.info.foto_cliente}}';
+                {% endif %}
+                notify('bipy3', notifyText, notifyImage, '{{notificacao.info.uid}}', '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+            {% elif notificacao.info.origem == 'troca_mesa' %}
+                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong><br /> trocou da mesa {{notificacao.info.mesa_anterior}} para {{notificacao.info.mesa}}';
+                var notifyImage = '../../static/bipy3/img/default_user.png';
+                {% if 'foto_cliente' in notificacao.info %}
+                    notifyImage = '{{notificacao.info.foto_cliente}}';
+                {% endif %}
+                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+            {% elif notificacao.info.origem == 'cardapio' %}
+                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> solicitou o cardápio';
+                var notifyImage = '../../static/bipy3/img/default_user.png';
+                {% if 'foto_cliente' in notificacao.info %}
+                    notifyImage = '{{notificacao.info.foto_cliente}}';
+                {% endif %}
+                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+            {% elif notificacao.info.origem == 'conta' %}
+                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> pediu a conta';
+                var notifyImage = '../../static/bipy3/img/default_user.png';
+                {% if 'foto_cliente' in notificacao.info %}
+                    notifyImage = '{{notificacao.info.foto_cliente}}';
+                {% endif %}
+                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+            {% elif notificacao.info.origem == 'garcom' %}
+                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> chamou o garçom';
+                var notifyImage = '../../static/bipy3/img/default_user.png';
+                {% if 'foto_cliente' in notificacao.info %}
+                    notifyImage = '{{notificacao.info.foto_cliente}}';
+                {% endif %}
+                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+            {% elif notificacao.info.origem == 'fbmessenger' %}
+                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> fez um novo pedido';
+                var notifyImage = '../../static/bipy3/img/default_user.png';
+                {% if 'foto_cliente' in notificacao.info %}
+                    notifyImage = '{{notificacao.info.foto_cliente}}';
+                {% endif %}
+                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+            {% endif %}
+		{% endfor %}
+		{% endif %}
 	});
 </script>
 

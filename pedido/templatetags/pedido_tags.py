@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from django import template
+from django.utils import timezone
 
 import datetime
 import time
 import logging
+import pytz
 
 logger = logging.getLogger('django')
 
@@ -25,3 +27,8 @@ def minutos_passados(data, hora):
 @register.simple_tag
 def pedido_uid(data, numero):
     return data.strftime('%Y%m%d') + repr(int(numero))
+
+
+@register.simple_tag
+def hora_notificacao(data):
+    return data.replace(tzinfo=pytz.UTC).astimezone(timezone.get_current_timezone()).strftime('%H:%M')

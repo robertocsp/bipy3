@@ -7,17 +7,17 @@
     <div class="header-pedido">
       <div class="cabecalho">
         <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/bipy3/img/default_user.png{% endif %}" width="40" height="40" alt="" >
-        <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span id="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
+        <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span class="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
       </div>
     </div>
     <div class="conteudo-pedido">
       <div class="detalhe-conteudo">
         <div><label class="status-label"><strong><i class="fa fa-barcode"></i> Pedido:</strong> {{ card_uid }}</label></div>
-        <div><label class="status-label"><strong><i class="fa fa-tag"></i> Mesa:</strong> {{ pedido.mesa }}</label></div>
+        <div><label class="status-label"><strong><i class="fa fa-tag"></i> Mesa:</strong> <span class="{{ card_uid }}_mesa">{{ pedido.mesa }}</span></label></div>
         <div class="{% if pedido.origem == 'fbmessenger' %}messeger {% endif %}detalhe-pedido-icon">
           <label class="interacao status-label">
             <strong><i class="fa fa-desktop"></i> Interação:</strong>
-            <i id="{{ card_uid }}_dialogo" class="logo open-dialogo"></i>
+            <i class="logo open-dialogo {{ card_uid }}_dialogo"></i>
             <i class="fa fa-wpforms open-lista-pedidos"></i>
           </label>
 
@@ -29,15 +29,15 @@
                     <a href="javascript:void(0);" class="list-group-item">
                        <div class="cabecalho">
                             <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/bipy3/img/default_user.png{% endif %}" width="40" height="40" alt="" >
-                            <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span id="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
+                            <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span class="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
                        </div>
                     </a>
                     <a href="javascript:void(0);" class="list-group-item border-4 detalhes-itens">
                         <label class="status-label">
                             <strong>Detalhes:</strong>
-                            <i id="{{ card_uid }}_dialogo" class="logo open-dialogo"></i>
+                            <i class="logo open-dialogo {{ card_uid }}_dialogo"></i>
                             <i class="fa fa-wpforms open-lista-pedidos"></i>
-                            <i id="{{ card_uid }}_mesa" class="mesa-numero">{{ pedido.mesa }}</i>
+                            <i class="mesa-numero {{ card_uid }}_mesa">{{ pedido.mesa }}</i>
                         </label>
                         <span class="border">border</span>
                     </a>
@@ -69,8 +69,8 @@
             </div>
           </div>
           <!-- inicio dialogo bot -->
-            <div class="content-dialog">
-          <div class="centraliza-popup dialogo {% if pedido.origem == 'fbmessenger' %}messeger{% else %}telegram{% endif %}">
+         <div class="content-dialog">
+          <div class="dialogo {% if pedido.origem == 'fbmessenger' %}messeger{% else %}telegram{% endif %}">
             <a href="javascript:void(0);" class="close">X</a>
             <div class="cabecalho-chat">
               <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span id="{{ card_uid }}_1" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>

@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'pedido',
     'cliente',
     'loja',
+    'notificacao',
 )
 
 MIDDLEWARE_CLASSES = (

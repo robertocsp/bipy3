@@ -2,7 +2,7 @@
 from loja.models import *
 from cliente.models import *
 from jsonfield import JSONField
-from django.utils import timezone
+from utils import BigForeignKey
 
 import datetime
 import logging
@@ -11,6 +11,7 @@ logger = logging.getLogger('django')
 
 
 class Pedido(models.Model):
+    id = BigAutoField(primary_key=True, editable=False)
     numero = models.IntegerField('numero', default=0)
     valor = models.FloatField('valor', blank=True, null=True)
     FORMAPAGAMENTO = (
@@ -39,7 +40,7 @@ class Pedido(models.Model):
     origem = models.CharField(max_length=20, choices=ORIGEM, blank=True, null=True)
     mesa = models.CharField(max_length=50, blank=True, null=True)
     loja = models.ForeignKey(Loja, null=True, blank=True)
-    cliente = models.ForeignKey(Cliente, null=True, blank=True)
+    cliente = BigForeignKey(Cliente, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
@@ -48,8 +49,7 @@ class Pedido(models.Model):
             self.data = self.modificado
             self.hora = self.data.time()
         logger.debug('-=-=-=-=-=-=-=- modificado 2: ' + repr(self.modificado))
-        # TODO banco armazena a DateTimeField como UTC, a data e hora separada é armazenada no timezone corrente.
-        # exemplo de conversão para timezone local: self.modificado.astimezone(timezone.get_default_timezone())
+        # banco armazena a DateTimeField como UTC, a data e hora separada é armazenada no timezone corrente.
         return super(Pedido, self).save(*args, **kwargs)
         '''
 Make sure you read Django's timezone documentation. The approach is succinctly stated in the very first sentence:
@@ -72,7 +72,8 @@ It also links to a more detailed description in the pytz documentation.
 
 
 class ItemPedido(models.Model):
-    pedido = models.ForeignKey(Pedido, null=True, blank=True, related_name='itens', on_delete=models.CASCADE)
+    id = BigAutoField(primary_key=True, editable=False)
+    pedido = BigForeignKey(Pedido, null=True, blank=True, related_name='itens', on_delete=models.CASCADE)
     produto = models.CharField('produto', max_length=100, blank=True, null=True)
     valor = models.FloatField('valor', blank=True, null=True)
     quantidade = models.IntegerField('quantidade', blank=True, null=True)

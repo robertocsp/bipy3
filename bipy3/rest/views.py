@@ -9,6 +9,7 @@ from bipy3.websocket import ws
 from pedido.models import Pedido, ItemPedido
 from cliente.models import Cliente
 from loja.models import Loja
+from notificacao.models import Notificacao
 from bipy3.forms import LoginForm
 
 from django.contrib.auth import authenticate, login, logout
@@ -21,6 +22,7 @@ import logging
 import requests
 
 logger = logging.getLogger('django')
+CHAVE_BOT_API_INTERNA = u'se vier essa frase passa se não nada feito, se não é chamada interna não tem pq acessar'
 
 
 class LoginView(views.APIView):
@@ -68,12 +70,43 @@ class LoginView(views.APIView):
                         status=status.HTTP_400_BAD_REQUEST)
 
 
+def valida_chamada_interna(request):
+    if 'chave_bot_api_interna' not in request.data or \
+                    request.data.get('chave_bot_api_interna') != CHAVE_BOT_API_INTERNA:
+        return Response({"success": False, "type": 400, "message": u'Chamada inválida.'},
+                        status=status.HTTP_400_BAD_REQUEST)
+    return None
+
+
+class AdicionarClienteView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+    parser_classes = (JSONParser,)
+
+    def post(self, request, *args, **kwargs):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
+        try:
+            cliente = Cliente.objects.get(chave_facebook=request.data.get('id_cliente'))
+        except Cliente.DoesNotExist:
+            cliente = Cliente()
+            cliente.chave_facebook = request.data.get('id_cliente')
+        cliente.nome = request.data.get('nome_cliente', None)
+        cliente.foto = request.data.get('foto_cliente', None)
+        cliente.save()
+        return Response({"success": True})
+
+
 class EnviarPedidoView(views.APIView):
     authentication_classes = (BasicAuthentication,)
     permission_classes = (IsAdminUser,)
     parser_classes = (JSONParser,)
 
     def post(self, request, *args, **kwargs):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
         try:
             loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
         except Loja.DoesNotExist:
@@ -93,13 +126,16 @@ class EnviarPedidoView(views.APIView):
             else:
                 numero_pedido = 1
             logger.debug('-=-=-=-=-=-=-=- num pedido 2: ' + repr(numero_pedido))
-            self.persistencia(request, numero_pedido, data_hora_pedido, loja.id)
+            cliente_id = self.persistencia(request, numero_pedido, data_hora_pedido, loja.id)
         request.data['numero_pedido'] = numero_pedido
         request.data['card_uid'] = data_pedido.strftime('%Y%m%d') + repr(numero_pedido)
         logger.debug('-=-=-=-=-=-=-=- num pedido 3: ' + repr(request.data['numero_pedido']))
-        if loja:
+        if loja and cliente_id is not None:
             del request.data['id_loja']
             del request.data['id_cliente']
+            del request.data['chave_bot_api_interna']
+            notificacao_uuid = salva_notificacao(request.data, loja.id, cliente_id)
+            request.data['notificacao_uuid'] = str(cliente_id) + '_' + str(loja.id) + '_' + str(notificacao_uuid)
             websocket = ws.Websocket()
             websocket.publicar_mensagem(loja.id, json.dumps(request.data))
             return Response({"success": True})
@@ -129,7 +165,6 @@ class EnviarPedidoView(views.APIView):
             pedido = Pedido()
             pedido.numero = numero_pedido
             pedido.cliente = cliente
-            pedido.historico = request.data.get('mensagem', None)
             pedido.data = data_hora_pedido.strftime('%Y-%m-%d')
             pedido.hora = data_hora_pedido.strftime('%H:%M:%S')
             pedido.origem = origem
@@ -144,6 +179,8 @@ class EnviarPedidoView(views.APIView):
                 item_pedido.produto = item['descricao']
                 item_pedido.quantidade = item['quantidade']
                 item_pedido.save()
+            return cliente.id
+        return None
 
 
 class StatusPedidoView(views.APIView):
@@ -232,6 +269,8 @@ class EnviarMensagemView(views.APIView):
                 return None
             else:
                 for um_pedido in pedido:
+                    if not um_pedido.historico:
+                        um_pedido.historico = []
                     um_pedido.historico.append({ator: mensagem})
                     um_pedido.save()
                     return um_pedido
@@ -242,11 +281,20 @@ class EnviarMensagemBotView(views.APIView):
     permission_classes = (IsAdminUser,)
 
     def post(self, request, *args, **kwargs):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
         try:
             loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
         except Loja.DoesNotExist:
             logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
                          repr(request.data.get('id_loja')))
+            return Response({"success": False})
+        try:
+            cliente = Cliente.objects.get(chave_facebook=request.data.get('id_cliente'))
+        except Cliente.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- usuario inexistente para facebook user_id: ' +
+                         repr(request.data.get('id_cliente')))
             return Response({"success": False})
         uid = request.data.get('uid')
         logger.debug('-=-=-=-=-=-=-=- mensagem bot ' + repr(uid))
@@ -254,6 +302,10 @@ class EnviarMensagemBotView(views.APIView):
         self.atualiza_historico(data_pedido, int(uid[8:]), 'cliente', request.data.get('cliente'), loja.id)
         if loja:
             del request.data['id_loja']
+            del request.data['id_cliente']
+            del request.data['chave_bot_api_interna']
+            notificacao_uuid = salva_notificacao(request.data, loja.id, cliente.id)
+            request.data['notificacao_uuid'] = str(cliente.id) + '_' + str(loja.id) + '_' + str(notificacao_uuid)
             websocket = ws.Websocket()
             websocket.publicar_mensagem(loja.id, json.dumps(request.data))
             return Response({"success": True})
@@ -277,6 +329,9 @@ class TrocarMesaView(views.APIView):
     permission_classes = (IsAdminUser,)
 
     def post(self, request, *args, **kwargs):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
         try:
             loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
         except Loja.DoesNotExist:
@@ -286,26 +341,41 @@ class TrocarMesaView(views.APIView):
         try:
             cliente = Cliente.objects.get(chave_facebook=request.data.get('id_cliente'))
         except Cliente.DoesNotExist:
-            logger.error('-=-=-=-=-=-=-=- cliente inexistente para facebook id: ' +
+            logger.error('-=-=-=-=-=-=-=- cliente inexistente para facebook user_id: ' +
                          repr(request.data.get('id_cliente')))
             return Response({"success": False})
+        mesa_anterior = request.data.get('mesa_anterior', None)
+        pedidos_payload = []
         data_corte = datetime.now() + timedelta(hours=-3)
-        pedidos = Pedido.objects.filter(
-            Q(loja=loja.id, cliente=cliente.id),
-            Q(data__gt=data_corte.date()) | Q(data=data_corte.date(), hora__gte=data_corte.time()))
-        if pedidos:
-            pedidos_payload = []
+        if mesa_anterior:
+            pedidos = Pedido.objects.filter(
+                Q(loja=loja.id, cliente=cliente.id, mesa=mesa_anterior),
+                Q(data__gt=data_corte.date()) | Q(data=data_corte.date(), hora__gte=data_corte.time()))\
+                .order_by('-data', '-hora')
+            if pedidos:
+                mesa = request.data.get('mesa')
+                for pedido in pedidos:
+                    pedido.mesa = mesa
+                    pedido.save()
+                    pedidos_payload.append({'uid': pedido.data.strftime('%Y%m%d') + repr(int(pedido.numero)),
+                                            'mesa': mesa})
+        notificacoes = Notificacao.objects.filter(loja=loja.id, cliente=cliente.id, dt_visto__isnull=True)
+        notificacoes_payload = []
+        if notificacoes:
             mesa = request.data.get('mesa')
-            for pedido in pedidos:
-                pedido.mesa = mesa
-                pedido.save()
-                pedidos_payload.append({'uid': pedido.data.strftime('%Y%m%d') + repr(int(pedido.numero)),
-                                        'mesa': mesa})
+            for notificacao in notificacoes:
+                notificacao.info['mesa'] = mesa
+                notificacao.save()
+                notificacoes_payload.append({'notificacao_uuid': str(notificacao.cliente_id) + '_' +
+                                            str(notificacao.loja_id) + '_' +
+                                            str(notificacao.uuid)})
+        if pedidos or notificacoes:
             payload = {'origem': 'troca_mesa', 'pedidos': pedidos_payload, 'nome_cliente': cliente.nome,
-                       'foto_cliente': cliente.foto, 'mesa': mesa}
-            mesa_anterior = request.data.get('mesa_anterior', None)
+                       'foto_cliente': cliente.foto, 'mesa': mesa, 'notificacoes': notificacoes_payload}
             if mesa_anterior:
                 payload['mesa_anterior'] = mesa_anterior
+                notificacao_uuid = salva_notificacao(payload, loja.id, cliente.id)
+                payload['notificacao_uuid'] = str(cliente.id) + '_' + str(loja.id) + '_' + str(notificacao_uuid)
             websocket = ws.Websocket()
             websocket.publicar_mensagem(loja.id, json.dumps(payload))
         return Response({"success": True})
@@ -316,20 +386,7 @@ class PedirCardapioView(views.APIView):
     permission_classes = (IsAdminUser,)
 
     def post(self, request, *args, **kwargs):
-        try:
-            loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
-        except Loja.DoesNotExist:
-            logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
-                         repr(request.data.get('id_loja')))
-            return Response({"success": False})
-        payload = {'origem': 'cardapio', 'nome_cliente': request.data.get('nome_cliente'),
-                   'mesa': request.data.get('mesa')}
-        foto = request.data.get('foto_cliente', None)
-        if foto:
-            payload['foto_cliente'] = foto
-        websocket = ws.Websocket()
-        websocket.publicar_mensagem(loja.id, json.dumps(payload))
-        return Response({"success": True})
+        return gera_notificacao(request, 'cardapio')
 
 
 class ChamarGarcomView(views.APIView):
@@ -337,17 +394,79 @@ class ChamarGarcomView(views.APIView):
     permission_classes = (IsAdminUser,)
 
     def post(self, request, *args, **kwargs):
+        return gera_notificacao(request, 'garcom')
+
+
+class PedirContaView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        return gera_notificacao(request, 'conta')
+
+
+def gera_notificacao(request, origem):
+    nao_valido = valida_chamada_interna(request)
+    if nao_valido:
+        return nao_valido
+    logger.debug('-=-=-=- 1 -=-=-=-')
+    try:
+        loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
+    except Loja.DoesNotExist:
+        logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
+                     repr(request.data.get('id_loja')))
+        return Response({"success": False})
+    logger.debug('-=-=-=- 2 -=-=-=-')
+    try:
+        cliente = Cliente.objects.get(chave_facebook=request.data.get('id_cliente'))
+    except Cliente.DoesNotExist:
+        logger.error('-=-=-=-=-=-=-=- usuario inexistente para facebook user_id: ' +
+                     repr(request.data.get('id_cliente')))
+        return Response({"success": False})
+    logger.debug('-=-=-=- 3 -=-=-=-')
+    payload = {'origem': origem, 'nome_cliente': request.data.get('nome_cliente'),
+               'mesa': request.data.get('mesa')}
+    foto = request.data.get('foto_cliente', None)
+    if foto:
+        payload['foto_cliente'] = foto
+    logger.debug('-=-=-=- 4 -=-=-=-')
+    notificacao_uuid = salva_notificacao(payload, loja.id, cliente.id)
+    payload['notificacao_uuid'] = str(cliente.id) + '_' + str(loja.id) + '_' + str(notificacao_uuid)
+    websocket = ws.Websocket()
+    websocket.publicar_mensagem(loja.id, json.dumps(payload))
+    return Response({"success": True})
+
+
+def salva_notificacao(payload, loja_id, cliente_id):
+    notificacao = Notificacao()
+    notificacao.loja_id = loja_id
+    notificacao.cliente_id = cliente_id
+    notificacao.info = payload
+    notificacao.save()
+    return notificacao.uuid
+
+
+class NotificacaoLidaView(views.APIView):
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        if 'id_loja' not in request.session:
+            return Response({"success": False, "type": 403, "message": u'Sessão inválida.'},
+                            status=status.HTTP_403_FORBIDDEN)
+        notificacao_uuid = request.data.get('notificacao_uuid')
+        dados = notificacao_uuid.split('_', 2)
+        id_loja = request.session['id_loja']
+        logger.debug('-=-=-=-=-=-=-=- id loja sessao: ' + str(id_loja))
+        logger.debug('-=-=-=-=-=-=-=- id loja dashboard: ' + dados[1])
+        if dados[1] != str(id_loja):
+            return Response({"success": False, "type": 400, "message": u'Dados inválidos.'},
+                            status=status.HTTP_400_BAD_REQUEST)
         try:
-            loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
-        except Loja.DoesNotExist:
-            logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
-                         repr(request.data.get('id_loja')))
+            notificacao = Notificacao.objects.get(uuid=dados[2], loja=id_loja, cliente=dados[0])
+            notificacao.dt_visto = datetime.today()
+            notificacao.save()
+        except Notificacao.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- notificação inexistente para uuid: ' + notificacao_uuid)
             return Response({"success": False})
-        payload = {'origem': 'garcom', 'nome_cliente': request.data.get('nome_cliente'),
-                   'mesa': request.data.get('mesa')}
-        foto = request.data.get('foto_cliente', None)
-        if foto:
-            payload['foto_cliente'] = foto
-        websocket = ws.Websocket()
-        websocket.publicar_mensagem(loja.id, json.dumps(payload))
         return Response({"success": True})
