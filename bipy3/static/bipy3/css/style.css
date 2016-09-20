@@ -109,7 +109,7 @@ ul, li{
 
 .left-login, .right-login{
 	height: 100%;
-} 
+}
 
 .left-login{
 	background-image: url('../img/telegram-login-2.jpg');
@@ -374,7 +374,7 @@ footer p{
     margin: 6px 0 8px 6px;
 }
 
-.droptrue li:hover, .droptrue li:focus{
+.droptrue li .header-pedido:hover, .droptrue li .header-pedido:focus{
     cursor: move;
 }
 
@@ -514,7 +514,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 .coluna .footer-pedido{
     float: left;
     width: 100%;
-    height: 80px;   
+    height: 80px;
 }
 
 .coluna .details-list{
@@ -574,7 +574,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     position: relative;
 }
 
-.coluna .detalhe-pedido-icon i:hover{
+.coluna .detalhe-pedido-icon i.open-dialogo:hover, .coluna .detalhe-pedido-icon i.open-lista-pedidos:hover{
     cursor: pointer;
 }
 
@@ -920,7 +920,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     margin-top: 10px;
 }
 
-.messeger .est .balao{ 
+.messeger .est .balao{
     border-top-left-radius: 0;
     border-top-right-radius: 13px;
     border-bottom-left-radius: 10px;
@@ -949,7 +949,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 	transform: rotate(160deg);
     -ms-transform: rotate(160deg);
     -webkit-transform: rotate(160deg);
-    
+
 }
 
 .box-teclado {
@@ -1267,9 +1267,15 @@ h4, h5{
 
 .icon-push{
     position: absolute;
-    top: 48px;
+    top: 42px;
     z-index: 10;
     left: 35px;
+    background-image: url(../img/fb-messeger.png);
+    background-repeat: no-repeat;
+    background-size: 25px;
+    background-position: 0 0;
+    width: 25px;
+    height: 25px;
 }
 
 .icon-push:before{
@@ -1278,4 +1284,8 @@ h4, h5{
 
 .ui-datepicker-div{
     width: 270px;
+}
+
+.novo-pedido .notifyjs-bipy3-base .text, .chamar-garcom .notifyjs-bipy3-base .text, .menu .notifyjs-bipy3-base .text{
+    color: #fff;
 }

@@ -1,6 +1,6 @@
 .notifyjs-bipy3-base {
 	position: relative;
-    min-height: 52px;
+    height: 71px;
     color:#444;
     border-radius: 5px;
     background-color: #fff !important;
@@ -9,6 +9,7 @@
     -webkit-box-shadow: 0px 1px 7px 0px rgba(0,0,0,0.71);
     -moz-box-shadow: 0px 1px 7px 0px rgba(0,0,0,0.71);
     box-shadow: 0px 1px 7px 0px rgba(0,0,0,0.71);
+    margin-bottom: 7px;
 }
 
     .notifyjs-bipy3-base .image {
@@ -17,8 +18,8 @@
         position: absolute;
         height: auto;
         width: auto;
-        left: 25px;
-        top: 42px;
+        left: 26px;
+        top: 40px;
 
         -moz-transform: translate(-50%, -50%);
         -ms-transform: translate(-50%, -50%);
