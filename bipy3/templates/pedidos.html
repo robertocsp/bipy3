@@ -506,7 +506,7 @@
             {
                 notifyImage = input.foto_cliente;
             }
-            notify('bipy3', notifyText, notifyImage, input.uid, input.notificacao_uuid);
+            notify('bipy3', input.origem, notifyText, notifyImage, input.uid, input.notificacao_uuid);
         }
         else if(input.origem === 'troca_mesa')
         {
@@ -528,7 +528,7 @@
                 {
                     notifyImage = input.foto_cliente;
                 }
-                notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
+                notify('bipy3', input.origem, notifyText, notifyImage, undefined, input.notificacao_uuid);
             }
         }
         else if(input.origem === 'cardapio')
@@ -539,7 +539,7 @@
             {
                 notifyImage = input.foto_cliente;
             }
-            notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
+            notify('bipy3', input.origem, notifyText, notifyImage, undefined, input.notificacao_uuid);
         }
         else if(input.origem === 'conta')
         {
@@ -549,7 +549,7 @@
             {
                 notifyImage = input.foto_cliente;
             }
-            notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
+            notify('bipy3', input.origem, notifyText, notifyImage, undefined, input.notificacao_uuid);
         }
         else if(input.origem === 'garcom')
         {
@@ -559,7 +559,7 @@
             {
                 notifyImage = input.foto_cliente;
             }
-            notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
+            notify('bipy3', input.origem, notifyText, notifyImage, undefined, input.notificacao_uuid);
         }
         else if(input.origem === 'fbmessenger')
         {
@@ -572,7 +572,7 @@
             {
                 notifyImage = input.foto_cliente;
             }
-            notify('bipy3', notifyText, notifyImage, undefined, input.notificacao_uuid);
+            notify('bipy3', input.origem, notifyText, notifyImage, undefined, input.notificacao_uuid);
         }
     }
 
@@ -594,7 +594,7 @@
                 "<i class='fa fa-bell icon-push text-laranja'></i>" +
             "</div>"
     });
-    function notify(style, notifyText, notifyImage, uidchat, notifyUUID, notifyTime) {
+    function notify(style, className, notifyText, notifyImage, uidchat, notifyUUID, notifyTime) {
         if (!notifyTime)
         {
             notifyTime = new Date();
@@ -618,7 +618,7 @@
         notifyParams.notifyUUID = $('<input type="hidden" name="notifyUUID" value="'+notifyUUID+'" />');
         $.notify(notifyParams, {
             style: style,
-            className: 'bipy3',
+            className: className,
             autoHide: false,
             autoHideDelay: 9000,
             clickToHide: true,
@@ -663,42 +663,42 @@
                 {% if 'foto_cliente' in notificacao.info %}
                     notifyImage = '{{notificacao.info.foto_cliente}}';
                 {% endif %}
-                notify('bipy3', notifyText, notifyImage, '{{notificacao.info.uid}}', '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, '{{notificacao.info.uid}}', '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
             {% elif notificacao.info.origem == 'troca_mesa' %}
                 var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong><br /> trocou da mesa {{notificacao.info.mesa_anterior}} para {{notificacao.info.mesa}}';
                 var notifyImage = '../../static/bipy3/img/default_user.png';
                 {% if 'foto_cliente' in notificacao.info %}
                     notifyImage = '{{notificacao.info.foto_cliente}}';
                 {% endif %}
-                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
             {% elif notificacao.info.origem == 'cardapio' %}
                 var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> solicitou o cardápio';
                 var notifyImage = '../../static/bipy3/img/default_user.png';
                 {% if 'foto_cliente' in notificacao.info %}
                     notifyImage = '{{notificacao.info.foto_cliente}}';
                 {% endif %}
-                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
             {% elif notificacao.info.origem == 'conta' %}
                 var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> pediu a conta';
                 var notifyImage = '../../static/bipy3/img/default_user.png';
                 {% if 'foto_cliente' in notificacao.info %}
                     notifyImage = '{{notificacao.info.foto_cliente}}';
                 {% endif %}
-                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
             {% elif notificacao.info.origem == 'garcom' %}
                 var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> chamou o garçom';
                 var notifyImage = '../../static/bipy3/img/default_user.png';
                 {% if 'foto_cliente' in notificacao.info %}
                     notifyImage = '{{notificacao.info.foto_cliente}}';
                 {% endif %}
-                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
             {% elif notificacao.info.origem == 'fbmessenger' %}
                 var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> fez um novo pedido';
                 var notifyImage = '../../static/bipy3/img/default_user.png';
                 {% if 'foto_cliente' in notificacao.info %}
                     notifyImage = '{{notificacao.info.foto_cliente}}';
                 {% endif %}
-                notify('bipy3', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
             {% endif %}
 		{% endfor %}
 		{% endif %}
