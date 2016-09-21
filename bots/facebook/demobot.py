@@ -480,7 +480,7 @@ def get_mensagem(id_mensagem, **args):
         'qtde1':      Template(u'Peço, por favor, que reenvie sua última mensagem corrigindo-os.'),
         'enviar':     Template(u'Maravilha, já já seu pedido estará aí.\nPosso ajudá-lo(a) em algo mais?'),
         'agradeco':   Template(u'Eu que agradeço.\nQualquer coisa é só digitar menu e escolher a opção "Novo pedido".'),
-        'robo':       Template(u'Desculpe por não entender, talvez a conversa tenha ficada parada por um longo período.'
+        'robo':       Template(u'Desculpe por não entender, talvez a conversa tenha ficado parada por um longo período.'
                                u'\nComo posso auxiliá-lo(a)?'),
         'anotado2':   Template(u'Por favor, escolha uma das opções que lhe apresento abaixo.'),
         'mesa3':      Template(u'Legal, providenciarei que seus pedidos sejam enviados para sua nova mesa $arg1.'),
