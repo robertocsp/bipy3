@@ -4,66 +4,25 @@
 
 {% block conteudo %}
 
-<div class="container">
+<div class="container hist">
   <div class="page-header">
-    <h1><i class="fa fa-list"></i>Historico de Pedidos</h1>
+    <h1><i class="fa fa-calendar-o"></i> Histórico de Pedidos</h1>
   </div>
     <form action="/pedidos/" method="post" id="form-filtros-pedido">
+    {% csrf_token %}
     <div class="filtros-pedidos">
-       <div class="form-group col-md-6">
-          {% csrf_token %}
-          <div class="col-md-12">
-            <h4 class="font17"><i class="fa fa-calendar-times-o"></i> Visualizar os pedidos a partir de:</h4><br>
-          </div>
-          <div class="col-md-6">
-              <input type="text" name="data_filtro" value="{% if filtros.data_filtro %}{{filtros.data_filtro}}{% endif %}" placeholder="selecione a data..." id="pedido-de" class="form-control">
-          </div>
-          <div class="col-md-6">
-            <label>
-              <select name="hora_filtro" class="form-control">
-                  <option value="00:00" {% if filtros.hora_filtro and filtros.hora_filtro = '00:00' %}selected="selected"{% endif %}>00:00</option>
-                  <option value="01:00" {% if filtros.hora_filtro and filtros.hora_filtro = '01:00' %}selected="selected"{% endif %}>01:00</option>
-                  <option value="02:00" {% if filtros.hora_filtro and filtros.hora_filtro = '02:00' %}selected="selected"{% endif %}>02:00</option>
-                  <option value="03:00" {% if filtros.hora_filtro and filtros.hora_filtro = '03:00' %}selected="selected"{% endif %}>03:00</option>
-                  <option value="04:00" {% if filtros.hora_filtro and filtros.hora_filtro = '04:00' %}selected="selected"{% endif %}>04:00</option>
-                  <option value="05:00" {% if filtros.hora_filtro and filtros.hora_filtro = '05:00' %}selected="selected"{% endif %}>05:00</option>
-                  <option value="06:00" {% if filtros.hora_filtro and filtros.hora_filtro = '06:00' %}selected="selected"{% endif %}>06:00</option>
-                  <option value="07:00" {% if filtros.hora_filtro and filtros.hora_filtro = '07:00' %}selected="selected"{% endif %}>07:00</option>
-                  <option value="08:00" {% if filtros.hora_filtro and filtros.hora_filtro = '08:00' %}selected="selected"{% endif %}>08:00</option>
-                  <option value="09:00" {% if filtros.hora_filtro and filtros.hora_filtro = '09:00' %}selected="selected"{% endif %}>09:00</option>
-                  <option value="10:00" {% if filtros.hora_filtro and filtros.hora_filtro = '10:00' %}selected="selected"{% endif %}>10:00</option>
-                  <option value="11:00" {% if filtros.hora_filtro and filtros.hora_filtro = '11:00' %}selected="selected"{% endif %}>11:00</option>
-                  <option value="12:00" {% if filtros.hora_filtro and filtros.hora_filtro = '12:00' %}selected="selected"{% endif %}>12:00</option>
-                  <option value="13:00" {% if filtros.hora_filtro and filtros.hora_filtro = '13:00' %}selected="selected"{% endif %}>13:00</option>
-                  <option value="14:00" {% if filtros.hora_filtro and filtros.hora_filtro = '14:00' %}selected="selected"{% endif %}>14:00</option>
-                  <option value="15:00" {% if filtros.hora_filtro and filtros.hora_filtro = '15:00' %}selected="selected"{% endif %}>15:00</option>
-                  <option value="16:00" {% if filtros.hora_filtro and filtros.hora_filtro = '16:00' %}selected="selected"{% endif %}>16:00</option>
-                  <option value="17:00" {% if filtros.hora_filtro and filtros.hora_filtro = '17:00' %}selected="selected"{% endif %}>17:00</option>
-                  <option value="18:00" {% if filtros.hora_filtro and filtros.hora_filtro = '18:00' %}selected="selected"{% endif %}>18:00</option>
-                  <option value="19:00" {% if filtros.hora_filtro and filtros.hora_filtro = '19:00' %}selected="selected"{% endif %}>19:00</option>
-                  <option value="20:00" {% if filtros.hora_filtro and filtros.hora_filtro = '20:00' %}selected="selected"{% endif %}>20:00</option>
-                  <option value="21:00" {% if filtros.hora_filtro and filtros.hora_filtro = '21:00' %}selected="selected"{% endif %}>21:00</option>
-                  <option value="22:00" {% if filtros.hora_filtro and filtros.hora_filtro = '22:00' %}selected="selected"{% endif %}>22:00</option>
-                  <option value="23:00" {% if filtros.hora_filtro and filtros.hora_filtro = '23:00' %}selected="selected"{% endif %}>23:00</option>
-              </select><br>
-            </label>
-          </div>
-
-          <div class="col-md-12">
-              <button id="data_hora_btn_filtro" type="button" class="btn btn-primary btn-verde" onclick="$('#data_hora_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'));$('#form-filtros-pedido').submit();">
-                  <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Selecionar Data/Horario
-                </button><br>
-          </div>
-      </div>
-      <div class="col-md-6">
+      <div class="col-md-9">
             <h4><i class="fa fa-filter"></i> Filtrar pedidos</h4><br>
             <div class="form-group">
 
-              <div class="col-md-6">
-                <input type="text" name="nome_cliente_filtro" placeholder="Cliente..." class="field-filter form-control" value="{% if filtros.nome_cliente_filtro %}{{filtros.nome_cliente_filtro}}{% endif %}"><br>
+              <div class="col-md-3">
+                <input type="text" name="nome_cliente_filtro" id="campo-nome" placeholder="Cliente..." class="field-filter form-control" value="{% if filtros.nome_cliente_filtro %}{{filtros.nome_cliente_filtro}}{% endif %}"><br>
               </div>
-              <div class="col-md-6">
-                <input type="text" name="num_pedido_filtro" placeholder="Número Pedido..." class="field-filter form-control" value="{% if filtros.num_pedido_filtro %}{{filtros.num_pedido_filtro}}{% endif %}"><br>
+              <div class="col-md-3">
+                <input type="text" name="num_pedido_filtro" id="campo-pedido" placeholder="Número Pedido..." class="field-filter form-control" value="{% if filtros.num_pedido_filtro %}{{filtros.num_pedido_filtro}}{% endif %}">
+              </div>
+              <div class="col-md-3">
+                <input type="text" name="" id="data-pedido" placeholder="Data do pedido..." class="field-filter form-control" value=""><br>
               </div>
               <div class="col-md-12">
                   <button type="button" id="outros_btn_filtro" class="btn btn-primary btn-verde" onclick="$('#outros_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'));$('#form-filtros-pedido').submit();">
@@ -77,557 +36,377 @@
         </div>
     </div>
     </form>
-    <div class="dnd">
-        <div class="linha-btn">
-            <select class="form-control status-combo" id="sel1">
-              <option value="status" selected="selected">Todos os Status</option>
-              <option value="solicitado">Solicitado</option>
-              <option value="em-processo">Em processo</option>
-              <option value="concluido">Concluído</option>
-              <option value="entregue">Entregue</option>
-              <option value="cancelado">Cancelado</option>
-            </select>
-            <button type="button" class="btn btn-default btn-expandir-tela" aria-label="Left Align">
-              <span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span> <strong>Expandir tela</strong>
-            </button>
-            <button type="button" class="btn btn-default btn-restaurar" aria-label="Left Align" style="display: none">
-              <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span> <strong>Restaurar colunas</strong>
-            </button>
-
-        </div>
-      <!--Coluna de pedidos solicitados-->
-
-      <div class="coluna">
-        <h3 class="info">
-          <label class="status-label text-laranja"><i class="fa fa-hand-paper-o fa-2x"></i> <span>Solicitado</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
-        </h3>
-        <ul id="solicitado" class="droptrue">
-            {% include "includes/snippets/cards_pedido.html" with pedidos=solicitado %}
-        </ul>
-      </div>
-      <div class="coluna">
-        <h3 class="info">
-          <label class="status-label text-azul"><i class="fa fa-hand-grab-o fa-2x"></i> <span>Em processo</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
-        </h3>
-        <ul id="em-processo" class="droptrue">
-            {% include "includes/snippets/cards_pedido.html" with pedidos=em_processamento %}
-        </ul>
-      </div>
-      <div class="coluna">
-        <h3 class="info">
-          <label class="status-label text-verde"><i class="fa fa-hand-pointer-o fa-2x "></i> <span>Concluído</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
-        </h3>
-        <ul id="concluido" class="droptrue">
-            {% include "includes/snippets/cards_pedido.html" with pedidos=concluido %}
-        </ul>
-      </div>
-      <div class="coluna">
-        <h3 class="info">
-          <label class="status-label text-verde"><i class="fa fa-thumbs-o-up fa-2x "></i> <span>Entregue</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
-        </h3>
-        <ul id="entregue" class="droptrue">
-            {% include "includes/snippets/cards_pedido.html" with pedidos=entregue %}
-        </ul>
-      </div>
-      <div class="coluna">
-        <h3 class="info">
-          <label class="status-label text-red"><i class="fa fa-thumbs-o-down fa-2x"></i> <span>Cancelado</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
-        </h3>
-        <ul id="cancelado" class="droptrue">
-            {% include "includes/snippets/cards_pedido.html" with pedidos=cancelado %}
-        </ul>
-      </div>
+     <div class="infos">
+       <label class="status-label"><i class="fa fa-tags"></i> Status</label>
+       <label class="data"><i class="fa fa-calendar"></i> Data</label>
+       <label class="hora"><i class="fa fa-tachometer"></i> Hora</label>
+       <label class="cliente"><i class="fa fa-user-md"></i> Cliente</label>
+       <label class="pedido-title"><i class="fa fa-map"></i> Pedido</label>
+       <label class="origem"><i class="fa fa-globe"></i> Origem</label>
     </div>
+    <div class="pedidos pizzaria">
+      <div id="accordion">
+
+          <!-- Início pedido-->
+
+          <!-- Informações-->
+          <h3 class="info">
+             <label class="status-label text-verde"><i class="fa fa-thumbs-o-up fa-2x"></i> Entregue</label>
+             <label class="data"> 17 de Maio de 2016</label>
+             <label class="hora">21:38</label>
+             <label class="cliente">Fábio Marques (21-99202-4832)</label>
+             <label class="pedido-title">1002002</label>
+             <label class="telegram"><i class="fa fa-send"></i> Telegram</label>
+          </h3>
+
+          <!-- Detalhe -->
+          <div class="detalhe">
+              <div class="col-md-6 detalhe-left">
+
+                <!-- Lista de pedidos -->
+                 <div class="lista-pedidos"><br>
+                    <h4><i class="fa fa fa-wpforms"></i> Itens do pedido</h4>
+                    <div class="bs-example">
+                        <div class="list-group">
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                </span> 2 Pizza
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 1 Coca-cola
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 3 Sobremesa
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 6 Cerveja
+                            </a>
+                        </div>
+                    </div>
+                 </div>
+                 <!-- Fim lista de pedido -->
+              </div>
+              <div class="col-md-6"><br>
+                <h4><i class="fa fa-comments-o"></i> Chat</h4>
+
+                <!-- Inicio dialogo -->
+              <div class="col-md-12"><br>
+                <h4><i class="fa fa-comments-o"></i> Chat</h4>
+                <div class="dialogo messeger">
+                  <div class="cabecalho-chat">
+                    <p>Fábio Marques<br> <span class="ultimo">Último pedido feito há 3 dias</span><p>
+                  </div>
+                  <ul>
+                    <li>
+                      <span>Enviado 12 de maio às 19:32</span>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>Olá</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Olá, Fábio! Digite o número de sua mesa para iniciarmos o seu atendimento.</p>
+                        </div>
+                    </li>
+                     <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>15</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Excelente! Veja o nosso cardápio e digite aqui o que deseja. Ah, quanto mais detalhado melhor :)</p>
+                        </div>
+                    </li>
+                    <li>
+                      <span>Enviado 12 de maio às 19:33</span>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>1 chope escuro 300 ml</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Mais alguma coisa?</p>
+                        </div>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>não</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li>
+                      <span>Enviado 12 de maio às 19:34</span>
+                    </li>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Ok, seu pedido já está indo.</p>
+                        </div>
+                    </li>
+                  </ul>
+                  <br><br>
+                </div>
+              </div>
+
+                <!-- Fim Dialogo -->
+              </div>
+            </div>
+
+            <!-- Fim pedido-->
+
+            <!-- Início Pedido-->
+
+            <!-- Informações-->
+            <h3 class="info">
+               <label class="status-label text-red"><i class="fa fa-thumbs-o-down fa-2x"></i> Cancelado</label>
+               <label class="data"> 17 de Maio de 2016</label>
+               <label class="hora">21:55</label>
+               <label class="cliente">Roberto Pereira (21-81202-4832)</label>
+               <label class="pedido-title">1002039</label>
+               <label class="telegram"><i class="fa fa-facebook"></i> Messenger</label>
+            </h3>
+
+            <!-- Detalhe -->
+            <div class="detalhe">
+              <div class="col-md-6 detalhe-left">
+
+                 <!-- Lista de pedido -->
+                 <div class="lista-pedidos"><br>
+                    <h4><i class="fa fa fa-wpforms"></i> Itens do pedido</h4>
+                    <div class="bs-example">
+                        <div class="list-group">
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                </span> 2 Pizza
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 1 Coca-cola
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 3 Sobremesa
+                            </a>
+
+                            <!-- Item -->
+                            <a href="#" class="list-group-item">
+                                 6 Cerveja
+                            </a>
+                        </div>
+                    </div>
+                 </div>
+
+                 <!-- Fim lista de pedido -->
+
+              </div>
+
+              <!-- Inicio dialogo -->
+
+              <div class="col-md-6"><br>
+                <h4><i class="fa fa-comments-o"></i> Chat</h4>
+                <div class="dialogo messeger">
+                  <div class="cabecalho-chat">
+                    <p>Fábio Marques<br> <span class="ultimo">Último pedido feito há 3 dias</span><p>
+                  </div>
+                  <ul>
+                    <li>
+                      <span>Enviado 12 de maio às 19:32</span>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>Olá</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Olá, Fábio! Digite o número de sua mesa para iniciarmos o seu atendimento.</p>
+                        </div>
+                    </li>
+                     <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>15</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Excelente! Veja o nosso cardápio e digite aqui o que deseja. Ah, quanto mais detalhado melhor :)</p>
+                        </div>
+                    </li>
+                    <li>
+                      <span>Enviado 12 de maio às 19:33</span>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>1 chope escuro 300 ml</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Mais alguma coisa?</p>
+                        </div>
+                    </li>
+                    <li class="cons">
+                        <img class="media-object img-circle" src="../static/bipy3/img/default_user.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Fábio</h4>
+                          <p>não</p>
+                        </div>
+                    </li>
+                    <span class="bico"></span>
+                    <li>
+                      <span>Enviado 12 de maio às 19:34</span>
+                    </li>
+                    <li class="est">
+                        <img class="media-object img-circle" src="img/logo-pizzaria.png" width="40" height="40" alt="">
+                        <div class="balao">
+                          <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                          <p>Ok, seu pedido já está indo.</p>
+                        </div>
+                    </li>
+                  </ul>
+                  <br><br>
+                </div>
+              </div>
+
+              <!-- Fim dialogo -->
+
+            </div>
+
+          <!--final pedido-->
+
+          <!-- Início pedido-->
+            <h3 class="info">
+               <label class="status-label text-verde"><i class="fa fa-thumbs-o-up fa-2x "></i> Entregue</label>
+               <label class="data"> 17 de Maio de 2016</label>
+               <label class="hora">22:05</label>
+               <label class="cliente">Gustavo Guly (21-9999-7766)</label>
+               <label class="pedido-title">1003445</label>
+               <label class="messenger"><i class="fa fa-send"></i> Telegram</label>
+            </h3>
+           <div class="detalhe">
+           </div>
+
+          <!--final pedido-->
+
+          <!-- Início pedido-->
+            <h3 class="info">
+               <label class="status-label text-azul"><i class="fa fa-hand-grab-o fa-2x"></i> Em processo</label>
+               <label class="data"> 17 de Maio de 2016</label>
+               <label class="hora">23:01</label>
+               <label class="cliente">Rodrigo Failace (21-96202-4832)</label>
+               <label class="pedido-title">1002099</label>
+               <label class="telegram"><i class="fa fa-send"></i> Telegram</label>
+            </h3>
+            <div class="detalhe">
+            </div>
+
+          <!--final pedido-->
+
+          <!-- Início pedido-->
+            <h3 class="info">
+               <label class="status-label text-laranja"><i class="fa fa-hand-paper-o fa-2x"></i> Solicitado</label>
+               <label class="data"> 17 de Maio de 2016</label>
+               <label class="hora">23:55</label>
+               <label class="cliente">Gelurmérsio (21-81202-4832)</label>
+               <label class="pedido-title">1002039</label>
+               <label class="messenger"><i class="fa fa-facebook"></i> Messenger</label>
+            </h3>
+            <div class="detalhe">
+            </div>
+          <!--final pedido-->
+        </div>
+    </div>
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li class="disabled">
+          <a href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+        <li><a href="#">4</a></li>
+        <li><a href="#">5</a></li>
+        <li>
+          <a href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
   </div>
-  <div class="bg"></div>
-<br><br>
+
 {% endblock %}
 
 {% block scripts %}
 
-<script id="template-pedido" type="text/x-jquery-tmpl">
-{% verbatim %}
-          <li class="ui-state-default" data-uid="{{= card_uid}}>
-            <div class="header-pedido">
-              <div class="cabecalho">
-                <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="" >
-                <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
-              </div>
-            </div>
-            <div class="conteudo-pedido">
-              <ul>
-                <li><label class="status-label"><strong>N&#186; do pedido:</strong> {{= card_uid}}</label></li>
-                <li class="{{if origem == 'fbmessenger'}}messeger {{/if}}detalhe-pedido-icon">
-                  <label class="status-label">
-                    <strong>Detalhes:</strong>
-                    <i id="{{= card_uid}}_dialogo" class="logo open-dialogo"></i>
-                    <i class="fa fa-list-ol open-lista-pedidos"></i>
-                    <i id="{{= card_uid}}_mesa">{{= mesa}}</i>
-                  </label>
+    <script type="text/javascript">
+      $(document).ready(function($) {
 
-                  <!-- Lista de pedidos-->
+        $('#accordion').find('h3').click(function(){
+          $(this).next().slideToggle('slow');
 
-                  <div class="lista-pedidos">
-                    <a href="javascript:void(0);" class="close">X</a>
-                    <div class="bs-example">
-                        <a href="javascript:void(0);" class="list-group-item">
-                            <div class="header-pedido">
-                              <div class="cabecalho">
-                                <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="" >
-                                <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
-                              </div>
-                            </div>
-                        </a>
-                        <div class="list-group">
-                            {{each itens_pedido}}
-                            <!-- Item pedido-->
-                            <a href="javascript:void(0);" class="list-group-item">
-                                {{= quantidade}} {{= descricao}}
-                            </a>
-                            <!--Fim item-->
-                            {{/each}}
-                        </div>
-                    </div>
-                  </div>
+          $(".detalhe").not($(this).next()).slideUp('slow');
 
-                  <!-- inicio dialogo bot -->
-                    <div class="content-dialog">
-                  <div class="dialogo {{if origem == 'fbmessenger'}}messeger{{else}}telegram{{/if}}">
-                    <a href="javascript:void(0);" class="close">X</a>
-                    <div class="cabecalho-chat">
-                      <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span id="{{= card_uid}}_1" data-minutes-passed="0">0 minutos</span></span></p>
-                    </div>
-                    <ul id="{{= card_uid}}_messages">
-                    {{each mensagem}}
-                     {{if typeof cliente != 'undefined'}}
-                      <li class="cons">
-                          <img class="media-object img-circle" src="{{if typeof $data.foto_cliente != 'undefined'}}{{= $data.foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> {{= $data.nome_cliente}}</h4>
-                            <p>{{= cliente}}</p>
-                          </div>
-                      </li>
-                     {{else typeof bot != 'undefined'}}
-                      <li class="est">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>{{= bot}}</p>
-                          </div>
-                      </li>
-                     {{/if}}
-                    {{/each}}
-                    </ul>
-                    <div class="box-teclado">
-                      <label>
-                        <input type="text" placeholder="Mensagem..." name="texto">
-                      </label>
-                      <i class="btn-send" id="{{= card_uid}}_btn-send" data-uid="{{= card_uid}}">Enviar</i>
-                    </div>
-                  </div>
-                 </div>
-                </li>
-              </ul>
-            </div>
-            <div class="footer-pedido">
-              <div class="status-list">
-                <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid="{{= card_uid}}"/><i class="fa fa-hand-paper-o"></i></label>
-                <label class="em-processo"><input type="radio" name="em-processo" data-uid="{{= card_uid}}"/><i class="fa fa-hand-grab-o"></i></label>
-                <label class="concluido"><input type="radio" name="concluido" data-uid="{{= card_uid}}"/><i class="fa fa-hand-pointer-o"></i></label>
-                <label class="entregue"><input type="radio" name="entregue" data-uid="{{= card_uid}}"/><i class="fa fa-thumbs-o-up"></i></label>
-                <label class="cancelado"><input type="radio" name="cancelado" data-uid="{{= card_uid}}"/><i class="fa fa-thumbs-o-down"></i></label>
-              </div>
-            </div>
-          </li>
-{% endverbatim %}
- </script>
- <script id="template-message" type="text/x-jquery-tmpl">
-{% verbatim %}
-         {{if typeof cliente != 'undefined'}}
-          <li class="cons">
-              <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="">
-              <div class="balao">
-                <h4 class="media-heading"> {{= nome_cliente}}</h4>
-                <p>{{= cliente}}</p>
-              </div>
-          </li>
-         {{else typeof bot != 'undefined'}}
-          <li class="est">
-              <div class="balao">
-                <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                <p>{{= bot}}</p>
-              </div>
-          </li>
-         {{/if}}
-{% endverbatim %}
- </script>
-
-<script type="text/javascript">
-  var pedidos_interval = {};
-  function startInterval(card_uid) {
-    var intervalId = setInterval(function() {
-        minutesPassed = parseInt($('#' + card_uid).attr('data-minutes-passed'));
-        minutesPassed += 1;
-        $('#' + card_uid).attr('data-minutes-passed', minutesPassed);
-        $('#' + card_uid).html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
-        $('#' + card_uid + '_1').attr('data-minutes-passed', minutesPassed);
-        $('#' + card_uid + '_1').html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
-    }, 60000);
-    pedidos_interval[card_uid] = intervalId;
-  }
-  function sendMessageBindClick(card_uid) {
-    $("#" + card_uid + "_btn-send").click(function(){
-      var $this = $(this);
-      $this.hide();
-      $.post('/bipy3/api/rest/mensagem',
-             {uid: $(this).attr("data-uid"), message: $(this).parent().find("input").val()},
-             function(data) {
-        console.log(data);
-        $.tmpl($('#template-message'), {bot: $this.parent().find("input").val()}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
-        $this.parent().find("input").val('');
-        var objDiv = document.getElementById($this.attr("data-uid") + '_messages');
-        objDiv.scrollTop = objDiv.scrollHeight;
-      })
-      .fail(function(data) {
-        if (data.status === 403)
-        {
-            alert('Sessão inválida. Realize o login novamente.');
-            window.location.href = '/?next='+window.location.pathname;
-        }
-      })
-      .always(function () {
-        $this.show();
-      });
-    });
-  }
-  $(document).ready(function($) {
-    //drag and drop pedidos
-    $( "ul.droptrue" ).sortable({
-      connectWith: "ul",
-      items: "> li",
-      placeholder: "sortable-placeholder",
-      revert: 200,
-      tolerance: "pointer",
-      handle: ".header-pedido p",
-      receive: function( event, ui ) {
-        // evento do momento em que o box e "solto" na coluna de destino
-        $.post('/bipy3/api/rest/status',
-               {uid: $(ui.item).attr("data-uid"), status: $(event.target).attr('id')},
-               function(data) {
-          console.log(data);
-        })
-        .fail(function(data) {
-          if (data.status === 403)
-          {
-            alert('Sessão inválida. Realize o login novamente.');
-            window.location.href = '/?next='+window.location.pathname;
-          }
-        });
-      }
-    });
-
-    // Datepicker
-    $('#pedido-de').datepicker({
-        dateFormat: 'dd/mm/yy'
-    });
-
-    // Seta altura do background quando a janela do dialogo é exibida
-    $(".bg").height($(document).height());
-
-    // Botão fechar box
-    $('.coluna').on('click', '.close, .bg', function() {
-      $(this).parent('.dialogo, .lista-pedidos').hide();
-      $('.bg').hide();
-    });
-
-    // Abrir dialogo
-    $('.coluna').on('click', '.open-dialogo', function() {
-        $(this).parent('.status-label').parent(".detalhe-pedido-icon").find('div.dialogo').show();
-        $('.bg').show();
-    });
-
-    // Abrir dialogo de dentro da lista de pedidos
-    $('.coluna').on('click', '.lista-pedidos .open-dialogo', function() {
-        $('.lista-pedidos').hide();
-        $(this).closest(".detalhe-pedido-icon").find('div.dialogo').show();
-    });
-
-    // Abrir lista de pedidos
-    $('.coluna').on('click', '.open-lista-pedidos', function() {
-        $(this).parent('.status-label').parent(".detalhe-pedido-icon").find("div.lista-pedidos").show();
-        $(".bg").show();
-    });
-
-    // Troca de colunas no clique dos botoes de status
-    $('.coluna').on('click', '.status-list-detalhe-del label', function() {
-      $(this).parent(".status-list").find("input").prop("checked", false);
-      $(this).find("input").prop("checked", true);
-
-      //clona e copia o box com o pedido para a coluna do status escolhido
-      $destino = $(this).attr("class");
-      $(this).closest('li').hide("300");
-      $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
-      $(this).closest('li').remove();
-      $.post('/bipy3/api/rest/status',
-             {uid: $(this).find("input").attr("data-uid"), status: $(this).find("input").attr("name")},
-             function(data) {
-               console.log(data);
-             }
-      )
-      .fail(function(data) {
-        if (data.status === 403)
-        {
-            alert('Sessão inválida. Realize o login novamente.');
-            window.location.href = '/?next='+window.location.pathname;
-        }
-      });
-    });
-
-    // Troca de colunas no clique dos botoes de status dentro da lista de itens
-    $('.coluna').on('click', '.status-list-detalhe label', function() {
-      $("div.lista-pedidos").hide();
-      $(".bg").hide();
-      $(this).parent(".status-list").find("input").prop("checked", false);
-      $(this).find("input").prop("checked", true);
-
-      //clona e copia o box com o pedido para a coluna do status escolhido
-      $destino = $(this).attr("class");
-      $(this).closest('li').hide("300");
-      $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
-      $(this).closest('li').remove();
-      $.post('/bipy3/api/rest/status',
-             {uid: $(this).find("input").attr("data-uid"), status: $(this).find("input").attr("name")},
-             function(data) {
-               console.log(data);
-             }
-      )
-      .fail(function(data) {
-        if (data.status === 403)
-        {
-            alert('Sessão inválida. Realize o login novamente.');
-            window.location.href = '/?next='+window.location.pathname;
-        }
-      });
-    });
-
-    //efeito para expandir colunas
-    $('.expandi').click(function(){
-        //inserir span no titulo coluna
-        //inserir btn para restaurar as colunas
-        $(".btn-restaurar").show(600);
-        $('i.fa-ellipsis-h').removeClass('fa-ellipsis-h').addClass('fa-ellipsis-v');
-        $('.coluna').addClass('coluna-normal');
-        $('.coluna').removeClass('col-active');
-        $(this).parent('.info').parent('.coluna').removeClass('coluna-normal');
-        $(this).parent('.info').parent('.coluna').addClass('col-active');
-        $(this).find('.fa').removeClass('fa-ellipsis-v').addClass('fa-ellipsis-h');
-
-        $('.coluna-normal').animate({
-          width: "5%"
-        }, 1500 );
-
-        $('.col-active').animate({
-          width: "75%"
-        }, 1500 );
-
-    });
-
-    //Botao restaurar as colunas
-    $('.btn-restaurar').click(function(){
-        $(".btn-restaurar").hide(600);
-        $(".coluna").show();
-        $('.coluna').removeClass('col-active');
-        $('.coluna').removeClass('coluna-normal');
-        $('i.fa-ellipsis-h').removeClass('fa-ellipsis-h').addClass('fa-ellipsis-v');
-        $('.coluna').animate({
-          width: "19.2%"
-        }, 1500 );
-    });
-
-    // Botao limpar
-    $('#btn-limpar').click(function(){
-        $('.field-filter').val(" ");
-    });
-
-    //Expandir area das colunas
-    $(".btn-expandir-tela").click(function(){
-        if($(this).find("span").hasClass("glyphicon-resize-full")){
-            $(this).find("span").removeClass("glyphicon-resize-full").addClass("glyphicon-resize-small");
-            $(this).find("strong").text("Diminuir tela");
-            $(".dnd").addClass("todo");
-            $(".dnd").animate({
-              left: 0,
-              top: 0
-            }, 1500 );
-        }else{
-            $(".dnd").removeClass("todo");
-            $(this).find("span").removeClass("glyphicon-resize-small").addClass("glyphicon-resize-full");
-            $(this).find("strong").text("Expandir tela");
-        }
-    });
-
-    //select status
-    $(".status-combo").change(function(){
-        id = $(this).find("option:selected").val();
-        $(".coluna").removeClass("coluna-normal");
-        if (id == "status"){
-            $(".coluna").show("slow");
-            $(".coluna").animate({
-              width: "19.2%"
-            }, 1500 );
-        }else{
-            $(".coluna").hide("slow");
-            $("#" + id).parent(".coluna").show("slow");
-            $("#" + id).parent(".coluna").animate({
-              width: "100%"
-            }, 1500 );
-        }
-    });
-
-    var ws4redis = WS4Redis({
-        uri: '{{ WEBSOCKET_URI }}{{ request.session.id_loja }}?subscribe-broadcast',
-        receive_message: receiveMessage,
-        heartbeat_msg: {{ WS4REDIS_HEARTBEAT }}
-    });
-
-    // attach this function to an event handler on your site
-    function sendMessage() {
-        ws4redis.send_message('A message');
-    }
-
-    // receive a message though the websocket from the server
-    function receiveMessage(msg) {
-        console.log('Message from Websocket: ' + msg);
-        var input = JSON.parse(msg);
-        console.log(input);
-        if(input.origem === 'chat')
-        {
-            $.tmpl($('#template-message'), input).appendTo($('#' + input.uid + '_messages'));
-            var objDiv = document.getElementById(input.uid + '_messages');
-            objDiv.scrollTop = objDiv.scrollHeight;
-            var notifyText = '<strong>'+input.nome_cliente+'</strong><br /> enviou uma mensagem';
-            var notifyImage = '../../static/bipy3/img/default_user.png';
-            if (input.foto_cliente)
-            {
-                notifyImage = input.foto_cliente;
-            }
-            notify('bipy3', notifyText, notifyImage, input.uid);
-        }
-        else if(input.origem === 'troca_mesa')
-        {
-            $.each(input.pedidos, function(i, pedido)
-                {
-                    $('#' + pedido.uid + '_notificacao_mesa').html('mesa '+pedido.mesa);
-                    $('#' + pedido.uid + '_mesa').html(pedido.mesa);
-                }
-            );
-            if (input.mesa_anterior !== undefined)
-            {
-                var notifyText = '<strong>'+input.nome_cliente+'</strong><br /> trocou da mesa '+input.mesa_anterior+' para '+input.mesa;
-                var notifyImage = '../../static/bipy3/img/default_user.png';
-                if (input.foto_cliente)
-                {
-                    notifyImage = input.foto_cliente;
-                }
-                notify('bipy3', notifyText, notifyImage);
-            }
-        }
-        else if(input.origem === 'cardapio')
-        {
-            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong>mesa '+input.mesa+'</strong><br /> solicitou o cardápio';
-            var notifyImage = '../../static/bipy3/img/default_user.png';
-            if (input.foto_cliente)
-            {
-                notifyImage = input.foto_cliente;
-            }
-            notify('bipy3', notifyText, notifyImage);
-        }
-        else if(input.origem === 'garcom')
-        {
-            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong>mesa '+input.mesa+'</strong><br /> chamou o garçom';
-            var notifyImage = '../../static/bipy3/img/default_user.png';
-            if (input.foto_cliente)
-            {
-                notifyImage = input.foto_cliente;
-            }
-            notify('bipy3', notifyText, notifyImage);
-        }
-        else if(input.origem === 'fbmessenger')
-        {
-            $.tmpl($('#template-pedido'), input).appendTo($('#solicitado'));
-            sendMessageBindClick(input.card_uid);
-            startInterval(input.card_uid);
-            var notifyText = '<strong>'+input.nome_cliente+'</strong> da <strong id="'+input.card_uid+'_notificacao_mesa">mesa '+input.mesa+'</strong><br /> fez um novo pedido';
-            var notifyImage = '../../static/bipy3/img/default_user.png';
-            if (input.foto_cliente)
-            {
-                notifyImage = input.foto_cliente;
-            }
-            notify('bipy3', notifyText, notifyImage);
-        }
-    }
-
-  });
-</script>
-
-<script type="text/javascript">
-    //Notificacao
-    $.notify.addStyle("bipy3", {
-        html:
-            "<div>" +
-                "<span data-notify-html='uidchat' />" +
-                "<time data-notify-html='time' />" +
-                "<div class='image' data-notify-html='image'/>" +
-                "<div class='text-wrapper'>" +
-                    "<div class='text' data-notify-html='text'/>" +
-                "</div>" +
-                "<i class='fa fa-bell icon-push text-laranja'></i>" +
-            "</div>"
-    });
-    function notify(style, notifyText, notifyImage, uidchat) {
-        var notifyTime = new Date();
-        var horas = notifyTime.getHours()+'';
-        if (horas.length === 1)
-            horas = '0'+horas;
-        var minutos = notifyTime.getMinutes()+'';
-        if (minutos.length === 1)
-            minutos = '0'+minutos;
-        var notifyParams = {
-            text: notifyText,
-            image: "<img class='img-circle' width='40px' src='"+notifyImage+"'/>",
-            time: horas+':'+minutos
-        };
-        if (uidchat)
-        {
-            notifyParams.uidchat = $('<input type="hidden" name="uidchat" value="'+uidchat+'" />');
-        }
-        $.notify(notifyParams, {
-            style: style,
-            className: 'bipy3',
-            autoHide: false,
-            autoHideDelay: 9000,
-            clickToHide: true,
-            order: 'fifo'
+          var topo = $(this).offset().top + -50;
+          $("body").animate({scrollTop : topo }, 800);
         });
 
-    }
-    $(function() {
-		$(document).on("notify-hide", ".notifyjs-wrapper", function(e) {
-			var uidInput = $(this).find('input');
-			if (uidInput[0])
-			{
-			    var uid = uidInput.val();
-			    $('#'+uid+'_dialogo').parent('.status-label').parent(".detalhe-pedido-icon").find('div.dialogo').show();
-                $('.bg').show();
-                var objDiv = document.getElementById(uid + '_messages');
-                objDiv.scrollTop = objDiv.scrollHeight;
-			}
-		});
-	});
-</script>
+        $('#data-pedido').datepicker({
+            language: 'pt-BR'
+        });
+
+      });
+
+    </script>
 
 {% endblock %}

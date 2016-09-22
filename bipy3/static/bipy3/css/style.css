@@ -172,6 +172,17 @@ ul, li{
     border-color: rgba(75,192,192,1);
 }
 
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+    background-color: rgba(75,192,192,1);
+    border-color: rgba(75,192,192,1);
+}
+
+.pagination {
+    display: block;
+    margin: 20px auto;
+    width: 250px;
+}
+
 .form-login .btn-border-white{
     border: 1px solid #fff;
     border-color: #fff !important;
@@ -205,6 +216,7 @@ footer{
     border-top: 1px solid #cecece;
     text-align: center;
     padding: 30px;
+    margin: 20px 0 0 0;
 }
 
 .footer p{
@@ -630,7 +642,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     width: 300px;
 }
 
-.list-group-item:last-child{
+.lista-pedidos-tela .list-group-item:last-child{
     border-top-width: 4px;
 }
 
@@ -721,7 +733,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     text-indent: -999em;
 }
 
-.lista-pedidos .list-group .list-group-item:first-child{
+.lista-pedidos-tela .lista-pedidos .list-group .list-group-item:first-child{
     height: 52px;
     padding: 0px;
 }
