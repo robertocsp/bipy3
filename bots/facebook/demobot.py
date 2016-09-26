@@ -62,6 +62,9 @@ with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'keys.txt')) as key
             SUPER_USER_USER = key_value_pair[1]
         if key_value_pair[0] == 'super_user_password':
             SUPER_USER_PASSWORD = key_value_pair[1]
+        if key_value_pair[0] == 'api-secret':
+            CHAVE_BOT_API_INTERNA = key_value_pair[1]
+
 FACEBOOK_TOKENS = {}
 with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'facebook_tokens.txt')) as keys_file:
     for line in keys_file:
@@ -72,19 +75,18 @@ with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'facebook_tokens.tx
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
 EXPIRACAO_CACHE_CONVERSA = 60 * 60 * 2  # 2 horas
-CHAVE_BOT_API_INTERNA = u'se vier essa frase passa se não nada feito, se não é chamada interna não tem pq acessar'
 POSTBACK_MAP = {
     'menu_novo_pedido': u'Novo pedido',
     'pedir_cardapio': u'Pedir cardápio',
     'chamar_garcom': u'Chamar garçom',
-    'menu_trocar_mesa': u'Número da mesa',
+    'menu_trocar_mesa': u'Definir mesa',
     'pedir_conta': u'Pedir a conta',
     'finalizar_pedido': u'Enviar pedido',
     'pedir_mais': u'+ itens ao pedido',
     'menu_rever_pedido': u'Atualizar pedido',
 }
 ROBOT_ICON = u'\U0001f4bb'
-# ULTIMO PASSO = 25
+# ULTIMO PASSO = 26
 
 
 class GraphAPIError(Exception):
@@ -459,6 +461,26 @@ def get_quickreply_conversa_suspensa():
     ]
 
 
+def get_quickreply_sim_nao():
+    return [
+        {
+            'content_type': 'text',
+            'title': u'Sim',
+            'payload': 'sim'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Não',
+            'payload': 'nao'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
+        }
+    ]
+
+
 def get_mensagem(id_mensagem, **args):
     mensagens = {
         'ola':        Template(u'Olá $arg1, como posso ajudá-lo(a)?'),
@@ -466,28 +488,28 @@ def get_mensagem(id_mensagem, **args):
                                u'atendimento.'),
         'menu':       Template(u'Digite a palavra menu para saber em como posso ajudá-lo(a). '
                                u'Você poderá digitá-la novamente a qualquer momento.'),
-        'mesa':       Template(u'Por favor, digite o número de sua mesa.'),
+        'mesa':       Template(u'Por favor, me informe sua mesa.'),
         'pedido':     Template(u'Excelente, digite aqui o que deseja, quanto mais detalhado melhor! ;)'),
         'pedido1':    Template(u'Exemplo: 1 água com gelo sem limão'),
         'pedido2':    Template(u'Desculpe, mas não encontrei um pedido sendo montado. Pedirei que comece um novo, por '
                                u'favor. Obrigado.'),
-        'mesa1':      Template(u'Mil desculpas, mas não consegui identificar o número da sua mesa. Por favor, você '
-                               u'poderia digitar novamente, só que desta vez utilizando somente números.'),
         'anotado':    Template(u'Anotado.\n$arg1, deseja mais alguma coisa ou posso enviar seu pedido?'),
         'anotado1':   Template(u'Pedido atualizado.\nDeseja mais alguma coisa ou posso enviar seu pedido?'),
         'qtde':       Template(u'$arg1\nPerdoe-me, mas não consegui identificar a quantidade do(s) seguinte(s) '
                                u'item(ns) acima.'),
         'qtde1':      Template(u'Peço, por favor, que reenvie sua última mensagem corrigindo-os.'),
         'enviar':     Template(u'Maravilha, já já seu pedido estará aí.\nPosso ajudá-lo(a) em algo mais?'),
-        'agradeco':   Template(u'Eu que agradeço.\nQualquer coisa é só digitar menu e escolher a opção "Novo pedido".'),
+        'agradeco':   Template(u'Eu que agradeço.'),
         'robo':       Template(u'Desculpe por não entender, talvez a conversa tenha ficado parada por um longo período.'
                                u'\nComo posso auxiliá-lo(a)?'),
         'anotado2':   Template(u'Por favor, escolha uma das opções que lhe apresento abaixo.'),
-        'mesa3':      Template(u'Legal, providenciarei que seus pedidos sejam enviados para sua nova mesa $arg1.'),
+        'mesa3':      Template(u'Certo, providenciarei que seus pedidos sejam enviados para esta mesa $arg1.'),
         'mesa4':      Template(u'Mesa anterior igual a atual.'),
+        'mesa5':      Template(u'Mesa $arg1, correto?'),
+        'sim_nao':    Template(u'Escolha uma das opções abaixo, por favor.'),
         'pedido3':    Template(u'Por favor, pode falar, ou melhor, digitar. :)'),
-        'pedido4':    Template(u'$arg1, notei que você já havia começado a montar um pedido. Você gostaria de continuar'
-                               u' mexendo neste pedido ou realmente começar um novo? Escolha uma das opções abaixo.'),
+        'pedido4':    Template(u'$arg1, já existe um pedido sendo montado. Deseja continuar este pedido ou começar um '
+                               u'novo?'),
         'rever':      Template(u'Digite o número entre parênteses seguido da quantidade e, se precisar, descrição. '
                                u'Para remover o item, coloque quantidade 0.'),
         'rever1':     Template(u'Desculpe, mas não consegui editar o item do seu pedido. Coloque o número entre '
@@ -500,7 +522,7 @@ def get_mensagem(id_mensagem, **args):
         'finalizar':  Template(u'Segue, acima, seu pedido para conferência. Confirma o envio?'),
         'cardapio':   Template(u'Já levaremos o cardápio para você. Em que posso ajudá-lo(a) agora?'),
         'garcom':     Template(u'Perfeito, logo logo ele(a) estará aí. Como posso ajudá-lo(a) agora?'),
-        'suspensao':  Template(u'Sua resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
+        'suspensao':  Template(u'Su a resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
         'conta':      Template(u'Ok, já avisei para trazerem sua conta.\nMuito obrigado(a), espero que sua experiência '
                                u'tenha sido a melhor possível.\nVolte sempre!'),
         'conta2':     Template(u'Desculpe, mas não tenho anotado sua mesa. Você poderia me informar, por favor.'),
@@ -508,22 +530,16 @@ def get_mensagem(id_mensagem, **args):
     return mensagens[id_mensagem].substitute(args)
 
 
-def define_mesa(message, conversa):
-    mesa = [int(s) for s in message.split(' ', 0) if s.isdigit()]
-    if len(mesa) == 1:
-        conversa['nao_entendidas'] = 0
-        if conversa['mesa'] is None:
-            conversa['mesa'] = []
-            conversa['mesa'].append('')
-        elif len(conversa['mesa']) == 2:
-            conversa['mesa'][1] = conversa['mesa'][0]
-        elif len(conversa['mesa']) == 1:
-            conversa['mesa'].append(conversa['mesa'][0])
-        conversa['mesa'][0] = mesa[0]
-        return True
-    else:
-        conversa['nao_entendidas'] += 1
-        return False
+def define_mesa(mesa, conversa):
+    if conversa['mesa'] is None:
+        conversa['mesa'] = []
+        conversa['mesa'].append('')
+    elif len(conversa['mesa']) == 2:
+        conversa['mesa'][1] = conversa['mesa'][0]
+    elif len(conversa['mesa']) == 1:
+        conversa['mesa'].append(conversa['mesa'][0])
+    conversa['mesa'][0] = mesa
+    return True
 
 
 def anota_pedido(message, conversa):
@@ -685,6 +701,20 @@ def set_variaveis(conversa, nao_entendidas=(True, 0), itens_pedido=(True, None),
         conversa['itens_pedido'] = [] if not itens_pedido[1] else itens_pedido[1]
 
 
+def checa_duplicidade(sender_id, loja_id, timestamp, conversa):
+    duplicado = False
+    if conversa['entry'] is None:
+        conversa['entry'] = {}
+    elif conversa['entry']['sender_id'] == sender_id and \
+            conversa['entry']['loja_id'] == loja_id and \
+            conversa['entry']['timestamp'] == timestamp:
+        duplicado = True
+    conversa['entry']['sender_id'] = sender_id
+    conversa['entry']['loja_id'] = loja_id
+    conversa['entry']['timestamp'] = timestamp
+    return duplicado
+
+
 @flask_app.route('/', defaults={'path': ''})
 @flask_app.route('/.well-known/acme-challenge/<path:path>')
 def ping(path):
@@ -742,7 +772,8 @@ def webhook():
         app_log.debug(u'INICIO POST :: ')
         output = request.json
         app_log.debug(output)
-        event = output['entry'][0]['messaging']
+        entry = output['entry'][0]
+        event = entry['messaging']
         for x in event:
             sender_id = None
             loja_id = None
@@ -773,17 +804,25 @@ def webhook():
                                 return resp
                             conversa = {
                                 'passo': 0,
+                                'passo_sim': None,
+                                'passo_nao': None,
                                 'usuario': user,
                                 'mesa': None,
+                                'mesa_aux': None,
                                 'itens_pedido': [],
                                 'nao_entendidas': 0,
                                 'datahora_inicio_pedido': None,
                                 'suspensa': 0,
-                                'uid': None
+                                'uid': None,
+                                'entry': None,
                             }
                             app_log.debug('usuario:: ' + repr(user))
-
                         if x.get('message') or x.get('postback'):
+                            if checa_duplicidade(sender_id, loja_id, x['timestamp'], conversa):
+                                resp = Response(u'chamada duplicada', status=200,
+                                                mimetype='text/plain')
+                                resp.status_code = 200
+                                return resp
                             if x.get('message') and x['message'].get('text') and not x['message'].get('quick_reply'):
                                 message = x['message']['text'].strip()
                                 app_log.debug('message: '+message)
@@ -798,59 +837,16 @@ def webhook():
                                         .encode('ASCII', 'ignore').lower():
                                     conversa['passo'] = 1
                                     passo_menu(message, sender_id, loja_id, conversa)
-                                elif u'novo pedido' in unicodedata.normalize('NFKD', message)\
+                                elif u'pedido' in unicodedata.normalize('NFKD', message)\
                                         .encode('ASCII', 'ignore').lower():
                                     # passos 13 e 14 definidos dentro do método
                                     passo_novo_pedido(message, sender_id, loja_id, conversa)
-                                elif conversa['passo'] == 3 or \
-                                        conversa['passo'] == 15:
-                                    # passos 2 e 3 definidos dentro do método
-                                    passo_trocar_mesa(message, sender_id, loja_id, conversa)
-                                elif conversa['passo'] == 4 or \
-                                        conversa['passo'] == 16:
-                                    # passos 4 e 5 definidos dentro do método
-                                    passo_rever_pedido(message, sender_id, loja_id, conversa)
-                                elif conversa['passo'] == 7 or conversa['passo'] == 13:
-                                    # passos 6 e 7 definidos dentro do método
-                                    passo_um(message, sender_id, loja_id, conversa)
-                                elif conversa['passo'] == 6 or conversa['passo'] == 9 or \
-                                        conversa['passo'] == 14 or \
-                                        conversa['passo'] == 17:
-                                    # passos 8 e 9 definidos dentro do método
-                                    passo_dois(message, sender_id, loja_id, conversa)
-                                elif conversa['passo'] == 8:
-                                    conversa['passo'] = 10
-                                    passo_tres(message, sender_id, loja_id, conversa)
-                                elif conversa['passo'] == 18:
-                                    if u'nao' in unicodedata.normalize('NFKD', message).\
-                                            encode('ASCII', 'ignore').lower():
-                                        conversa['passo'] = 21
-                                        passo_menu(message, sender_id, loja_id, conversa)
-                                    elif u'sim' in unicodedata.normalize('NFKD', message).\
-                                            encode('ASCII', 'ignore').lower() or \
-                                         u'pode' in unicodedata.normalize('NFKD', message).\
-                                            encode('ASCII', 'ignore').lower() or \
-                                         u'confirm' in unicodedata.normalize('NFKD', message).\
-                                            encode('ASCII', 'ignore').lower():
-                                        conversa['passo'] = 0
-                                        passo_finalizar_enviar(message, sender_id, loja_id, conversa)
-                                    elif u'editar' in unicodedata.normalize('NFKD', message).\
-                                            encode('ASCII', 'ignore').lower():
-                                        conversa['passo'] = 16
-                                        passo_rever_pedido_2(message, sender_id, loja_id, conversa)
-                                elif conversa['passo'] == 19:
-                                    passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'cardapio', 20)
-                                elif conversa['passo'] == 22:
-                                    passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'garcom', 23)
-                                elif conversa['passo'] == 25:
-                                    passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'conta', 24)
-                                elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower()\
+                                elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() \
                                         in agradecimentos:
                                     conversa['passo'] = 11
                                     passo_agradecimento(message, sender_id, loja_id, conversa)
                                 else:
-                                    conversa['passo'] = 12
-                                    passo_nao_entendido(message, sender_id, loja_id, conversa)
+                                    define_passo(message, sender_id, loja_id, conversa, conversa['passo'])
                             elif ((x.get('message') and x['message'].get('quick_reply') and
                                    x['message']['quick_reply'].get('payload')) or
                                   (x.get('postback') and x['postback'].get('payload'))):
@@ -862,40 +858,10 @@ def webhook():
                                     message = POSTBACK_MAP[payload]
                                 app_log.debug(payload)
                                 if conversa['suspensa'] > 0:
-                                    resposta_dashboard(message=message, payload=payload, sender_id=sender_id, loja_id=loja_id,
-                                                       conversa=conversa)
-                                elif payload == 'menu_novo_pedido' or payload == 'menu_novo_pedido2':
-                                    if payload == 'menu_novo_pedido2':
-                                        set_variaveis(conversa)
-                                    # passos 13 e 14 definidos dentro do método
-                                    passo_novo_pedido(message, sender_id, loja_id, conversa)
-                                elif payload == 'menu_trocar_mesa':
-                                    conversa['passo'] = 15
-                                    passo_trocar_mesa_2(message, sender_id, loja_id, conversa)
-                                elif payload == 'menu_rever_pedido':
-                                    conversa['passo'] = 16
-                                    passo_rever_pedido_2(message, sender_id, loja_id, conversa)
-                                elif payload == 'pedir_conta':
-                                    # passos 24 e 25 definidos dentro do método
-                                    passo_pedir_conta(message, sender_id, loja_id, conversa)
-                                elif payload == 'pedir_mais':
-                                    conversa['passo'] = 17
-                                    passo_pedir_mais(message, sender_id, loja_id, conversa)
-                                elif payload == 'finalizar_pedido':
-                                    conversa['passo'] = 18
-                                    passo_finalizar_pedido(message, sender_id, loja_id, conversa)
-                                elif payload == 'finalizar_enviar':
-                                    conversa['passo'] = 0
-                                    passo_finalizar_enviar(message, sender_id, loja_id, conversa)
-                                elif payload == 'pedir_cardapio':
-                                    # passos 19 e 20 definidos dentro do método
-                                    passo_pedir_cardapio(message, sender_id, loja_id, conversa)
-                                elif payload == 'chamar_garcom':
-                                    # passos 22 e 23 definidos dentro do método
-                                    passo_chamar_garcom(message, sender_id, loja_id, conversa)
-                                elif payload == 'voltar_menu':
-                                    conversa['passo'] = 1
-                                    passo_menu(message, sender_id, loja_id, conversa)
+                                    resposta_dashboard(message=message, payload=payload, sender_id=sender_id,
+                                                       loja_id=loja_id, conversa=conversa)
+                                else:
+                                    define_payload(message, sender_id, loja_id, conversa, payload)
                         elif x.get('dashboard'):
                             conversa['suspensa'] += 1
                             conversa['uid'] = x['dashboard']['uid']
@@ -904,6 +870,115 @@ def webhook():
         resp = Response('success', status=200, mimetype='text/plain')
         resp.status_code = 200
         return resp
+
+
+def define_payload(message, sender_id, loja_id, conversa, payload):
+    if payload == 'menu_novo_pedido' or payload == 'menu_novo_pedido2':
+        if payload == 'menu_novo_pedido2':
+            set_variaveis(conversa)
+        # passos 13 e 14 definidos dentro do método
+        passo_novo_pedido(message, sender_id, loja_id, conversa)
+    elif payload == 'menu_trocar_mesa':
+        define_sim_nao(conversa, 3, define_passo, 15, define_payload, 'menu_trocar_mesa')
+        passo_trocar_mesa_2(message, sender_id, loja_id, conversa)
+    elif payload == 'menu_rever_pedido':
+        conversa['passo'] = 16
+        passo_rever_pedido_2(message, sender_id, loja_id, conversa)
+    elif payload == 'pedir_conta':
+        # passos 24 e 25 definidos dentro do método
+        passo_pedir_conta(message, sender_id, loja_id, conversa)
+    elif payload == 'pedir_mais':
+        conversa['passo'] = 17
+        passo_pedir_mais(message, sender_id, loja_id, conversa)
+    elif payload == 'finalizar_pedido':
+        conversa['passo'] = 18
+        passo_finalizar_pedido(message, sender_id, loja_id, conversa)
+    elif payload == 'finalizar_enviar':
+        conversa['passo'] = 0
+        passo_finalizar_enviar(message, sender_id, loja_id, conversa)
+    elif payload == 'pedir_cardapio':
+        # passos 19 e 20 definidos dentro do método
+        passo_pedir_cardapio(message, sender_id, loja_id, conversa)
+    elif payload == 'chamar_garcom':
+        # passos 22 e 23 definidos dentro do método
+        passo_chamar_garcom(message, sender_id, loja_id, conversa)
+    elif payload == 'voltar_menu':
+        conversa['passo'] = 1
+        conversa['mesa_aux'] = None
+        conversa['passo_sim'] = None
+        conversa['passo_nao'] = None
+        passo_menu(message, sender_id, loja_id, conversa)
+    elif payload == 'sim':
+        conversa['passo_sim'][0](message, sender_id, loja_id, conversa, conversa['passo_sim'][1])
+        conversa['passo_sim'] = None
+        conversa['passo_nao'] = None
+    elif payload == 'nao':
+        conversa['passo_nao'][0](message, sender_id, loja_id, conversa, conversa['passo_nao'][1])
+
+
+def define_sim_nao(conversa, passo, passo_sim_func, passo_sim_var, passo_nao_func, passo_nao_var):
+    conversa['passo'] = passo
+    conversa['passo_sim'] = []
+    conversa['passo_sim'].append(passo_sim_func)
+    conversa['passo_sim'].append(passo_sim_var)
+    conversa['passo_nao'] = []
+    conversa['passo_nao'].append(passo_nao_func)
+    conversa['passo_nao'].append(passo_nao_var)
+
+
+def define_passo(message, sender_id, loja_id, conversa, passo):
+    conversa['passo'] = passo
+    if passo == 3:
+        conversa['passo'] = 26
+        conversa['mesa_aux'] = message
+        passo_confirma_mesa(message, sender_id, loja_id)
+    elif passo == 15:
+        conversa['passo'] = 2
+        passo_trocar_mesa(message, sender_id, loja_id, conversa)
+    elif passo == 4 or passo == 16:
+        # passos 4 e 5 definidos dentro do método
+        passo_rever_pedido(message, sender_id, loja_id, conversa)
+    elif passo == 13:
+        # passos 6 definido dentro do método
+        passo_um(message, sender_id, loja_id, conversa)
+    elif passo == 6 or passo == 9 or passo == 14 or passo == 17:
+        # passos 8 e 9 definidos dentro do método
+        passo_dois(message, sender_id, loja_id, conversa)
+    elif passo == 8:
+        conversa['passo'] = 10
+        passo_tres(message, sender_id, loja_id, conversa)
+    elif passo == 18:
+        if u'nao' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+            conversa['passo'] = 21
+            passo_menu(message, sender_id, loja_id, conversa)
+        elif u'sim' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
+             u'pode' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
+             u'confirm' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+            conversa['passo'] = 0
+            passo_finalizar_enviar(message, sender_id, loja_id, conversa)
+        elif u'editar' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+            conversa['passo'] = 16
+            passo_rever_pedido_2(message, sender_id, loja_id, conversa)
+    elif passo == 19:
+        passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'cardapio', 20)
+    elif passo == 22:
+        passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'garcom', 23)
+    elif passo == 25:
+        passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'conta', 24)
+    elif passo == 26:
+        normalizada = unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower()
+        if u'sim' == normalizada:
+            conversa['passo_sim'][0](message, sender_id, loja_id, conversa, conversa['passo_sim'][1])
+            conversa['passo_sim'] = None
+            conversa['passo_nao'] = None
+        elif u'nao' == normalizada:
+            conversa['passo_nao'][0](message, sender_id, loja_id, conversa, conversa['passo_nao'][1])
+        else:
+            bot = get_mensagem('sim_nao')
+            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_sim_nao())
+    else:
+        conversa['passo'] = 12
+        passo_nao_entendido(message, sender_id, loja_id, conversa)
 
 
 def pega_usuario(sender_id, loja_id):
@@ -928,13 +1003,15 @@ def pega_usuario(sender_id, loja_id):
 
 def passo_finalizar_contato(sender_id, loja_id, conversa):
     if conversa['passo'] == 0 or conversa['passo'] == 1 or conversa['passo'] == 2 or conversa['passo'] == 5 \
-            or conversa['passo'] == 20 or conversa['passo'] == 21 or conversa['passo'] == 24:
+            or conversa['passo'] == 20 or conversa['passo'] == 21 or conversa['passo'] == 23 or conversa['passo'] == 24:
         passo_menu(None, sender_id, loja_id, conversa)
-    elif conversa['passo'] == 3 or conversa['passo'] == 15:
+    elif conversa['passo'] == 3:
+        mensagem_mesa(conversa, loja_id, sender_id)
+    elif conversa['passo'] == 15:
         passo_trocar_mesa_2(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 4 or conversa['passo'] == 16:
         passo_rever_pedido_2(None, sender_id, loja_id, conversa)
-    elif conversa['passo'] == 7 or conversa['passo'] == 13:
+    elif conversa['passo'] == 13:
         passo_novo_pedido(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 6 or conversa['passo'] == 9 or conversa['passo'] == 14 or conversa['passo'] == 17:
         mensagem_pedido(sender_id, loja_id, conversa)
@@ -969,6 +1046,11 @@ def pre_requisito_pedido(sender_id, loja_id, conversa):
     return True
 
 
+def passo_confirma_mesa(message, sender_id, loja_id):
+    bot = get_mensagem('mesa5', arg1=message)
+    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_sim_nao())
+
+
 def passo_pedir_conta(message, sender_id, loja_id, conversa):
     set_variaveis(conversa,
                   itens_pedido=(False, None),
@@ -977,7 +1059,7 @@ def passo_pedir_conta(message, sender_id, loja_id, conversa):
         conversa['passo'] = 24
         mensagem_sucesso(sender_id, loja_id, conversa, 'conta')
     else:
-        conversa['passo'] = 25
+        define_sim_nao(conversa, 3, define_passo, 25, define_payload, 'pedir_conta')
         bot = get_mensagem('conta2')
         send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
 
@@ -987,7 +1069,7 @@ def passo_chamar_garcom(message, sender_id, loja_id, conversa):
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None))
     if conversa['mesa'] is None:
-        conversa['passo'] = 22
+        define_sim_nao(conversa, 3, define_passo, 22, define_payload, 'chamar_garcom')
         mensagem_mesa(conversa, loja_id, sender_id)
     else:
         conversa['passo'] = 23
@@ -999,7 +1081,7 @@ def passo_pedir_cardapio(message, sender_id, loja_id, conversa):
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None))
     if conversa['mesa'] is None:
-        conversa['passo'] = 19
+        define_sim_nao(conversa, 3, define_passo, 19, define_payload, 'pedir_cardapio')
         mensagem_mesa(conversa, loja_id, sender_id)
     else:
         conversa['passo'] = 20
@@ -1014,20 +1096,13 @@ def mensagem_sucesso(sender_id, loja_id, conversa, mensagem):
 
 
 def passo_mesa_dependencia(message, sender_id, loja_id, conversa, mensagem, passo):
-    if define_mesa(message, conversa):
-        conversa['passo'] = passo
-        set_variaveis(conversa,
-                      itens_pedido=(False, None),
-                      datetime_pedido=(False, None))
-        mensagem_sucesso(sender_id, loja_id, conversa, mensagem)
-    else:
-        if conversa['nao_entendidas'] > 1:
-            bot = get_mensagem('robo')
-            chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
-                                                                                         get_elements_menu(conversa)))()
-        else:
-            bot = get_mensagem('mesa1')
-            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+    conversa['passo'] = passo
+    define_mesa(conversa['mesa_aux'], conversa)
+    conversa['mesa_aux'] = None
+    set_variaveis(conversa,
+                  itens_pedido=(False, None),
+                  datetime_pedido=(False, None))
+    mensagem_sucesso(sender_id, loja_id, conversa, mensagem)
 
 
 def passo_finalizar_enviar(message, sender_id, loja_id, conversa):
@@ -1098,14 +1173,10 @@ def passo_trocar_mesa_2(message, sender_id, loja_id, conversa):
 
 
 def passo_novo_pedido(message, sender_id, loja_id, conversa):
-    # TODO verificar pedido nao enviado
-    # verificar se existe pedido nao enviado para poder perguntar o que o cliente deseja fazer
-    # com ele, enviar, cancelar, rever pedido, adicionar mais itens
-    # por enquanto, como nao tem esta tratativa o pedido pendente de envio sera cancelado
     if not existe_pedido_andamento(sender_id, loja_id, conversa):
         set_variaveis(conversa, datetime_pedido=(True, datetime.datetime.utcnow()))
         if conversa['mesa'] is None:
-            conversa['passo'] = 13
+            define_sim_nao(conversa, 3, define_passo, 13, define_payload, 'menu_novo_pedido')
             mensagem_mesa(conversa, loja_id, sender_id)
         else:
             conversa['passo'] = 14
@@ -1164,22 +1235,13 @@ def passo_dois(message, sender_id, loja_id, conversa):
 def passo_um(message, sender_id, loja_id, conversa):
     # send_image_message(sender_id, loja_id, 'cardapio01.jpg', 'image/jpeg')
     if pre_requisito_pedido(sender_id, loja_id, conversa):
-        if define_mesa(message, conversa):
-            conversa['passo'] = 6
-            set_variaveis(conversa,
-                          itens_pedido=(False, None),
-                          datetime_pedido=(False, None))
-            mensagem_pedido(sender_id, loja_id, conversa)
-        else:
-            conversa['passo'] = 7
-            if conversa['nao_entendidas'] > 1:
-                bot = get_mensagem('robo')
-                chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
-                                                                                             get_elements_menu(
-                                                                                                 conversa)))()
-            else:
-                bot = get_mensagem('mesa1')
-                send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+        define_mesa(conversa['mesa_aux'], conversa)
+        conversa['mesa_aux'] = None
+        conversa['passo'] = 6
+        set_variaveis(conversa,
+                      itens_pedido=(False, None),
+                      datetime_pedido=(False, None))
+        mensagem_pedido(sender_id, loja_id, conversa)
 
 
 def mensagem_pedido(sender_id, loja_id, conversa):
@@ -1211,29 +1273,20 @@ def passo_rever_pedido(message, sender_id, loja_id, conversa):
 
 
 def passo_trocar_mesa(message, sender_id, loja_id, conversa):
-    if define_mesa(message, conversa):
-        conversa['passo'] = 2
-        if len(conversa['mesa']) == 2 and conversa['mesa'][0] == conversa['mesa'][1]:
-            bot = get_mensagem('mesa4')
-            chain(send_text_message.si(sender_id, loja_id, bot),
-                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-            return
-        troca_mesa_dashboard.delay(sender_id, loja_id, conversa)
-        set_variaveis(conversa,
-                      itens_pedido=(False, None),
-                      datetime_pedido=(False, None))
-        bot = get_mensagem('mesa3', arg1=conversa['mesa'][0])
+    define_mesa(conversa['mesa_aux'], conversa)
+    conversa['mesa_aux'] = None
+    if len(conversa['mesa']) == 2 and conversa['mesa'][0] == conversa['mesa'][1]:
+        bot = get_mensagem('mesa4')
         chain(send_text_message.si(sender_id, loja_id, bot),
               send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-    else:
-        conversa['passo'] = 3
-        if conversa['nao_entendidas'] > 1:
-            bot = get_mensagem('robo')
-            chain(send_text_message.si(sender_id, loja_id, bot),
-                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-        else:
-            bot = get_mensagem('mesa1')
-            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+        return
+    troca_mesa_dashboard.delay(sender_id, loja_id, conversa)
+    set_variaveis(conversa,
+                  itens_pedido=(False, None),
+                  datetime_pedido=(False, None))
+    bot = get_mensagem('mesa3', arg1=conversa['mesa'][0])
+    chain(send_text_message.si(sender_id, loja_id, bot),
+          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_menu(message, sender_id, loja_id, conversa):

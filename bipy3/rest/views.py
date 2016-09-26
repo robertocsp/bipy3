@@ -20,9 +20,16 @@ from datetime import datetime, timedelta, date
 import json
 import logging
 import requests
+import os
 
 logger = logging.getLogger('django')
-CHAVE_BOT_API_INTERNA = u'se vier essa frase passa se não nada feito, se não é chamada interna não tem pq acessar'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'keys.txt')) as keys_file:
+    for line in keys_file:
+        key_value_pair = line.strip().split('=')
+        if key_value_pair[0] == 'api-secret':
+            CHAVE_BOT_API_INTERNA = key_value_pair[1]
+            break
 
 
 class LoginView(views.APIView):
