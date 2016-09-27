@@ -436,6 +436,12 @@ footer p{
     font-size: 26px;
 }
 
+.status-mini{
+    font-size: 8px;
+    display: block;
+    margin-top: -2px;
+}
+
 .status-list label{
     float: left;
     width: 20%;
@@ -552,13 +558,12 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 }
 
 .coluna .detalhe-pedido-icon .detalhes-itens .status-label i{
-    font-size: 21px;
-    margin-right: 10px;
+
 }
 
 .coluna .detalhe-pedido-icon .detalhes-itens .status-label i.fa-wpforms{
     font-size: 27px;
-    padding-top: 1px;
+    padding-top: 6px;
 }
 
 .coluna .detalhe-pedido-icon .detalhes-itens .status-label i.mesa-numero{
@@ -644,6 +649,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 
 .lista-pedidos-tela .list-group-item:last-child{
     border-top-width: 4px;
+    padding-top: 3px;
 }
 
 .list-group-item.border-4{
@@ -747,8 +753,8 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     display: block;
     position: absolute;
     text-indent: -999em;
-    left: 127px;
-    top: 51px;
+    left: 147px;
+    top: 33px;
 }
 
 .bg{
@@ -1300,4 +1306,107 @@ h4, h5{
 
 .novo-pedido .notifyjs-bipy3-base .text, .chamar-garcom .notifyjs-bipy3-base .text, .menu .notifyjs-bipy3-base .text{
     color: #fff;
+}
+
+.mesa span{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 115px;
+    display: block;
+    float: right;
+    margin: 3px 0 0 3px;
+}
+
+.mesa-detalhe span{
+    text-overflow: ellipsis;
+    max-width: 115px;
+    display: block;
+    float: right;
+    margin: 13px 0 0 3px;
+}
+
+.mesa-item{
+    padding: 0px 15px;
+}
+
+@media only screen and (max-width: 1024px){
+    .around{
+        overflow-y: hidden;
+        overflow-x: scroll;
+        width: 998px;
+    }
+
+}
+
+@media only screen and (min-width: 968px) and (max-width: 1024px){
+    .coluna {
+        width: 197px;
+        margin: 0 3px 0 0;
+    }
+
+    .coluna .droptrue > li {
+        margin-left: 5px;
+        width: 188px;
+    }
+
+    .coluna .cabecalho p {
+        width: 133px;
+    }
+
+    .around{
+        margin-left: -30px;
+    }
+}
+
+@media only screen and (max-width: 768px){
+
+    .left-login{ display: none;}
+
+    .right-login { padding-top: 100px;}
+
+    .dnd {
+        width: 1170px;
+    }
+
+    .around{
+        width: 750px;
+    }
+
+    .navbar-header a {
+        width: 100px;
+    }
+
+    .navbar-header a img {
+        margin: -10px 0 0 -8px;
+        float: left;
+        width: 82px;
+        height: 46px;
+    }
+
+    .navbar-header a span.nome-loja{display: none;}
+
+}
+
+@media only screen and (max-width: 640px){
+    .around {
+        width: 100%;
+    }
+
+    .linha-btn, .expandi{
+        display: none;
+    }
+
+    .conteudo-pedido .content-dialog .dialogo {
+        width: 300px;
+        height: 275px;
+    }
+
+    .box-teclado {
+        width: 299px;
+    }
+
+    .box-teclado input[type="text"] {
+        width: 240px;
+    }
 }
