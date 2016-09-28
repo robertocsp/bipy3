@@ -74,7 +74,7 @@
   // successful.  See statusChangeCallback() for when this call is made.
   function loggedIn(res) {
 	console.log(res.authResponse.accessToken);
-	document.getElementById('permissao-pagina').value = res.authResponse.accessToken;
+	document.getElementById('uac').value = res.authResponse.accessToken;
 	document.getElementById('fb-login-btn').style.display = 'none';
 	document.getElementById('fb-logout-btn').style.display = 'block';
     FB.api('/me', function(response) {
@@ -173,8 +173,8 @@
         <fb:login-button scope="manage_pages,pages_messaging" onlogin="checkLoginState();">
         </fb:login-button>
     </div>
-    <div id="fb-logout-btn">
-        <input type="button" name="sair" value="Sair" onclick="logout();" style="display: none;" />
+    <div id="fb-logout-btn" style="display: none;">
+        <input type="button" name="sair" value="Sair" onclick="logout();" />
     </div>
 
 </body>
