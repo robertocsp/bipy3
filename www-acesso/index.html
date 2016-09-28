@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marvin Bipy3 Acesso</title>
+        <meta charset="UTF-8">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    </head>
+    <body>
+    <script>
+  // This is called with the results from from FB.getLoginStatus().
+  function statusChangeCallback(response) {
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      loggedIn(response);
+    } else if (response.status === 'not_authorized') {
+      // The person is logged into Facebook, but not your app.
+      document.getElementById('status').innerHTML = 'É necessário realizar o login no aplicativo para poder utilizar o Marvin.';
+    } else {
+      // The person is not logged into Facebook, so we're not sure if
+      // they are logged into this app or not.
+      document.getElementById('status').innerHTML = 'Por favor, realize o login no Facebook.';
+    }
+  }
+
+  // This function is called when someone finishes with the Login
+  // Button.  See the onlogin handler attached to it in the sample
+  // code below.
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '548897018630774',
+        cookie     : true,  // enable cookies to allow the server to access
+                            // the session
+        xfbml      : true,  // parse social plugins on this page
+        version    : 'v2.7' // use graph api version 2.5
+      });
+
+      // Now that we've initialized the JavaScript SDK, we call
+      // FB.getLoginStatus().  This function gets the state of the
+      // person visiting this page and can return one of three states to
+      // the callback you provide.  They can be:
+      //
+      // 1. Logged into your app ('connected')
+      // 2. Logged into Facebook, but not your app ('not_authorized')
+      // 3. Not logged into Facebook and can't tell if they are logged into
+      //    your app or not.
+      //
+      // These three cases are handled in the callback function.
+
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+  };
+
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/pt_BR/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  // Here we run a very simple test of the Graph API after login is
+  // successful.  See statusChangeCallback() for when this call is made.
+  function loggedIn(res) {
+	console.log(res.authResponse.accessToken);
+	document.getElementById('permissao-pagina').value = res.authResponse.accessToken;
+	document.getElementById('fb-login-btn').style.display = 'none';
+	document.getElementById('fb-logout-btn').style.display = 'block';
+    FB.api('/me', function(response) {
+      document.getElementById('status').innerHTML =
+        'Olá ' + response.name + '!';
+    });
+    FB.api('/me/permissions', function(response) {
+      var notGranted = [];
+      var y = 0;
+      for (var i = 0; i < response.data.length; i++)
+      {
+        var perm = response.data[i].permission;
+        if (perm === 'manage_pages' || perm === 'pages_messaging')
+        {
+            var status = response.data[i].status;
+            if (status !== 'granted')
+            {
+                notGranted[y++] = perm;
+            }
+        }
+      }
+      if (notGranted.length)
+      {
+        document.getElementById('permissao-pagina').innerHTML = 'Para poder ter acesso ao Marvin, é preciso dar as ' +
+        'permissões solicitadas.<br>Estas permissões somente serão usadas para enviar e receber mensagens pela página ' +
+        'a ser selecionada após a liberação das permissões.<br>Para dar as permissões necessárias, clique no botão abaixo.' +
+        '<br><input type="button" name="permissao" value="Dar permissões" onclick="rerequest(\''+ notGranted.join(',') +'\');" />';
+      }
+      else
+      {
+        //SHOW PAGES FOR USER TO CHOOSE
+        FB.api('/me/accounts', function(response) {
+           if(response.data.length > 0)
+           {
+              var selecao = '<select id="selecao-pagina"><option value="-1">Selecione a página</option>';
+              for (var i = 0; i < response.data.length; i++)
+              {
+                selecao += '<option value="'+response.data[i].id+';'+response.data[i].access_token+'">'+response.data[i].name+'</option>';
+              }
+              selecao += '</select><br><input type="button" name="selecionar" value="Selecionar" onclick="sendPage();" />';
+           }
+           else
+           {
+              document.getElementById('permissao-pagina').innerHTML = 'Nenhuma página encontrada em sua conta do Facebook.';
+           }
+        });
+      }
+    });
+  }
+
+  function rerequest(notGranted)
+  {
+    FB.login(
+      function(response) {
+        console.log(response);
+      },
+      {
+        scope: notGranted,
+        auth_type: 'rerequest'
+      }
+    );
+  }
+
+  function logout()
+  {
+    FB.logout(function(response) {
+        document.getElementById('uac').value = '';
+        document.getElementById('status').innerHTML = '';
+        document.getElementById('permissao-pagina').innerHTML = '';
+        document.getElementById('fb-logout-btn').style.display = 'none';
+        document.getElementById('fb-login-btn').style.display = 'block';
+    });
+  }
+
+  function sendPage()
+  {
+    console.log(document.getElementById('uac').value);
+    console.log(document.getElementById('selecao-pagina').value);
+  }
+</script>
+
+<!--
+  Below we include the Login Button social plugin. This button uses
+  the JavaScript SDK to present a graphical Login button that triggers
+  the FB.login() function when clicked.
+-->
+    <input type="hidden" id="uac" name="uac" value="" />
+    <div id="status">
+    </div>
+    <hr>
+    <div id="permissao-pagina">
+    </div>
+    <hr>
+    <div id="fb-login-btn">
+        <fb:login-button scope="manage_pages,pages_messaging" onlogin="checkLoginState();">
+        </fb:login-button>
+    </div>
+    <div id="fb-logout-btn">
+        <input type="button" name="sair" value="Sair" onclick="logout();" style="display: none;" />
+    </div>
+
+</body>
+</html>
