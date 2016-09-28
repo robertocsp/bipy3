@@ -495,11 +495,12 @@ class AcessoBotView(views.APIView):
                                                                            arg2=settings.FB_APP_SECRET,
                                                                            arg3=user_access_token)
         response = self.fb_request(fb_url=url_long_lived_user_token)
-        logger.debug('url_long_lived_user_token ' + repr(response))
+        logger.debug('url_long_lived_user_token text ' + repr(response.text))
+        logger.debug('url_long_lived_user_token json ' + repr(response.json()))
         # TODO pegar user_access_token
         url_user_accounts = 'https://graph.facebook.com/v2.7/me/accounts?access_token='+user_access_token
         response = self.fb_request(fb_url=url_user_accounts)
-        logger.debug('url_user_accounts ' + repr(response))
+        logger.debug('url_user_accounts json ' + repr(response.json()))
         # TODO pegar page_access_token do page_id selecionado
         page_access_token = None
         '''
