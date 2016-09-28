@@ -1330,6 +1330,26 @@ h4, h5{
     padding: 0px 15px;
 }
 
+.notifyjs-bipy3-garcom{
+    background-color: rgba(253, 200, 47, .9);
+}
+
+.notifyjs-bipy3-cardapio{
+    background-color: rgba(92, 184, 92, .9);
+}
+
+.notifyjs-bipy3-fbmessenger{
+    background-color: #fff;
+}
+
+.notifyjs-corner .notifyjs-bipy3-fbmessenger .text{
+    color: #777;
+}
+
+.notifyjs-corner .notifyjs-bipy3-fbmessenger time{
+    color: #777;
+}
+
 @media only screen and (max-width: 1024px){
     .around{
         overflow-y: hidden;
@@ -1345,9 +1365,21 @@ h4, h5{
         margin: 0 3px 0 0;
     }
 
+    .todo .coluna{
+        width: 19.7%;
+    }
+
     .coluna .droptrue > li {
         margin-left: 5px;
         width: 188px;
+    }
+
+    .todo .coluna .droptrue > li {
+        width: 188px;
+    }
+
+    .todo {
+        padding: 5px;
     }
 
     .coluna .cabecalho p {
