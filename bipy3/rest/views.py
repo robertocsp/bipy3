@@ -498,13 +498,28 @@ class AcessoBotView(views.APIView):
         if response is None:
             return Response({"success": False, "type": 500, "message": u'Não foi possível completar a solicitação.'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        logger.debug('url_long_lived_user_token text ' + repr(response.text))
+        logger.debug('-=-=-=- url_long_lived_user_token text ' + repr(response.text))
         user_access_token = response.text.split('=')[1]
         url_user_accounts = 'https://graph.facebook.com/v2.7/me/accounts?access_token='+user_access_token
         response = self.fb_request(fb_url=url_user_accounts)
-        logger.debug('url_user_accounts json ' + repr(response.json()))
-        # TODO pegar page_access_token do page_id selecionado
+        if response is None:
+            return Response({"success": False, "type": 500, "message": u'Não foi possível completar a solicitação.'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.debug('-=-=-=- url_user_accounts json ' + repr(response.json()))
+        user_pages = response.json()
+        if 'data' not in user_pages:
+            return Response({"success": False, "type": 500, "message": u'Nenhuma página encontrada para o usuário.'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         page_access_token = None
+        for user_page in user_pages['data']:
+            if page_id == user_page['id']:
+                page_access_token = user_page['access_token']
+                break
+        if page_access_token is None:
+            return Response({"success": False, "type": 500, "message": u'Não foi possível obter access_token da '
+                                                                       u'página.'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.debug('-=-=-=- page_access_token ' + page_access_token)
         '''
         fb_service_subscribe_app_to_page = Template('https://graph.facebook.com/$arg1/subscribed_apps?'
                                                     'access_token=$arg2')
