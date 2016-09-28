@@ -495,9 +495,11 @@ class AcessoBotView(views.APIView):
                                                                            arg2=settings.FB_APP_SECRET,
                                                                            arg3=user_access_token)
         response = self.fb_request(fb_url=url_long_lived_user_token)
+        if response is None:
+            return Response({"success": False, "type": 500, "message": u'Não foi possível completar a solicitação.'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         logger.debug('url_long_lived_user_token text ' + repr(response.text))
-        logger.debug('url_long_lived_user_token json ' + repr(response.json()))
-        # TODO pegar user_access_token
+        user_access_token = response.text.split('=')[1]
         url_user_accounts = 'https://graph.facebook.com/v2.7/me/accounts?access_token='+user_access_token
         response = self.fb_request(fb_url=url_user_accounts)
         logger.debug('url_user_accounts json ' + repr(response.json()))
