@@ -3,7 +3,7 @@
     <head>
         <title>Marvin Bipy3 Acesso</title>
         <meta charset="UTF-8">
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     </head>
     <body>
     <script>
@@ -115,6 +115,7 @@
                 selecao += '<option value="'+response.data[i].id+';'+response.data[i].access_token+'">'+response.data[i].name+'</option>';
               }
               selecao += '</select><br><input type="button" name="selecionar" value="Selecionar" onclick="sendPage();" />';
+              document.getElementById('permissao-pagina').innerHTML = selecao;
            }
            else
            {
