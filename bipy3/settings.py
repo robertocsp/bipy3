@@ -25,6 +25,12 @@ with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'bipy3_conf'), 'k
         key_value_pair = line.strip().split('=')
         if key_value_pair[0] == 'secret_key':
             SECRET_KEY = key_value_pair[1]
+        elif key_value_pair[0] == 'api-secret':
+            CHAVE_BOT_API_INTERNA = key_value_pair[1]
+        elif key_value_pair[0] == 'app-id':
+            FB_APP_ID = key_value_pair[1]
+        elif key_value_pair[0] == 'app-secret':
+            FB_APP_SECRET = key_value_pair[1]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -50,6 +56,7 @@ INSTALLED_APPS = (
     'cliente',
     'loja',
     'notificacao',
+    'fb_acesso',
 )
 
 MIDDLEWARE_CLASSES = (

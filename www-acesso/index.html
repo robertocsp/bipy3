@@ -109,10 +109,10 @@
         FB.api('/me/accounts', function(response) {
            if(response.data.length > 0)
            {
-              var selecao = '<select id="selecao-pagina"><option value="-1">Selecione a página</option>';
+              var selecao = '<select id="pid"><option value="-1">Selecione a página</option>';
               for (var i = 0; i < response.data.length; i++)
               {
-                selecao += '<option value="'+response.data[i].id+';'+response.data[i].access_token+'">'+response.data[i].name+'</option>';
+                selecao += '<option value="'+response.data[i].id+'">'+response.data[i].name+'</option>';
               }
               selecao += '</select><br><input type="button" name="selecionar" value="Selecionar" onclick="sendPage();" />';
               document.getElementById('permissao-pagina').innerHTML = selecao;
@@ -152,8 +152,15 @@
 
   function sendPage()
   {
-    console.log(document.getElementById('uac').value);
-    console.log(document.getElementById('selecao-pagina').value);
+      $.post('//sistema.bipy3.com/bipy3/api/rest/mensagem',
+             {uac: document.getElementById('uac').value,
+              pid: document.getElementById('pid').value},
+             function(data) {
+        console.log(data);
+      })
+      .fail(function(data) {
+        console.log(data);
+      });
   }
 </script>
 

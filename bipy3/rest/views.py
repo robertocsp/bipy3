@@ -10,26 +10,21 @@ from pedido.models import Pedido, ItemPedido
 from cliente.models import Cliente
 from loja.models import Loja
 from notificacao.models import Notificacao
+from fb_acesso.models import Fb_acesso
 from bipy3.forms import LoginForm
 
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
 from django.db.models import Max, Q
+from django.conf import settings
 
+from string import Template
 from datetime import datetime, timedelta, date
 import json
 import logging
 import requests
-import os
 
 logger = logging.getLogger('django')
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'keys.txt')) as keys_file:
-    for line in keys_file:
-        key_value_pair = line.strip().split('=')
-        if key_value_pair[0] == 'api-secret':
-            CHAVE_BOT_API_INTERNA = key_value_pair[1]
-            break
 
 
 class LoginView(views.APIView):
@@ -79,7 +74,7 @@ class LoginView(views.APIView):
 
 def valida_chamada_interna(request):
     if 'chave_bot_api_interna' not in request.data or \
-                    request.data.get('chave_bot_api_interna') != CHAVE_BOT_API_INTERNA:
+                    request.data.get('chave_bot_api_interna') != settings.CHAVE_BOT_API_INTERNA:
         return Response({"success": False, "type": 400, "message": u'Chamada inválida.'},
                         status=status.HTTP_400_BAD_REQUEST)
     return None
@@ -477,3 +472,51 @@ class NotificacaoLidaView(views.APIView):
             logger.error('-=-=-=-=-=-=-=- notificação inexistente para uuid: ' + notificacao_uuid)
             return Response({"success": False})
         return Response({"success": True})
+
+
+class AcessoBotView(views.APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        page_id = request.data.get('pid')
+        try:
+            Fb_acesso.objects.get(page_id=page_id)
+            return Response({"success": False, "type": 400, "message": u'Página já utiliza o Marvin.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Fb_acesso.DoesNotExist:
+            pass
+        user_access_token = request.data.get('uac')
+        fb_service_long_lived_token = Template('https://graph.facebook.com/oauth/access_token?'
+                                               'client_id=$arg1&'
+                                               'client_secret=$arg2&'
+                                               'grant_type=fb_exchange_token&'
+                                               'fb_exchange_token=$arg3')
+        url_long_lived_user_token = fb_service_long_lived_token.substitute(arg1=settings.FB_APP_ID,
+                                                                           arg2=settings.FB_APP_SECRET,
+                                                                           arg3=user_access_token)
+        response = self.fb_request(fb_url=url_long_lived_user_token)
+        logger.debug('url_long_lived_user_token ' + repr(response))
+        # TODO pegar user_access_token
+        url_user_accounts = 'https://graph.facebook.com/v2.7/me/accounts?access_token='+user_access_token
+        response = self.fb_request(fb_url=url_user_accounts)
+        logger.debug('url_user_accounts ' + repr(response))
+        # TODO pegar page_access_token do page_id selecionado
+        page_access_token = None
+        '''
+        fb_service_subscribe_app_to_page = Template('https://graph.facebook.com/$arg1/subscribed_apps?'
+                                                    'access_token=$arg2')
+        url_subscribe_app_to_page = fb_service_subscribe_app_to_page.substitute(arg1=page_id, arg2=page_access_token)
+        response = self.fb_request(method='POST', fb_url=url_subscribe_app_to_page)
+        fb_acesso = Fb_acesso()
+        fb_acesso.page_id = page_id
+        fb_acesso.page_access_token = page_access_token
+        fb_acesso.save()
+        '''
+        return Response({"success": True})
+
+    def fb_request(self, method=None, fb_url=None):
+        try:
+            return requests.request(method or "GET", fb_url)
+        except requests.RequestException as e:
+            response = json.loads(e.read())
+            logger.error('!!!ERROR!!! ' + repr(response))
