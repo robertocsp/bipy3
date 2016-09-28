@@ -123,7 +123,7 @@
     <div class="conteudo-pedido">
       <div class="detalhe-conteudo">
         <div><label class="status-label"><strong><i class="fa fa-barcode"></i> Pedido:</strong> {{= card_uid }}</label></div>
-        <div><label class="status-label"><strong><i class="fa fa-tag"></i> Mesa:</strong> <span class="{{= card_uid }}_mesa">{{= mesa }}</span></label></div>
+        <div><label class="status-label mesa"><strong><i class="fa fa-tag"></i> Mesa:</strong> <span class="{{= card_uid }}_mesa">{{= mesa }}</span></label></div>
         <div class="{{if origem == 'fbmessenger'}}messeger {{/if}}detalhe-pedido-icon">
           <label class="interacao status-label">
             <strong><i class="fa fa-desktop"></i> Interação:</strong>
@@ -142,12 +142,19 @@
                             <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span class="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
                        </div>
                     </a>
-                    <a href="javascript:void(0);" class="list-group-item border-4 detalhes-itens">
+                    <a href="javascript:void(0);" class="list-group-item mesa-item">
+                        <div>
+                            <label class="status-label mesa-detalhe">
+                                <strong><i class="fa fa-tag"></i> Mesa:</strong>
+                                <span class="{{= card_uid }}_mesa">{{= mesa }}</span>
+                            </label>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0);" class="list-group-item border-4 detalhes-itens mesa-item">
                         <label class="status-label">
-                            <strong>Detalhes:</strong>
+                            <strong><i class="fa fa-desktop"></i> Interação:</strong>
                             <i class="logo open-dialogo {{= card_uid }}_dialogo"></i>
                             <i class="fa fa-wpforms open-lista-pedidos"></i>
-                            <i class="mesa-numero {{= card_uid }}_mesa">{{= mesa }}</i>
                         </label>
                         <span class="border">border</span>
                     </a>
@@ -161,19 +168,19 @@
                     <a href="javascript:void(0);" class="list-group-item">
                        <div class="status-list status-list-detalhe">
                         <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid="{{= card_uid }}"/>
-                            <i class="fa fa-hand-paper-o"></i>
+                            <i class="fa fa-hand-paper-o"></i> <span class="status-mini">Solicitado</span>
                         </label>
                         <label class="em-processo"><input type="radio" name="em-processo" data-uid="{{= card_uid }}"/>
-                            <i class="fa fa-hand-grab-o"></i>
+                            <i class="fa fa-hand-grab-o"></i><span class="status-mini">Em processo</span>
                         </label>
                         <label class="concluido"><input type="radio" name="concluido" data-uid="{{= card_uid }}"/>
-                            <i class="fa fa-hand-pointer-o"></i>
+                            <i class="fa fa-hand-pointer-o"></i><span class="status-mini">Concluido</span>
                         </label>
                         <label class="entregue"><input type="radio" name="entregue" data-uid="{{= card_uid }}"/>
-                            <i class="fa fa-thumbs-o-up"></i>
+                            <i class="fa fa-thumbs-o-up"></i><span class="status-mini">Entregue</span>
                         </label>
                         <label class="cancelado"><input type="radio" name="cancelado" data-uid="{{= card_uid }}"/>
-                            <i class="fa fa-thumbs-o-down"></i>
+                            <i class="fa fa-thumbs-o-down"></i><span class="status-mini">Cancelado</span>
                         </label>
                       </div>
                     </a>
