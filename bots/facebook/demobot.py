@@ -65,8 +65,6 @@ with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'keys.txt')) as key
         if key_value_pair[0] == 'api-secret':
             CHAVE_BOT_API_INTERNA = key_value_pair[1]
 
-FACEBOOK_TOKENS = {}
-
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
 EXPIRACAO_CACHE_CONVERSA = 60 * 60 * 2  # 2 horas
@@ -134,17 +132,17 @@ def fb_request(path, loja_id, args=None, post_args=None, json=None, files=None, 
     if post_args is not None or json is not None:
         method = "POST"
 
-    if loja_id not in FACEBOOK_TOKENS:
+    access_token = cache.get(loja_id + 'pac')
+    if access_token is None:
         access_token = get_page_access_token(loja_id)
         app_log.debug('=========================>>>>> access token call result ' + repr(access_token))
         if access_token:
-            FACEBOOK_TOKENS[loja_id] = access_token
-            app_log.debug('=========================>>>>> FACEBOOK_TOKENS call result ' + repr(FACEBOOK_TOKENS))
+            cache.add(loja_id + 'pac', access_token)
         else:
             # TODO pensar no que fazer em caso de erro.
             return
 
-    args["access_token"] = FACEBOOK_TOKENS[loja_id]
+    args["access_token"] = access_token
 
     try:
         response = requests.request(method or "GET",
