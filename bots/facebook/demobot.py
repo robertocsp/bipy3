@@ -66,11 +66,6 @@ with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'keys.txt')) as key
             CHAVE_BOT_API_INTERNA = key_value_pair[1]
 
 FACEBOOK_TOKENS = {}
-with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'facebook_tokens.txt')) as keys_file:
-    for line in keys_file:
-        key_value_pair = line.strip().split('=')
-        app_log.debug('======>>>>> facebook config ' + key_value_pair[0])
-        FACEBOOK_TOKENS[key_value_pair[0]] = key_value_pair[1]
 
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
@@ -84,6 +79,7 @@ POSTBACK_MAP = {
     'finalizar_pedido': u'Enviar pedido',
     'pedir_mais': u'+ itens ao pedido',
     'menu_rever_pedido': u'Atualizar pedido',
+    'menu_get_started': u'Menu principal',
 }
 ROBOT_ICON = u'\U0001f4bb'
 # ULTIMO PASSO = 26
@@ -138,6 +134,14 @@ def fb_request(path, loja_id, args=None, post_args=None, json=None, files=None, 
     if post_args is not None or json is not None:
         method = "POST"
 
+    if loja_id not in FACEBOOK_TOKENS:
+        access_token = get_page_access_token(loja_id)
+        if access_token:
+            FACEBOOK_TOKENS[loja_id] = access_token
+        else:
+            # TODO pensar no que fazer em caso de erro.
+            return
+
     args["access_token"] = FACEBOOK_TOKENS[loja_id]
 
     try:
@@ -175,6 +179,17 @@ def fb_request(path, loja_id, args=None, post_args=None, json=None, files=None, 
     if result and isinstance(result, dict) and result.get("error"):
         raise GraphAPIError(result)
     return result
+
+
+def get_page_access_token(page_id):
+    payload = {'chave_bot_api_interna': CHAVE_BOT_API_INTERNA, 'page_id': page_id}
+    url = 'http://localhost:8888/bipy3/api/rest/page_access_token'
+    headers = {'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
+    response = requests.get(url, params=payload, headers=headers)
+    res_json = response.json()
+    if 'success' in res_json and res_json['success'] == True:
+        return res_json['access_token']
+    return None
 
 
 def send_image_message(sender_id, loja_id, image_path, content_type):
@@ -484,8 +499,7 @@ def get_quickreply_sim_nao():
 def get_mensagem(id_mensagem, **args):
     mensagens = {
         'ola':        Template(u'Olá $arg1, como posso ajudá-lo(a)?'),
-        'ola1':       Template(u'Que bom tê-lo(a) conosco, $arg1, seja muito bem-vindo(a) a uma nova experiência de '
-                               u'atendimento.'),
+        'getstarted': Template(u'Como posso ajudá-lo(a), $arg1?'),
         'menu':       Template(u'Digite a palavra menu para saber em como posso ajudá-lo(a). '
                                u'Você poderá digitá-la novamente a qualquer momento.'),
         'mesa':       Template(u'Por favor, me informe sua mesa.'),
@@ -914,6 +928,11 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
         conversa['passo_nao'] = None
     elif payload == 'nao':
         conversa['passo_nao'][0](message, sender_id, loja_id, conversa, conversa['passo_nao'][1])
+    elif payload == 'menu_get_started':
+        conversa['passo'] = 0
+        bot1 = get_mensagem('getstarted', arg1=conversa['usuario']['first_name'])
+        chain(send_text_message.si(sender_id, loja_id, bot1),
+              send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def define_sim_nao(conversa, passo, passo_sim_func, passo_sim_var, passo_nao_func, passo_nao_var):

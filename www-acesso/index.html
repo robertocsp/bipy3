@@ -56,9 +56,7 @@
       //
       // These three cases are handled in the callback function.
 
-      FB.getLoginStatus(function(response) {
-        statusChangeCallback(response);
-      });
+      checkLoginState();
   };
 
   // Load the SDK asynchronously
@@ -109,13 +107,14 @@
         FB.api('/me/accounts', function(response) {
            if(response.data.length > 0)
            {
+              var nomeLoja = '<label>Nome da loja no dashboard</label><input type="text" name="nome_loja" value="" id="nome_loja" />';
               var selecao = '<select id="pid"><option value="-1">Selecione a página</option>';
               for (var i = 0; i < response.data.length; i++)
               {
                 selecao += '<option value="'+response.data[i].id+'">'+response.data[i].name+'</option>';
               }
-              selecao += '</select><br><input type="button" name="selecionar" value="Selecionar" onclick="sendPage();" />';
-              document.getElementById('permissao-pagina').innerHTML = selecao;
+              selecao += '</select><br><input type="button" name="selecionar" value="Selecionar página" onclick="sendPage();" />';
+              document.getElementById('permissao-pagina').innerHTML = nomeLoja + '<br>' + selecao;
            }
            else
            {
@@ -130,7 +129,7 @@
   {
     FB.login(
       function(response) {
-        console.log(response);
+        checkLoginState();
       },
       {
         scope: notGranted,
@@ -147,19 +146,45 @@
         document.getElementById('permissao-pagina').innerHTML = '';
         document.getElementById('fb-logout-btn').style.display = 'none';
         document.getElementById('fb-login-btn').style.display = 'block';
+        checkLoginState();
     });
   }
 
   function sendPage()
   {
+      var nomeLoja = document.getElementById('nome_loja').value;
+      var pid = document.getElementById('pid').value;
+      var erro = undefined;
+      if ($.trim(nomeLoja) === '')
+      {
+        erro = 'Nome da loja é obrigatório.';
+      }
+      if (pid === '-1')
+      {
+        if (erro)
+        {
+            erro += '\nPágina é obrigatória.';
+        }
+        else
+        {
+            erro = 'Página é obrigatória.';
+        }
+      }
+      if (erro)
+      {
+        alert(erro);
+        return;
+      }
       $.post('//sistema.bipy3.com/bipy3/api/rest/acesso_bot',
              {uac: document.getElementById('uac').value,
-              pid: document.getElementById('pid').value},
+              pid: pid,
+              nome_loja: nomeLoja},
              function(data) {
         console.log(data);
       })
       .fail(function(data) {
         console.log(data);
+        alert(data.responseJSON.message);
       });
   }
 </script>

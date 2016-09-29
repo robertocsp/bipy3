@@ -40,6 +40,7 @@ urlpatterns = [
     url(r'^bipy3/api/rest/pede_conta[/]?$', views.PedirContaView.as_view(), name='pedir_conta_view'),
     url(r'^bipy3/api/rest/notificacao_lida[/]?$', views.NotificacaoLidaView.as_view(), name='notificacao_lida_view'),
     url(r'^bipy3/api/rest/acesso_bot[/]?$', views.AcessoBotView.as_view(), name='acesso_bot_view'),
+    url(r'^bipy3/api/rest/page_access_token[/]?$', views.PageAccessTokenView.as_view(), name='page_access_token_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^upload/$', upload, name='upload'),
     url(r'^relacionamento/$', relacionamento, name='relacionamento')]

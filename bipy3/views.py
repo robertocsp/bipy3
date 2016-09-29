@@ -17,7 +17,7 @@ def login_geral(request):
                               {"form": form, "success": False, "type": 400, "message": u'Loja é obrigatório.'})
             id_loja = request.POST['loja'].strip()
             try:
-                loja = Loja.objects.get(group=id_loja)
+                loja = Loja.objects.get(pk=id_loja)
             except Loja.DoesNotExist:
                 return render(request, 'login.html',
                               {"form": form, "success": False, "type": 400,
