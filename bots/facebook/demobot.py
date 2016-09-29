@@ -136,8 +136,10 @@ def fb_request(path, loja_id, args=None, post_args=None, json=None, files=None, 
 
     if loja_id not in FACEBOOK_TOKENS:
         access_token = get_page_access_token(loja_id)
+        app_log.debug('=========================>>>>> access token call result ' + repr(access_token))
         if access_token:
             FACEBOOK_TOKENS[loja_id] = access_token
+            app_log.debug('=========================>>>>> FACEBOOK_TOKENS call result ' + repr(FACEBOOK_TOKENS))
         else:
             # TODO pensar no que fazer em caso de erro.
             return
