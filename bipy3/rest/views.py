@@ -73,8 +73,15 @@ class LoginView(views.APIView):
 
 
 def valida_chamada_interna(request):
-    if 'chave_bot_api_interna' not in request.data or \
-                    request.data.get('chave_bot_api_interna') != settings.CHAVE_BOT_API_INTERNA:
+    if 'chave_bot_api_interna' in request.data:
+        chave_bot_api_interna = request.data.get('chave_bot_api_interna')
+    elif 'chave_bot_api_interna' in request.GET:
+        chave_bot_api_interna = request.GET['chave_bot_api_interna']
+    elif 'chave_bot_api_interna' in request.POST:
+        chave_bot_api_interna = request.POST['chave_bot_api_interna']
+    else:
+        chave_bot_api_interna = None
+    if chave_bot_api_interna is None or chave_bot_api_interna != settings.CHAVE_BOT_API_INTERNA:
         return Response({"success": False, "type": 400, "message": u'Chamada inválida.'},
                         status=status.HTTP_400_BAD_REQUEST)
     return None
