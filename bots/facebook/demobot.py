@@ -187,6 +187,7 @@ def get_page_access_token(page_id):
     headers = {'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.get(url, params=payload, headers=headers)
     res_json = response.json()
+    app_log.debug('=========================>>>>> access token call result ' + repr(res_json))
     if 'success' in res_json and res_json['success'] == True:
         return res_json['access_token']
     return None

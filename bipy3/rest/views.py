@@ -628,6 +628,7 @@ class PageAccessTokenView(views.APIView):
             return nao_valido
         try:
             fb_acesso = Fb_acesso.objects.get(pk=request.data.get('page_id'))
+            logger.debug('===---=-=--=--=-=-= access token::: ' + fb_acesso.page_access_token)
             return Response({"success": True, "access_token": fb_acesso.page_access_token})
         except Fb_acesso.DoesNotExist:
             logger.error('-=-=-=-=-=-=-=- facebook page_id inexistente: ' +
