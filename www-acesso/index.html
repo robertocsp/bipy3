@@ -181,10 +181,13 @@
               nome_loja: nomeLoja},
              function(data) {
         console.log(data);
+        document.getElementById('nome_loja').value = '';
+        document.getElementById('pid').value = '-1';
+        alert('Bem-vindo(a) à mais avançada forma de atendimento.\nBem-vindo(a) ao Marvin!');
       })
       .fail(function(data) {
         console.log(data);
-        alert(data.responseJSON.message);
+        alert(JSON.parse(data.responseText).message);
       });
   }
 </script>

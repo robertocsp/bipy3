@@ -23,6 +23,7 @@ from pedido.views import *
 
 urlpatterns = [
     url(r'^$', login_geral, name='login_geral'),
+    url(r'^logout/$', logout_geral, name='logout'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^cadastro/$', cadastro, name='Home'),
     url(r'^dashboard/$', dashboard, name='Dashboard'),

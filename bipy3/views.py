@@ -2,7 +2,7 @@
 
 from bipy3.forms import *
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 
 from loja.models import Loja
@@ -47,3 +47,8 @@ def login_geral(request):
     else:
         form = LoginForm()
         return render(request, 'login.html', {'form': form, 'error': False})
+
+
+def logout_geral(request):
+    logout(request)
+    return HttpResponseRedirect('/')

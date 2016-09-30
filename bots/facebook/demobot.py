@@ -299,7 +299,7 @@ def get_elements_menu(conversa):
         menu.append(
             {
                 'title': u'Envie seu pedido',
-                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/enviar_pedido.png',
+                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/enviar_pedido.jpg',
                 'subtitle': u'Envie seu pedido para iniciarmos seu preparo.',
                 'buttons': [
                     {
@@ -313,7 +313,7 @@ def get_elements_menu(conversa):
         menu.append(
             {
                 'title': u'Adicione itens ao pedido',
-                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/add_itens_pedido.png',
+                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/adicionar_itens.jpg',
                 'subtitle': u'Adicione itens ao pedido que você já começou a montar.',
                 'buttons': [
                     {
@@ -327,7 +327,7 @@ def get_elements_menu(conversa):
         menu.append(
             {
                 'title': u'Atualize seu pedido',
-                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/atualizar_pedido.png',
+                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/atualizar_pedido.jpg',
                 'subtitle': u'Atualize os itens já adicionados ao seu pedido.',
                 'buttons': [
                     {
