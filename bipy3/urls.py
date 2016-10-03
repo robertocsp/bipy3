@@ -23,10 +23,11 @@ from pedido.views import *
 
 urlpatterns = [
     url(r'^$', login_geral, name='login_geral'),
+    url(r'^logout/$', logout_geral, name='logout'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^cadastro/$', cadastro, name='Home'),
+    url(r'^cadastro/$', cadastro, name='cadastro'),
     url(r'^dashboard/$', dashboard, name='Dashboard'),
-    url(r'^historico/$', historico_pedidos, name='Home'),
+    url(r'^historico/$', historico_pedidos, name='historico'),
     url(r'^home/$', home, name='Home'),
     url(r'^bipy3/api/rest/login[/]?$', views.LoginView.as_view(), name='login_view'),
     url(r'^bipy3/api/rest/cliente[/]?$', views.AdicionarClienteView.as_view(), name='adicionar_cliente_view'),
@@ -40,6 +41,7 @@ urlpatterns = [
     url(r'^bipy3/api/rest/pede_conta[/]?$', views.PedirContaView.as_view(), name='pedir_conta_view'),
     url(r'^bipy3/api/rest/notificacao_lida[/]?$', views.NotificacaoLidaView.as_view(), name='notificacao_lida_view'),
     url(r'^bipy3/api/rest/acesso_bot[/]?$', views.AcessoBotView.as_view(), name='acesso_bot_view'),
+    url(r'^bipy3/api/rest/page_access_token[/]?$', views.PageAccessTokenView.as_view(), name='page_access_token_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^upload/$', upload, name='upload'),
     url(r'^termos-e-condicoes-de-uso/$', termos, name='termos'),

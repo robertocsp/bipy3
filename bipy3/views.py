@@ -2,7 +2,7 @@
 
 from bipy3.forms import *
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 
 from loja.models import Loja
@@ -17,7 +17,7 @@ def login_geral(request):
                               {"form": form, "success": False, "type": 400, "message": u'Loja é obrigatório.'})
             id_loja = request.POST['loja'].strip()
             try:
-                loja = Loja.objects.get(group=id_loja)
+                loja = Loja.objects.get(pk=id_loja)
             except Loja.DoesNotExist:
                 return render(request, 'login.html',
                               {"form": form, "success": False, "type": 400,
@@ -47,3 +47,8 @@ def login_geral(request):
     else:
         form = LoginForm()
         return render(request, 'login.html', {'form': form, 'error': False})
+
+
+def logout_geral(request):
+    logout(request)
+    return HttpResponseRedirect('/')
