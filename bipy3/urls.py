@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^bipy3/api/rest/acesso_bot[/]?$', views.AcessoBotView.as_view(), name='acesso_bot_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^upload/$', upload, name='upload'),
+    url(r'^termos-e-condicoes-de-uso/$', termos, name='termos'),
     url(r'^relacionamento/$', relacionamento, name='relacionamento')]
 
 

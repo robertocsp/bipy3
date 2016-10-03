@@ -39,3 +39,8 @@ def cadastro(request):
 @login_required(login_url='/')
 def relacionamento(request):
     return render(request, 'relacionamento.html')
+
+
+@login_required(login_url='/')
+def termos(request):
+    return render(request, 'termos.html')

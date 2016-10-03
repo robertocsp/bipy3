@@ -479,7 +479,8 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 }
 
 .coluna .info .status-label{
-    width: 70%;
+    width: 82%;
+    text-transform: uppercase;
 }
 
 .coluna .info .expandi{
@@ -1331,16 +1332,37 @@ h4, h5{
 }
 
 .notifyjs-bipy3-garcom{
-    background-color: rgba(253, 200, 47, .9);
+    background-color: #5cb07f;
 }
 
 .notifyjs-bipy3-cardapio{
-    background-color: rgba(92, 184, 92, .9);
+    background-color: #7c557c;
 }
 
 .notifyjs-bipy3-fbmessenger{
     background-color: #fff;
 }
+
+.notifyjs-bipy3-conta{
+    background-color: #f55d49;
+}
+
+.notifyjs-bipy3-troca_mesa{
+    background-color: #0bc0c2;
+}
+
+/*
+#F4EE1F amarelo
+
+#f55d49 vermelho
+
+#7c557c roxo --------
+
+#5cb07f verde ----------------
+
+#0bc0c2 verde claro
+
+#fe7684 rosa*/
 
 .notifyjs-corner .notifyjs-bipy3-fbmessenger .text{
     color: #777;
@@ -1423,6 +1445,20 @@ h4, h5{
 @media only screen and (max-width: 640px){
     .around {
         width: 100%;
+    }
+
+    .form-login form {
+        margin: 0 auto;
+        width: auto;
+    }
+
+    .logo-login a img {
+        width: 100%;
+        margin: 0 auto 20px auto;
+    }
+
+    .right-login {
+        padding-top: 20px;
     }
 
     .linha-btn, .expandi{
