@@ -27,11 +27,6 @@ def upload(request):
 
 
 @login_required(login_url='/')
-def historico_pedidos(request):
-    return render(request, 'historico.html')
-
-
-@login_required(login_url='/')
 def cadastro(request):
     return render(request, 'cadastro.html')
 

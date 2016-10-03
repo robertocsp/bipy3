@@ -113,8 +113,8 @@
 
 <script id="template-pedido" type="text/x-jquery-tmpl">
 {% verbatim %}
-  <li class="ui-state-default" data-uid="{{= card_uid }}">
-    <div class="header-pedido">
+  <li class="ui-state-default">
+    <div class="header-pedido" data-uid="{{= card_uid }}">
       <div class="cabecalho">
         <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="">
         <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span class="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
@@ -304,6 +304,29 @@
       });
     });
   }
+  function mudaStatus(uid, status)
+  {
+      $.post('/bipy3/api/rest/status',
+           {uid: uid, status: status},
+           function(data) {
+      console.log(data);
+      if (data.stop && pedidos_interval[data.uid] !== undefined)
+      {
+        clearInterval(pedidos_interval[data.uid]);
+        delete pedidos_interval[data.uid];
+      } else if (data.start && pedidos_interval[data.uid] === undefined)
+      {
+        startInterval(data.uid);
+      }
+    })
+    .fail(function(data) {
+      if (data.status === 403)
+      {
+        alert('Sessão inválida. Realize o login novamente.');
+        window.location.href = '/?next='+window.location.pathname;
+      }
+    });
+  }
   $(document).ready(function($) {
     //drag and drop pedidos
     $( "ul.droptrue" ).sortable({
@@ -315,18 +338,7 @@
       handle: ".header-pedido p",
       receive: function( event, ui ) {
         // evento do momento em que o box e "solto" na coluna de destino
-        $.post('/bipy3/api/rest/status',
-               {uid: $(ui.item).attr("data-uid"), status: $(event.target).attr('id')},
-               function(data) {
-          console.log(data);
-        })
-        .fail(function(data) {
-          if (data.status === 403)
-          {
-            alert('Sessão inválida. Realize o login novamente.');
-            window.location.href = '/?next='+window.location.pathname;
-          }
-        });
+        mudaStatus($(ui.item).children(':first-child').attr("data-uid"), $(event.target).attr('id'));
       }
     });
 
@@ -372,19 +384,7 @@
       $(this).closest('li').hide("300");
       $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
       $(this).closest('li').remove();
-      $.post('/bipy3/api/rest/status',
-             {uid: $(this).find("input").attr("data-uid"), status: $(this).find("input").attr("name")},
-             function(data) {
-               console.log(data);
-             }
-      )
-      .fail(function(data) {
-        if (data.status === 403)
-        {
-            alert('Sessão inválida. Realize o login novamente.');
-            window.location.href = '/?next='+window.location.pathname;
-        }
-      });
+      mudaStatus($(this).find("input").attr("data-uid"), $(this).find("input").attr("name"));
     });
 
     // Troca de colunas no clique dos botoes de status dentro da lista de itens
@@ -399,19 +399,7 @@
       $(this).closest('li').hide("300");
       $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
       $(this).closest('li').remove();
-      $.post('/bipy3/api/rest/status',
-             {uid: $(this).find("input").attr("data-uid"), status: $(this).find("input").attr("name")},
-             function(data) {
-               console.log(data);
-             }
-      )
-      .fail(function(data) {
-        if (data.status === 403)
-        {
-            alert('Sessão inválida. Realize o login novamente.');
-            window.location.href = '/?next='+window.location.pathname;
-        }
-      });
+      mudaStatus($(this).find("input").attr("data-uid"), $(this).find("input").attr("name"));
     });
 
     //efeito para expandir colunas

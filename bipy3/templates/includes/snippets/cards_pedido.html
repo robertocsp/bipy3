@@ -3,8 +3,8 @@
 {% for pedido in pedidos %}
 {% minutos_passados pedido.data pedido.hora as minutos_resultado %}
 {% pedido_uid pedido.data pedido.numero as card_uid %}
-  <li class="ui-state-default" data-uid="{{ card_uid }}">
-    <div class="header-pedido">
+  <li class="ui-state-default">
+    <div class="header-pedido" data-uid="{{ card_uid }}">
       <div class="cabecalho">
         <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/bipy3/img/default_user.png{% endif %}" width="40" height="40" alt="" >
         <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span class="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
@@ -136,7 +136,9 @@
   <script type="text/javascript">
       $(document).ready(function() {
         sendMessageBindClick('{{ card_uid }}');
+        {% if pedido.status != 'entregue' and pedido.status != 'cancelado' %}
         startInterval('{{ card_uid }}');
+        {% endif %}
       });
   </script>
 {% endfor %}

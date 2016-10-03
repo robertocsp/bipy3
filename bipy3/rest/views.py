@@ -213,18 +213,29 @@ class StatusPedidoView(views.APIView):
             return Response({"success": False})
         except Pedido.MultipleObjectsReturned:
             return Response({"success": False})
+        response = {"success": True}
         if status_loja == 'solicitado':
             pedido.status = 'solicitado'
+            response['start'] = True
+            response['uid'] = uid
         elif status_loja == 'em-processo':
             pedido.status = 'emprocessamento'
+            response['start'] = True
+            response['uid'] = uid
         elif status_loja == 'concluido':
             pedido.status = 'concluido'
+            response['start'] = True
+            response['uid'] = uid
         elif status_loja == 'entregue':
             pedido.status = 'entregue'
+            response['stop'] = True
+            response['uid'] = uid
         elif status_loja == 'cancelado':
             pedido.status = 'cancelado'
+            response['stop'] = True
+            response['uid'] = uid
         pedido.save()
-        return Response({"success": True})
+        return Response(response)
 
 
 class EnviarMensagemView(views.APIView):
@@ -355,6 +366,7 @@ class TrocarMesaView(views.APIView):
             return Response({"success": False})
         mesa_anterior = request.data.get('mesa_anterior', None)
         pedidos_payload = []
+        pedidos = None
         data_corte = datetime.now() + timedelta(hours=-3)
         if mesa_anterior:
             pedidos = Pedido.objects.filter(
