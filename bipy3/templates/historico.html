@@ -38,9 +38,11 @@
         </div>
     </div>
   </form>
+    {% if pedidos %}
     <span class="current">
         Página {{ pedidos.number }} de {{ pedidos.paginator.num_pages }}
     </span>
+    {% endif %}
     <div class="infos">
        <label class="status-label"><i class="fa fa-tags"></i> Status</label>
        <label class="data"><i class="fa fa-calendar"></i> Data</label>
@@ -134,6 +136,7 @@
         {% endfor %}
         </div>
     </div>
+    {% if pedidos %}
     <nav aria-label="Page navigation">
       {% paginacao_inicial pedidos.paginator.num_pages pedidos.number 5 as pagina_inicial %}
       {% paginacao_range pedidos.paginator.num_pages 5 as pagina_range %}
@@ -154,7 +157,9 @@
         {% if pedidos.paginator.num_pages|add:'-5' > pagina_inicial %}
         <li><a href="javascript:void(0);">...</a></li>
         {% endif %}
+        {% if pedidos.paginator.num_pages > 1 %}
         <li {% if pedidos.number == pedidos.paginator.num_pages %}class="active"{% endif %}><a href="javascript:setPagina({{ pedidos.paginator.num_pages }});">{{ pedidos.paginator.num_pages }}{% if pedidos.number == pedidos.paginator.num_pages %} <span class="sr-only">(current)</span>{% endif %}</a></li>
+        {% endif %}
         <li {% if not pedidos.has_next %}class="disabled"{% endif %}>
           <a href="{% if not pedidos.has_next %}javascript:void(0);{% else %}javascript:setPagina({{ pedidos.next_page_number }});{% endif %}" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
@@ -162,7 +167,7 @@
         </li>
       </ul>
     </nav>
-
+    {% endif %}
 </div>
 
 {% endblock %}
