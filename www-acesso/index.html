@@ -77,7 +77,6 @@
   // Here we run a very simple test of the Graph API after login is
   // successful.  See statusChangeCallback() for when this call is made.
   function loggedIn(res) {
-	console.log(res.authResponse.accessToken);
 	document.getElementById('uac').value = res.authResponse.accessToken;
 	document.getElementById('fb-login-btn').style.display = 'none';
 	document.getElementById('fb-logout-btn').style.display = 'block';
@@ -126,7 +125,7 @@
            }
            else
            {
-              document.getElementById('permissao-pagina').innerHTML = 'Nenhuma página encontrada em sua conta do Facebook.';
+              document.getElementById('permissao-pagina').innerHTML = '<p class="acesso-texto">Nenhuma página encontrada em sua conta do Facebook.</p>';
            }
         });
       }
@@ -188,13 +187,11 @@
               pid: pid,
               nome_loja: nomeLoja},
              function(data) {
-        console.log(data);
         document.getElementById('nome_loja').value = '';
         document.getElementById('pid').value = '-1';
         alert('Bem-vindo(a) à mais avançada forma de atendimento.\nBem-vindo(a) ao Marvin!');
       })
       .fail(function(data) {
-        console.log(data);
         alert(JSON.parse(data.responseText).message);
       });
   }
