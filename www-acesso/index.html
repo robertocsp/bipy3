@@ -2,7 +2,9 @@
 <html>
     <head>
         <title>Bipy3 - Acesso</title>
-        <meta charset="UTF-8">
+         <meta charset="utf-8">
+         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+         <meta id="viewport" name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
         <link rel="stylesheet" href="css/style.css">
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -79,7 +81,7 @@
 	document.getElementById('fb-logout-btn').style.display = 'block';
     FB.api('/me', function(response) {
       document.getElementById('status').innerHTML =
-        'Olá ' + response.name + '!';
+        'Olá, ' + response.name + '!';
     });
     FB.api('/me/permissions', function(response) {
       var notGranted = [];
@@ -109,14 +111,16 @@
         FB.api('/me/accounts', function(response) {
            if(response.data.length > 0)
            {
-              var nomeLoja = '<label>Nome da loja no dashboard</label><input type="text" name="nome_loja" value="" id="nome_loja" />';
-              var selecao = '<select id="pid"><option value="-1">Selecione a página</option>';
+              var nomeLoja = '<label>Nome da loja no dashboard: </label><input type="text" name="nome_loja" value="" id="nome_loja" />';
+              var selecao = '<label>Selecione sua página no Facebook que utilizara o Marvin:</label><select id="pid"><option value="-1">Selecione</option>';
               for (var i = 0; i < response.data.length; i++)
               {
                 selecao += '<option value="'+response.data[i].id+'">'+response.data[i].name+'</option>';
               }
-              selecao += '</select><br><input type="button" name="selecionar" value="Selecionar página" onclick="sendPage();" />';
-              document.getElementById('permissao-pagina').innerHTML = nomeLoja + '<br>' + selecao;
+              selecao += '</select><br><div class="button"><input type="button" name="selecionar" id="ok" value="Enviar" onclick="sendPage();" /></div>';
+              document.getElementById('permissao-pagina').innerHTML = '<br><label class='text-into'>Preencha os dados abaixo para comecar a usar o Marvin:</label>' + nomeLoja + '<br>' + selecao;
+
+              $(".acesso-texto").hide();
            }
            else
            {
@@ -199,20 +203,21 @@
   the JavaScript SDK to present a graphical Login button that triggers
   the FB.login() function when clicked.
 -->
-    <input type="hidden" id="uac" name="uac" value="" />
-    <div id="status">
-    </div>
-    <hr>
-    <div id="permissao-pagina">
-    </div>
-    <hr>
-    <div id="fb-login-btn">
-        <fb:login-button scope="manage_pages,pages_messaging" onlogin="checkLoginState();">
-        </fb:login-button>
-    </div>
-    <div id="fb-logout-btn" style="display: none;">
-        <input type="button" name="sair" value="Sair" onclick="logout();" />
-    </div>
+    <div class="content">
+        <img src="img/logo-header.png" width="350" height="" />
+        <p class="acesso-texto">Para se cadastrar e comecar a utilizar o Marvin, acesse nosso sistema com sua conta do Facebook</p>
+        <input type="hidden" id="uac" name="uac" value="" />
+        <div id="status"></div>
 
+        <div id="permissao-pagina"></div>
+
+        <div id="fb-login-btn">
+            <fb:login-button scope="manage_pages,pages_messaging" onlogin="checkLoginState();">
+            </fb:login-button>
+        </div>
+        <div id="fb-logout-btn" style="display: none">
+            <input type="button" name="sair" value="Sair" id="sair" onclick="logout();" />
+        </div>
+    </div>
 </body>
 </html>

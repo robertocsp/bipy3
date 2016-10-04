@@ -100,32 +100,37 @@
                 <h4><i class="fa fa-comments-o"></i> Chat</h4>
 
                 <!-- Inicio dialogo -->
-              <div class="col-md-12"><br>
+              <div class="col-md-12">
                 <div class="dialogo messeger">
                   <div class="cabecalho-chat">
                     <p>{{ pedido.cliente.nome }}<p>
                   </div>
-                  <ul>
-                    {% for item in pedido.historico %}
-                     {% if 'cliente' in item %}
-                      <li class="cons">
-                          <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/bipy3/img/default_user.png{% endif %}" width="40" height="40" alt="">
-                          <div class="balao">
-                            <h4 class="media-heading"> {{ pedido.cliente.nome }}</h4>
-                            <p>{{ item.cliente }}</p>
-                          </div>
-                      </li>
-                     {% elif 'bot' in item %}
-                      <span class="bico"></span>
-                      <li class="est">
-                          <div class="balao">
-                            <h4 class="media-heading"> Bar Demonstração Indoor</h4>
-                            <p>{{ item.bot }}</p>
-                          </div>
-                      </li>
-                     {% endif %}
-                    {% endfor %}
-                  </ul>
+                  {% if pedido.historico %}
+                      <ul class="dialogo-hist">
+                        {% for item in pedido.historico %}
+                         {% if 'cliente' in item %}
+                          <li class="cons">
+                              <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/bipy3/img/default_user.png{% endif %}" width="40" height="40" alt="">
+                              <div class="balao">
+                                <h4 class="media-heading"> {{ pedido.cliente.nome }}</h4>
+                                <p>{{ item.cliente }}</p>
+                              </div>
+                          </li>
+                         {% elif 'bot' in item %}
+                          <span class="bico"></span>
+                          <li class="est">
+                              <div class="balao">
+                                <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                                <p>{{ item.bot }}</p>
+                              </div>
+                          </li>
+                         {% endif %}
+                        {% endfor %}
+                      </ul>
+                    {% else %}
+                        <p class="interacao-hist">Sem interação com cliente</p>
+                  {% endif %}
+
                   <br><br>
                 </div>
               </div>
