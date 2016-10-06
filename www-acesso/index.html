@@ -22,11 +22,13 @@
       loggedIn(response);
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
-      document.getElementById('status').innerHTML = 'É necessário realizar o login no aplicativo para poder utilizar o Marvin.';
+      //document.getElementById('status').innerHTML = 'É necessário realizar o login no aplicativo para poder utilizar o Marvin.';
+      $(".acesso-texto").show();
     } else {
       // The person is not logged into Facebook, so we're not sure if
       // they are logged into this app or not.
-      document.getElementById('status').innerHTML = 'Por favor, realize o login no Facebook.';
+      //document.getElementById('status').innerHTML = 'Por favor, realize o login no Facebook.';
+      $(".acesso-texto").show();
     }
   }
 
@@ -75,7 +77,6 @@
   // Here we run a very simple test of the Graph API after login is
   // successful.  See statusChangeCallback() for when this call is made.
   function loggedIn(res) {
-	console.log(res.authResponse.accessToken);
 	document.getElementById('uac').value = res.authResponse.accessToken;
 	document.getElementById('fb-login-btn').style.display = 'none';
 	document.getElementById('fb-logout-btn').style.display = 'block';
@@ -118,13 +119,13 @@
                 selecao += '<option value="'+response.data[i].id+'">'+response.data[i].name+'</option>';
               }
               selecao += '</select><br><div class="button"><input type="button" name="selecionar" id="ok" value="Enviar" onclick="sendPage();" /></div>';
-              document.getElementById('permissao-pagina').innerHTML = '<br><label class='text-into'>Preencha os dados abaixo para comecar a usar o Marvin:</label>' + nomeLoja + '<br>' + selecao;
+              document.getElementById('permissao-pagina').innerHTML = '<br><label class="text-into">Preencha os dados abaixo para comecar a usar o Marvin:</label>' + nomeLoja + '<br>' + selecao;
 
               $(".acesso-texto").hide();
            }
            else
            {
-              document.getElementById('permissao-pagina').innerHTML = 'Nenhuma página encontrada em sua conta do Facebook.';
+              document.getElementById('permissao-pagina').innerHTML = '<p class="acesso-texto">Nenhuma página encontrada em sua conta do Facebook.</p>';
            }
         });
       }
@@ -186,13 +187,11 @@
               pid: pid,
               nome_loja: nomeLoja},
              function(data) {
-        console.log(data);
         document.getElementById('nome_loja').value = '';
         document.getElementById('pid').value = '-1';
         alert('Bem-vindo(a) à mais avançada forma de atendimento.\nBem-vindo(a) ao Marvin!');
       })
       .fail(function(data) {
-        console.log(data);
         alert(JSON.parse(data.responseText).message);
       });
   }
