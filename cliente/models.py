@@ -2,6 +2,8 @@
 from django.db import models
 from utils import BigAutoField
 
+import datetime
+
 
 class Cliente(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
@@ -11,6 +13,14 @@ class Cliente(models.Model):
     #cheguei a este tamanho a partir deste post: http://stackoverflow.com/questions/7566672/whats-the-max-length-of-a-facebook-uid
     chave_facebook = models.CharField('chave_facebook', max_length=128, unique=True, null=True, blank=True)
     foto = models.CharField('foto', max_length=255, null=True, blank=True)
+    data_interacao = models.DateTimeField(null=True)
+    mensagens = models.IntegerField('numero', default=0)
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        self.data_interacao = datetime.datetime.today()
+        # banco armazena a DateTimeField como UTC, a data e hora separada é armazenada no timezone corrente.
+        return super(Cliente, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.nome

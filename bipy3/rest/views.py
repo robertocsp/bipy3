@@ -500,7 +500,7 @@ class AcessoBotView(views.APIView):
         page_id = request.data.get('pid')
         try:
             Fb_acesso.objects.get(page_id=page_id)
-            return fail_response(400, u'Página já utiliza o Marvin.')
+            return fail_response(400, u'Página já utiliza o Marviin.')
         except Fb_acesso.DoesNotExist:
             pass
         user_access_token = request.data.get('uac')
@@ -616,7 +616,7 @@ class AcessoBotView(views.APIView):
         greeting_text = {
           "setting_type": "greeting",
           "greeting": {
-            "text": u"Olá {{user_first_name}}, muito prazer, me chamo Marvin. Seja bem-vindo(a) a uma nova forma de "
+            "text": u"Olá {{user_first_name}}, muito prazer, me chamo Marviin. Seja bem-vindo(a) a uma nova forma de "
                     u"atendimento."
           }
         }

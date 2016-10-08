@@ -299,7 +299,7 @@ def get_elements_menu(conversa):
         menu.append(
             {
                 'title': u'Envie seu pedido',
-                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/enviar_pedido.jpg',
+                'image_url': 'https://sistema.bipy3.com/static/bipy3/img/enviar_pedido.jpg',
                 'subtitle': u'Envie seu pedido para iniciarmos seu preparo.',
                 'buttons': [
                     {
@@ -313,7 +313,7 @@ def get_elements_menu(conversa):
         menu.append(
             {
                 'title': u'Adicione itens ao pedido',
-                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/adicionar_itens.jpg',
+                'image_url': 'https://sistema.bipy3.com/static/bipy3/img/adicionar_itens.jpg',
                 'subtitle': u'Adicione itens ao pedido que você já começou a montar.',
                 'buttons': [
                     {
@@ -327,7 +327,7 @@ def get_elements_menu(conversa):
         menu.append(
             {
                 'title': u'Atualize seu pedido',
-                'image_url': 'http://sistema.bipy3.com/static/bipy3/img/atualizar_pedido.jpg',
+                'image_url': 'https://sistema.bipy3.com/static/bipy3/img/atualizar_pedido.jpg',
                 'subtitle': u'Atualize os itens já adicionados ao seu pedido.',
                 'buttons': [
                     {
@@ -340,7 +340,7 @@ def get_elements_menu(conversa):
     menu.append(
         {
             'title': u'Realize um novo pedido',
-            'image_url': 'http://sistema.bipy3.com/static/bipy3/img/novo-pedido.jpg',
+            'image_url': 'https://sistema.bipy3.com/static/bipy3/img/novo-pedido.jpg',
             'subtitle': u'Monte um novo pedido por aqui, é bem fácil.',
             'buttons': [
                 {
@@ -353,7 +353,7 @@ def get_elements_menu(conversa):
     menu.append(
         {
             'title': u'Peça o cardápio',
-            'image_url': 'http://sistema.bipy3.com/static/bipy3/img/pedir-cardapio.jpg',
+            'image_url': 'https://sistema.bipy3.com/static/bipy3/img/pedir-cardapio.jpg',
             'subtitle': u'Peça nosso cardápio para auxiliá-lo(a) na montagem de seu pedido.',
             'buttons': [
                 {
@@ -366,7 +366,7 @@ def get_elements_menu(conversa):
     menu.append(
         {
             'title': u'Chame o garçom',
-            'image_url': 'http://sistema.bipy3.com/static/bipy3/img/chamar-garcom.jpg',
+            'image_url': 'https://sistema.bipy3.com/static/bipy3/img/chamar-garcom.jpg',
             'subtitle': u'Precisando de ajuda, pode deixar que peço para ele(a) ir aí.',
             'buttons': [
                 {
@@ -503,7 +503,7 @@ def get_mensagem(id_mensagem, **args):
         'getstarted': Template(u'Como posso ajudá-lo(a), $arg1?'),
         'menu':       Template(u'Digite a palavra menu para saber em como posso ajudá-lo(a). '
                                u'Você poderá digitá-la novamente a qualquer momento.'),
-        'mesa':       Template(u'Por favor, me informe sua mesa.'),
+        'mesa':       Template(u'Por favor, digite sua mesa.'),
         'pedido':     Template(u'Excelente, digite aqui o que deseja, quanto mais detalhado melhor! ;)'),
         'pedido1':    Template(u'Exemplo: 1 água com gelo sem limão'),
         'pedido2':    Template(u'Desculpe, mas não encontrei um pedido sendo montado. Pedirei que comece um novo, por '
@@ -522,7 +522,7 @@ def get_mensagem(id_mensagem, **args):
         'mesa4':      Template(u'Mesa anterior igual a atual.'),
         'mesa5':      Template(u'Mesa $arg1, correto?'),
         'sim_nao':    Template(u'Escolha uma das opções abaixo, por favor.'),
-        'pedido3':    Template(u'Por favor, pode falar, ou melhor, digitar. :)'),
+        'pedido3':    Template(u'Por favor, pode digitar. :)'),
         'pedido4':    Template(u'$arg1, já existe um pedido sendo montado. Deseja continuar este pedido ou começar um '
                                u'novo?'),
         'rever':      Template(u'Digite o número entre parênteses seguido da quantidade e, se precisar, descrição. '
@@ -537,7 +537,7 @@ def get_mensagem(id_mensagem, **args):
         'finalizar':  Template(u'Segue, acima, seu pedido para conferência. Confirma o envio?'),
         'cardapio':   Template(u'Já levaremos o cardápio para você. Em que posso ajudá-lo(a) agora?'),
         'garcom':     Template(u'Perfeito, logo logo ele(a) estará aí. Como posso ajudá-lo(a) agora?'),
-        'suspensao':  Template(u'Su a resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
+        'suspensao':  Template(u'Sua resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
         'conta':      Template(u'Ok, já avisei para trazerem sua conta.\nMuito obrigado(a), espero que sua experiência '
                                u'tenha sido a melhor possível.\nVolte sempre!'),
         'conta2':     Template(u'Desculpe, mas não tenho anotado sua mesa. Você poderia me informar, por favor.'),

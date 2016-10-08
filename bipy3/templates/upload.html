@@ -11,24 +11,14 @@
       </div>
       <label>Mantenha sempre seu cardápio atualizado conosco. Carregue-o abaixo. Não se esqueça de salvar as alterações clicando no botão "Salvar cardápio".</label>
     </div>
-    <div class="col-md-6">
-        <h2 class="tel"><i class="fa fa-send"></i> Telegram</h2>
-        <form>
-          <input id="file-tel" name="file-es[]" type="file" multiple>
-          <br />
-
-        </form>
-        <button type="submit" class="btn btn-primary save-card">
-            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar Cardápio Telegram
-          </button>
-    </div>
-    <div class="col-md-6">
+    <div class="col-md-12">
         <h2 class="fb"><i class="fa fa-facebook"></i> Messeger Facebook</h2>
-        <form>
-          <input id="file-fb" name="file-es[]" type="file" multiple>
+        <form action="/upload-cardapio/">
+          {% csrf_token %}
+          <input id="file-fb" name="cardapios" type="file" multiple>
           <br />
         </form>
-        <button type="submit" class="btn btn-primary save-card">
+        <button type="button" class="btn btn-primary save-card">
             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar Cardápio Messenger
           </button>
           <br /><br /><br /><br />
@@ -46,7 +36,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-primary">Confirmar alteração do cardápio</button>
+                <button type="button" class="btn btn-primary" onclick="uploadImages()">Confirmar alteração do cardápio</button>
             </div>
         </div>
     </div>
@@ -59,20 +49,129 @@
 {% block scripts %}
 
     <script type="text/javascript">
-       $('#file-tel').fileinput({
-          language: 'pt-BR',
-          uploadUrl: '#',
-          allowedFileExtensions : ['jpg', 'png','gif'],
-       });
+       var initialPreviewStart = [];
+       var initialPreviewConfigStart = [];
+       {% for cardapio in cardapios %}
+           initialPreviewStart.push('{{cardapio.caminho}}');
+           initialPreviewConfigStart.push({caption: '{{cardapio.nome}}', size: {{cardapio.tamanho|stringformat:'f'}}, width: '120px', key: '{{cardapio.chave}}'});
+       {% endfor %}
        $('#file-fb').fileinput({
           language: 'pt-BR',
-          uploadUrl: '#',
+          fileActionSettings: {
+            showUpload: false,
+            showRemove: true
+          },
+          uploadAsync: false,
+          showUpload: false,
+          showRemove: false,
+          uploadUrl: '/upload-cardapio/',
+          deleteUrl: '/upload-cardapio/',
+          deleteExtraData: {action: 'delete'},
+          allowedFileTypes: ['image'],
           allowedFileExtensions : ['jpg', 'png','gif'],
+          maxFileSize: 1024,
+          maxFileCount: 2,
+          validateInitialCount: true,
+          overwriteInitial: false,
+          initialPreviewShowDelete: true,
+          initialPreviewAsData: true,
+          initialPreview: initialPreviewStart,
+          initialPreviewConfig: initialPreviewConfigStart
+      }).fileinput('enable');
+
+      $('#file-fb').on('filepredelete', function(event, key, jqXHR) {
+        jqXHR.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        console.log('pre delete');
       });
 
-       $(".save-card").click(function(){
-          $("#myModal").modal('show');
-       });
+      $('#file-fb').on('filebatchpreupload', function(event, data, previewId, index) {
+        data.jqXHR.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        console.log('File pre upload triggered');
+      });
+
+      function refreshFileInput(success_files)
+      {
+        var initialPreview = [];
+        var initialPreviewConfig = [];
+        for (file in success_files)
+        {
+            var successFile = success_files[file];
+            initialPreview.push(successFile.caminho);
+            initialPreviewConfig.push({caption: successFile.nome, size: successFile.tamanho, width: '120px', key: successFile.chave});
+        }
+        $('#file-fb').fileinput('refresh', {
+          language: 'pt-BR',
+          fileActionSettings: {
+            showUpload: false,
+            showRemove: true
+          },
+          uploadAsync: false,
+          showUpload: false,
+          showRemove: false,
+          uploadUrl: '/upload-cardapio/',
+          deleteUrl: '/upload-cardapio/',
+          deleteExtraData: {action: 'delete'},
+          allowedFileTypes: ['image'],
+          allowedFileExtensions : ['jpg', 'png','gif'],
+          maxFileSize: 1024,
+          maxFileCount: 2,
+          validateInitialCount: true,
+          overwriteInitial: false,
+          initialPreviewShowDelete: true,
+          initialPreviewAsData: true,
+          initialPreview: initialPreview,
+          initialPreviewConfig: initialPreviewConfig
+        }).fileinput('enable');
+      }
+
+      $('#file-fb').on('filebatchuploadsuccess', function(event, data, previewId, index) {
+        var form = data.form, files = data.files, extra = data.extra,
+            response = data.response, reader = data.reader;
+        console.log('File batch upload success');
+        refreshFileInput(data.response.success_files);
+      });
+
+      $('#file-fb').on('filebatchuploaderror', function(event, data, msg) {
+        var form = data.form, files = data.files, extra = data.extra,
+            response = data.response, reader = data.reader;
+        console.log('File batch upload error');
+
+        if (data.jqXHR.responseJSON !== undefined)
+        {
+            var resJSON = data.jqXHR.responseJSON;
+            if (resJSON.type === 403)
+            {
+                msg = resJSON.error !== undefined ? resJSON.error : data.jqXHR.responseText;
+                // get message
+                alert(msg);
+                var loginUrl = resJSON.login_url;
+                var next = window.location.pathname;
+                if (loginUrl !== next)
+                {
+                    loginUrl += '?'+resJSON.next_field_name+'='+next;
+                }
+                window.location.href = loginUrl;
+            }
+            else if (resJSON.type === 200)
+            {
+                msg = resJSON.error !== undefined ? resJSON.error : data.jqXHR.responseText;
+                // get message
+                alert(msg);
+                $('#file-fb').fileinput('destroy');
+                refreshFileInput(resJSON.success_files);
+            }
+        }
+      });
+
+      $(".save-card").click(function(){
+         $("#myModal").modal('show');
+      });
+
+      function uploadImages()
+      {
+        $('#file-fb').fileinput('upload');
+        $("#myModal").modal('hide');
+      }
     </script>
 
 {% endblock %}

@@ -16,10 +16,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'bipy3_conf'), 'keys.txt')) as keys_file:
     for line in keys_file:
         key_value_pair = line.strip().split('=')
@@ -37,6 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_URL = '/'
 
 # Application definition
 
@@ -57,6 +54,7 @@ INSTALLED_APPS = (
     'loja',
     'notificacao',
     'fb_acesso',
+    'upload_cardapio',
 )
 
 MIDDLEWARE_CLASSES = (

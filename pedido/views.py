@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger('django')
 
 
-@login_required(login_url='/')
+@login_required
 def pedidos(request):
     nome_cliente_filtro = None
     num_pedido_filtro = None
@@ -72,7 +72,7 @@ def pedidos(request):
                               context_instance=RequestContext(request))
 
 
-@login_required(login_url='/')
+@login_required
 def historico_pedidos(request):
     data_filtro = None
     hora_filtro = None

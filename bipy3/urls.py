@@ -20,6 +20,7 @@ from bipy3.rest import views
 from bipy3.views import *
 from dashboard.views import *
 from pedido.views import *
+from upload_cardapio.views import *
 
 urlpatterns = [
     url(r'^$', login_geral, name='login_geral'),
@@ -44,6 +45,7 @@ urlpatterns = [
     url(r'^bipy3/api/rest/page_access_token[/]?$', views.PageAccessTokenView.as_view(), name='page_access_token_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^upload/$', upload, name='upload'),
+    url(r'^upload-cardapio/$', FileFieldView.as_view(), name='upload-cardapio'),
     url(r'^termos-e-condicoes-de-uso/$', termos, name='termos'),
     url(r'^relacionamento/$', relacionamento, name='relacionamento')]
 
