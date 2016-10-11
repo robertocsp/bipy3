@@ -16,20 +16,24 @@ import logging
 import os
 import json
 import shutil
+import requests
 
 logger = logging.getLogger('django')
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CARDAPIO_BASE_DIR = os.path.join(os.path.join(os.path.join(
-    os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'bipy3'), 'bipy3'), 'static'), 'marviin'), 'cardapios')
+    os.path.join(os.path.dirname(BASE_DIR), 'bipy3'), 'bipy3'), 'marviin'), 'cardapios')
 
 
 @login_required
 def upload(request):
     id_loja = request.session['id_loja']
-    cardapios = Cardapio.objects.filter(loja=id_loja)
+    cardapios = Cardapio.objects.filter(loja=id_loja, pagina=1)
     if not cardapios:
         cardapios = []
-    return render_to_response('upload.html', {'cardapios': cardapios},
+    cardapios2 = Cardapio.objects.filter(loja=id_loja, pagina=2)
+    if not cardapios2:
+        cardapios2 = []
+    return render_to_response('upload.html', {'cardapios': cardapios, 'cardapios2': cardapios2},
                               context_instance=RequestContext(request))
 
 
@@ -42,25 +46,33 @@ class FileFieldView(FormView):
         if 'action' in request.POST and request.POST['action'] == 'delete':
             resultado = self.delete_cardapio(request, id_loja)
             return resultado
-        if Cardapio.objects.filter(loja=id_loja).count() > 1:
+        if 'page' not in request.POST:
             response = HttpResponse(json.dumps({'success': False, 'type': 400,
-                                                'error': u'Só são permitidos 2 arquivos de imagem.'}),
+                                                'error': u'Chamada inválida, recarregue a página e repita a '
+                                                         u'operação.'}),
+                                    content_type='application/json')
+            response.status_code = 400
+            return response
+        page = request.POST['page']
+        if Cardapio.objects.filter(loja=id_loja, pagina=page).count() > 0:
+            response = HttpResponse(json.dumps({'success': False, 'type': 400,
+                                                'error': u'Só é permitido 1 arquivo por página.'}),
                                     content_type='application/json')
             response.status_code = 400
             return response
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        files = request.FILES.getlist('cardapios')
+        files = request.FILES.getlist('cardapio')
         failure_message = None
         if form.is_valid():
             for idx, f in enumerate(files):
-                if idx > 1:
+                if idx > 0:
                     if not failure_message:
                         failure_message = ''
                     else:
                         failure_message += ' '
-                    failure_message += 'O arquivo "' + f.name + '" foi descartado, pois ultrapassa o limite de 2 ' \
-                                                               'arquivos.'
+                    failure_message += 'O arquivo "' + f.name + '" foi descartado, pois ultrapassa o limite de 1 ' \
+                                       'arquivo da página '+repr(page)+'.'
                     continue
                 if f.size > 1048576:
                     if not failure_message:
@@ -72,11 +84,11 @@ class FileFieldView(FormView):
                 while True:
                     file_directory = get_random_string(length=32)
                     try:
-                        Cardapio.objects.get(chave=file_directory, loja=id_loja)
+                        Cardapio.objects.get(chave=file_directory, pagina=page)
                     except Cardapio.DoesNotExist:
                         cardapio = Cardapio()
                         break
-                file_dir_path = os.path.join(CARDAPIO_BASE_DIR, file_directory)
+                file_dir_path = os.path.join(CARDAPIO_BASE_DIR, file_directory + str(page))
                 try:
                     os.makedirs(file_dir_path)
                 except OSError:
@@ -87,14 +99,16 @@ class FileFieldView(FormView):
                     for chunk in f.chunks():
                         destination.write(chunk)
                 cardapio.chave = file_directory
+                cardapio.pagina = page
                 cardapio.nome = f.name
                 cardapio.tamanho = f.size
-                cardapio.caminho = '/static/marviin/cardapios/' + file_directory + '/' + f.name
+                cardapio.caminho = '/download-cardapio/?chave=' + file_directory + '&pagina=' + str(page)
                 cardapio.loja_id = id_loja
                 cardapio.save()
-            cardapios = Cardapio.objects.filter(loja=id_loja)
+            cardapios = Cardapio.objects.filter(loja=id_loja, pagina=page)
             if cardapios:
                 success_files = [cardapio.as_dict() for cardapio in cardapios]
+                self.update_cardapio_bot(request, id_loja)
             else:
                 success_files = []
             if not failure_message:
@@ -114,6 +128,26 @@ class FileFieldView(FormView):
 
     def delete_cardapio(self, request, id_loja):
         dir_to_delete = request.POST['key']
-        Cardapio.objects.filter(chave=dir_to_delete, loja=id_loja).delete()
-        shutil.rmtree(os.path.join(CARDAPIO_BASE_DIR, dir_to_delete))
+        page = request.POST['page']
+        Cardapio.objects.filter(chave=dir_to_delete, loja=id_loja, pagina=page).delete()
+        shutil.rmtree(os.path.join(CARDAPIO_BASE_DIR, dir_to_delete + str(page)))
+        self.update_cardapio_bot(request, id_loja)
         return JsonResponse({'success': True})
+
+    def update_cardapio_bot(self, request, id_loja):
+        cardapios = Cardapio.objects.filter(loja=id_loja).order_by('pagina')
+        cardapio_payload = ['https://sistema.bipy3.com' + cardapio.caminho for cardapio in cardapios]
+        data = {
+            'entry': [
+                {
+                    'recipient': {
+                        'id': request.session['id_fb_loja']
+                    },
+                    'cardapio': cardapio_payload
+                }
+            ]
+        }
+        url = 'https://localhost:5002/webhook'
+        headers = {'content-type': 'application/json'}
+        response = requests.post(url, data=json.dumps(data), headers=headers, verify=False)
+        logger.debug('------======------- response: ' + repr(response))

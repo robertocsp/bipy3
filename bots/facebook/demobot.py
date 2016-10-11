@@ -17,7 +17,7 @@ from flask import Flask, request, send_from_directory, Response
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
 from celery import Celery, chain
-from celery.exceptions import SoftTimeLimitExceeded, TimeLimitExceeded
+from celery.exceptions import SoftTimeLimitExceeded
 from contextlib import contextmanager
 
 try:
@@ -68,6 +68,8 @@ with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'keys.txt')) as key
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
 EXPIRACAO_CACHE_CONVERSA = 60 * 60 * 2  # 2 horas
+EXPIRACAO_CACHE_LOJA = 60 * 60 * 24 * 30  # 30 dias
+EXPIRACAO_CACHE_LOCK = 15  # tempo de vida do lock é de 15 segundos, no caso de um erro.
 POSTBACK_MAP = {
     'menu_novo_pedido': u'Novo pedido',
     'pedir_cardapio': u'Pedir cardápio',
@@ -80,7 +82,7 @@ POSTBACK_MAP = {
     'menu_get_started': u'Menu principal',
 }
 ROBOT_ICON = u'\U0001f4bb'
-# ULTIMO PASSO = 26
+# ULTIMO PASSO = 27
 
 
 class GraphAPIError(Exception):
@@ -132,17 +134,24 @@ def fb_request(path, loja_id, args=None, post_args=None, json=None, files=None, 
     if post_args is not None or json is not None:
         method = "POST"
 
-    access_token = cache.get(loja_id + 'pac')
-    if access_token is None:
+    page_info = cache.get(loja_id + 'info')
+    if page_info is None or page_info['access_token'] is None:
         access_token = get_page_access_token(loja_id)
         app_log.debug('=========================>>>>> access token call result ' + repr(access_token))
         if access_token:
-            cache.add(loja_id + 'pac', access_token)
+            if page_info is None:
+                page_info = {
+                    'access_token': access_token,
+                    'cardapio': None
+                }
+            else:
+                page_info['access_token'] = access_token
+            cache.set(loja_id + 'info', page_info, time=EXPIRACAO_CACHE_LOJA)
         else:
             # TODO pensar no que fazer em caso de erro.
             return
 
-    args["access_token"] = access_token
+    args["access_token"] = page_info['access_token']
 
     try:
         response = requests.request(method or "GET",
@@ -211,6 +220,24 @@ def send_image_message(sender_id, loja_id, image_path, content_type):
     }
     multipart_data = {'filedata': (image_path, open(image_path, 'rb'), content_type)}
     return post(loja_id, post_args=payload, files=multipart_data)
+
+
+@celery_app.task(bind=True, soft_time_limit=7)
+def send_image_url_message(self, sender_id, loja_id, url, icon=ROBOT_ICON):
+    payload = {
+        'recipient': {
+            'id': sender_id
+        },
+        'message': {
+            'attachment': {
+                'type': 'image',
+                'payload': {
+                    'url': url
+                }
+            }
+        }
+    }
+    return post(loja_id, json=payload)
 
 
 def send_button_message(sender_id, loja_id, text, buttons):
@@ -497,6 +524,26 @@ def get_quickreply_sim_nao():
     ]
 
 
+def get_quickreply_cardapio():
+    return [
+        {
+            'content_type': 'text',
+            'title': u'Digital',
+            'payload': 'cardapio_digital'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Impresso',
+            'payload': 'cardapio_impresso'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
+        }
+    ]
+
+
 def get_mensagem(id_mensagem, **args):
     mensagens = {
         'ola':        Template(u'Olá $arg1, como posso ajudá-lo(a)?'),
@@ -536,6 +583,9 @@ def get_mensagem(id_mensagem, **args):
         'desenv':     Template(u'Função em desenvolvimento...'),
         'finalizar':  Template(u'Segue, acima, seu pedido para conferência. Confirma o envio?'),
         'cardapio':   Template(u'Já levaremos o cardápio para você. Em que posso ajudá-lo(a) agora?'),
+        'cardapio2':  Template(u'Deseja a versão digital ou quer que lhe traga o impresso?'),
+        'cardapio3':  Template(u'Segue, acima, imagem do cardápio.'),
+        'cardapio4':  Template(u'Seguem, acima, 2 imagens do cardápio.'),
         'garcom':     Template(u'Perfeito, logo logo ele(a) estará aí. Como posso ajudá-lo(a) agora?'),
         'suspensao':  Template(u'Sua resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
         'conta':      Template(u'Ok, já avisei para trazerem sua conta.\nMuito obrigado(a), espero que sua experiência '
@@ -605,6 +655,20 @@ def editar_pedido(message, conversa):
         conversa['itens_pedido'][i[0] - 1]['descricao'] = item_pedido[1]
         conversa['itens_pedido'][i[0] - 1]['quantidade'] = 1
     return True
+
+
+def get_cardapio(loja_id):
+    data = {}
+    pass
+    data['chave_bot_api_interna'] = CHAVE_BOT_API_INTERNA
+    data['id_loja_fb'] = loja_id
+    url = 'http://localhost:8888/bipy3/api/rest/cardapio'
+    response = requests.get(url, auth=(SUPER_USER_USER, SUPER_USER_PASSWORD), params=data)
+    json_response = response.json()
+    app_log.debug(repr(json_response))
+    if json_response['success']:
+        return json_response['cardapio']
+    return None
 
 
 @celery_app.task(bind=True, soft_time_limit=20)
@@ -767,7 +831,7 @@ def teste_tarefa_route():
 @contextmanager
 def sender_lock(sender_id):
     app_log.debug('lock acquire:: ' + sender_id)
-    lock = cache.add(sender_id + 'lock', True, time=15)  # tempo de vida do lock é de 15 segundos, no caso de um erro.
+    lock = cache.add(sender_id + 'lock', True, time=EXPIRACAO_CACHE_LOCK)
     app_log.debug('lock:: ' + repr(lock) + ' :: ' + sender_id)
     yield lock
     if lock:
@@ -775,6 +839,20 @@ def sender_lock(sender_id):
         app_log.debug('lock released:: ' + sender_id)
     else:
         app_log.debug('no lock ' + sender_id)
+
+
+def atualiza_cardapio(loja_id, cardapio):
+    page_info = cache.get(loja_id + 'info')
+    app_log.debug('atualiza_cardapio:: ' + repr(page_info))
+    if page_info is None:
+        app_log.debug('=========================>>>>> cardapio ' + repr(cardapio))
+        page_info = {
+            'access_token': None,
+            'cardapio': cardapio
+        }
+    else:
+        page_info['cardapio'] = cardapio
+    cache.set(loja_id + 'info', page_info, time=EXPIRACAO_CACHE_LOJA)
 
 
 @flask_app.route("/webhook", methods=['GET', 'POST'])
@@ -788,6 +866,16 @@ def webhook():
         output = request.json
         app_log.debug(output)
         entry = output['entry'][0]
+        if 'cardapio' in entry:
+            app_log.debug('atualiza_cardapio:: ')
+            atualiza_cardapio(entry['recipient']['id'], entry['cardapio'])
+            resp = Response('success', status=200, mimetype='text/plain')
+            resp.status_code = 200
+            return resp
+        if 'messaging' not in entry:
+            resp = Response('success', status=200, mimetype='text/plain')
+            resp.status_code = 200
+            return resp
         event = entry['messaging']
         for x in event:
             sender_id = None
@@ -929,6 +1017,10 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
         conversa['passo_nao'] = None
     elif payload == 'nao':
         conversa['passo_nao'][0](message, sender_id, loja_id, conversa, conversa['passo_nao'][1])
+    elif payload == 'cardapio_impresso':
+        passo_cardapio_impresso(message, sender_id, loja_id, conversa)
+    elif payload == 'cardapio_digital':
+        passo_cardapio_digital(message, sender_id, loja_id, conversa)
     elif payload == 'menu_get_started':
         conversa['passo'] = 0
         bot1 = get_mensagem('getstarted', arg1=conversa['usuario']['first_name'])
@@ -980,7 +1072,9 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
             conversa['passo'] = 16
             passo_rever_pedido_2(message, sender_id, loja_id, conversa)
     elif passo == 19:
-        passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'cardapio', 20)
+        define_mesa(conversa['mesa_aux'], conversa)
+        conversa['mesa_aux'] = None
+        passo_cardapio(message, sender_id, loja_id, conversa)
     elif passo == 22:
         passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'garcom', 23)
     elif passo == 25:
@@ -1046,6 +1140,8 @@ def passo_finalizar_contato(sender_id, loja_id, conversa):
         passo_pedir_cardapio(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 25:
         passo_pedir_conta(None, sender_id, loja_id, conversa)
+    elif conversa['passo'] == 27:
+        passo_cardapio(None, sender_id, loja_id, conversa)
     conversa['suspensa'] = 0
 
 
@@ -1064,6 +1160,46 @@ def pre_requisito_pedido(sender_id, loja_id, conversa):
               send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
         return False
     return True
+
+
+def passo_cardapio_impresso(message, sender_id, loja_id, conversa):
+    conversa['passo'] = 20
+    mensagem_sucesso(sender_id, loja_id, conversa, 'cardapio')
+
+
+def passo_cardapio_digital(message, sender_id, loja_id, conversa):
+    page_info = cache.get(loja_id + 'info')
+    if page_info is None or page_info['cardapio'] is None or len(page_info['cardapio']) == 0:
+        passo_cardapio_impresso(message, sender_id, loja_id, conversa)
+    else:
+        conversa['passo'] = 0
+        for cardapio in page_info['cardapio']:
+            app_log.debug('cardapio digital:: ' + repr(cardapio))
+            send_image_url_message.delay(sender_id, loja_id, cardapio)
+        if len(page_info['cardapio']) == 1:
+            bot = get_mensagem('cardapio3')
+        else:
+            bot = get_mensagem('cardapio4')
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+
+
+def passo_cardapio(message, sender_id, loja_id, conversa):
+    page_info = cache.get(loja_id + 'info')
+    app_log.debug('passo_cardapio 1:: ' + repr(page_info))
+    if page_info is None or page_info['cardapio'] is None:
+        cardapio = get_cardapio(loja_id)
+        app_log.debug('passo_cardapio 2:: ' + repr(cardapio))
+        if cardapio is not None:
+            atualiza_cardapio(loja_id, cardapio)
+            page_info = cache.get(loja_id + 'info')
+            app_log.debug('passo_cardapio 3:: ' + repr(page_info))
+    if page_info is None or page_info['cardapio'] is None or len(page_info['cardapio']) == 0:
+        app_log.debug('passo_cardapio 4:: ')
+        passo_cardapio_impresso(message, sender_id, loja_id, conversa)
+    else:
+        conversa['passo'] = 27
+        bot = get_mensagem('cardapio2')
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_cardapio())
 
 
 def passo_confirma_mesa(message, sender_id, loja_id):
@@ -1100,12 +1236,11 @@ def passo_pedir_cardapio(message, sender_id, loja_id, conversa):
     set_variaveis(conversa,
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None))
-    if conversa['mesa'] is None:
+    if conversa['mesa'] is None or conversa['mesa'][0] is None:
         define_sim_nao(conversa, 3, define_passo, 19, define_payload, 'pedir_cardapio')
         mensagem_mesa(conversa, loja_id, sender_id)
     else:
-        conversa['passo'] = 20
-        mensagem_sucesso(sender_id, loja_id, conversa, 'cardapio')
+        passo_cardapio(message, sender_id, loja_id, conversa)
 
 
 def mensagem_sucesso(sender_id, loja_id, conversa, mensagem):

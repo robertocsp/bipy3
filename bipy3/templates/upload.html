@@ -13,12 +13,22 @@
     </div>
     <div class="col-md-12">
         <h2 class="fb"><i class="fa fa-facebook"></i> Messeger Facebook</h2>
-        <form action="/upload-cardapio/">
-          {% csrf_token %}
-          <input id="file-fb" name="cardapios" type="file" multiple>
-          <br />
-        </form>
-        <button type="button" class="btn btn-primary save-card">
+    </div>
+    <form action="/upload-cardapio/">
+        {% csrf_token %}
+        <div class="col-md-6">
+            <h2 class="fb">Página 1</h2>
+              <input id="file-fb" name="cardapio" type="file" multiple>
+              <br />
+        </div>
+        <div class="col-md-6">
+            <h2 class="fb">Página 2</h2>
+              <input id="file-fb-2" name="cardapio" type="file" multiple>
+              <br />
+        </div>
+    </form>
+    <div class="col-md-12">
+        <button id="save-menu-fb" type="button" class="btn btn-primary save-card" disabled>
             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar Cardápio Messenger
           </button>
           <br /><br /><br /><br />
@@ -49,35 +59,51 @@
 {% block scripts %}
 
     <script type="text/javascript">
+       var pagina1UploadEnabled = false;
+       var pagina2UploadEnabled = false;
+       function initFileInput (fileInputId, initialPreview, initialPreviewConfig, page)
+       {
+           $(fileInputId).fileinput({
+              language: 'pt-BR',
+              fileActionSettings: {
+                showUpload: false,
+                showRemove: true
+              },
+              uploadAsync: false,
+              showUpload: false,
+              showRemove: false,
+              uploadUrl: '/upload-cardapio/',
+              uploadExtraData: {page: page},
+              deleteUrl: '/upload-cardapio/',
+              deleteExtraData: {action: 'delete', page: page},
+              allowedFileTypes: ['image'],
+              allowedFileExtensions : ['jpg', 'png','gif'],
+              maxFileSize: 1024,
+              maxFileCount: 1,
+              previewZoomSettings: {image: {width: "auto", height: "100%"}},
+              validateInitialCount: true,
+              overwriteInitial: false,
+              initialPreviewShowDelete: true,
+              initialPreviewAsData: true,
+              initialPreview: initialPreview,
+              initialPreviewConfig: initialPreviewConfig
+           }).fileinput('enable');
+       }
        var initialPreviewStart = [];
        var initialPreviewConfigStart = [];
        {% for cardapio in cardapios %}
            initialPreviewStart.push('{{cardapio.caminho}}');
            initialPreviewConfigStart.push({caption: '{{cardapio.nome}}', size: {{cardapio.tamanho|stringformat:'f'}}, width: '120px', key: '{{cardapio.chave}}'});
        {% endfor %}
-       $('#file-fb').fileinput({
-          language: 'pt-BR',
-          fileActionSettings: {
-            showUpload: false,
-            showRemove: true
-          },
-          uploadAsync: false,
-          showUpload: false,
-          showRemove: false,
-          uploadUrl: '/upload-cardapio/',
-          deleteUrl: '/upload-cardapio/',
-          deleteExtraData: {action: 'delete'},
-          allowedFileTypes: ['image'],
-          allowedFileExtensions : ['jpg', 'png','gif'],
-          maxFileSize: 1024,
-          maxFileCount: 2,
-          validateInitialCount: true,
-          overwriteInitial: false,
-          initialPreviewShowDelete: true,
-          initialPreviewAsData: true,
-          initialPreview: initialPreviewStart,
-          initialPreviewConfig: initialPreviewConfigStart
-      }).fileinput('enable');
+       initFileInput('#file-fb', initialPreviewStart, initialPreviewConfigStart, 1);
+
+       var initialPreviewStart2 = [];
+       var initialPreviewConfigStart2 = [];
+       {% for cardapio in cardapios2 %}
+           initialPreviewStart2.push('{{cardapio.caminho}}');
+           initialPreviewConfigStart2.push({caption: '{{cardapio.nome}}', size: {{cardapio.tamanho|stringformat:'f'}}, width: '120px', key: '{{cardapio.chave}}'});
+       {% endfor %}
+       initFileInput('#file-fb-2', initialPreviewStart2, initialPreviewConfigStart2, 2);
 
       $('#file-fb').on('filepredelete', function(event, key, jqXHR) {
         jqXHR.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
@@ -89,7 +115,17 @@
         console.log('File pre upload triggered');
       });
 
-      function refreshFileInput(success_files)
+      $('#file-fb-2').on('filepredelete', function(event, key, jqXHR) {
+        jqXHR.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        console.log('pre delete');
+      });
+
+      $('#file-fb-2').on('filebatchpreupload', function(event, data, previewId, index) {
+        data.jqXHR.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        console.log('File pre upload triggered');
+      });
+
+      function refreshFileInput(fileInputId, success_files, page)
       {
         var initialPreview = [];
         var initialPreviewConfig = [];
@@ -99,7 +135,7 @@
             initialPreview.push(successFile.caminho);
             initialPreviewConfig.push({caption: successFile.nome, size: successFile.tamanho, width: '120px', key: successFile.chave});
         }
-        $('#file-fb').fileinput('refresh', {
+        $(fileInputId).fileinput('refresh', {
           language: 'pt-BR',
           fileActionSettings: {
             showUpload: false,
@@ -109,12 +145,14 @@
           showUpload: false,
           showRemove: false,
           uploadUrl: '/upload-cardapio/',
+          uploadExtraData: {page: page},
           deleteUrl: '/upload-cardapio/',
-          deleteExtraData: {action: 'delete'},
+          deleteExtraData: {action: 'delete', page: page},
           allowedFileTypes: ['image'],
           allowedFileExtensions : ['jpg', 'png','gif'],
           maxFileSize: 1024,
-          maxFileCount: 2,
+          maxFileCount: 1,
+          previewZoomSettings: {image: {width: "auto", height: "100%"}},
           validateInitialCount: true,
           overwriteInitial: false,
           initialPreviewShowDelete: true,
@@ -128,8 +166,38 @@
         var form = data.form, files = data.files, extra = data.extra,
             response = data.response, reader = data.reader;
         console.log('File batch upload success');
-        refreshFileInput(data.response.success_files);
+        pagina1UploadEnabled = false;
+        if (!pagina2UploadEnabled) $('#save-menu-fb').disable(true);
+        refreshFileInput('#file-fb', data.response.success_files, 1);
       });
+
+      $('#file-fb-2').on('filebatchuploadsuccess', function(event, data, previewId, index) {
+        var form = data.form, files = data.files, extra = data.extra,
+            response = data.response, reader = data.reader;
+        console.log('File batch upload success');
+        pagina2UploadEnabled = false;
+        if (!pagina1UploadEnabled) $('#save-menu-fb').disable(true);
+        refreshFileInput('#file-fb-2', data.response.success_files, 2);
+      });
+
+      var redirectControl = true;
+      function redirect403(resJSON, data)
+      {
+        if(redirectControl)
+        {
+            redirectControl = false;
+            var msg = resJSON.error !== undefined ? resJSON.error : data.jqXHR.responseText;
+            // get message
+            alert(msg);
+            var loginUrl = resJSON.login_url;
+            var next = window.location.pathname;
+            if (loginUrl !== next)
+            {
+                loginUrl += '?'+resJSON.next_field_name+'='+next;
+            }
+            window.location.href = loginUrl;
+        }
+      }
 
       $('#file-fb').on('filebatchuploaderror', function(event, data, msg) {
         var form = data.form, files = data.files, extra = data.extra,
@@ -141,26 +209,88 @@
             var resJSON = data.jqXHR.responseJSON;
             if (resJSON.type === 403)
             {
-                msg = resJSON.error !== undefined ? resJSON.error : data.jqXHR.responseText;
-                // get message
-                alert(msg);
-                var loginUrl = resJSON.login_url;
-                var next = window.location.pathname;
-                if (loginUrl !== next)
-                {
-                    loginUrl += '?'+resJSON.next_field_name+'='+next;
-                }
-                window.location.href = loginUrl;
+                redirect403(resJSON, data);
             }
             else if (resJSON.type === 200)
             {
-                msg = resJSON.error !== undefined ? resJSON.error : data.jqXHR.responseText;
+                var msg = resJSON.error !== undefined ? resJSON.error : data.jqXHR.responseText;
                 // get message
                 alert(msg);
                 $('#file-fb').fileinput('destroy');
-                refreshFileInput(resJSON.success_files);
+                refreshFileInput('#file-fb', resJSON.success_files, 1);
             }
         }
+      });
+
+      $('#file-fb-2').on('filebatchuploaderror', function(event, data, msg) {
+        var form = data.form, files = data.files, extra = data.extra,
+            response = data.response, reader = data.reader;
+        console.log('File batch upload error');
+
+        if (data.jqXHR.responseJSON !== undefined)
+        {
+            var resJSON = data.jqXHR.responseJSON;
+            if (resJSON.type === 403)
+            {
+                redirect403(resJSON, data);
+            }
+            else if (resJSON.type === 200)
+            {
+                var msg = resJSON.error !== undefined ? resJSON.error : data.jqXHR.responseText;
+                // get message
+                alert(msg);
+                $('#file-fb-2').fileinput('destroy');
+                refreshFileInput('#file-fb-2', resJSON.success_files, 2);
+            }
+        }
+      });
+
+      $('#file-fb').on('fileloaded', function(event, file, previewId, index, reader) {
+        console.log("fileloaded1");
+        pagina1UploadEnabled = true;
+        $('#save-menu-fb').disable(false);
+      });
+
+      $('#file-fb-2').on('fileloaded', function(event, file, previewId, index, reader) {
+        console.log("fileloaded2");
+        pagina2UploadEnabled = true;
+        $('#save-menu-fb').disable(false);
+      });
+
+      $('#file-fb').on('filecleared', function(event) {
+        console.log("filecleared1");
+        pagina1UploadEnabled = false;
+        if (!pagina2UploadEnabled) $('#save-menu-fb').disable(true);
+      });
+
+      $('#file-fb-2').on('filecleared', function(event) {
+        console.log("filecleared2");
+        pagina2UploadEnabled = false;
+        if (!pagina1UploadEnabled) $('#save-menu-fb').disable(true);
+      });
+
+      $('#file-fb').on('filedeleted', function(event) {
+        console.log("filedeleted1");
+        pagina1UploadEnabled = false;
+        if (!pagina2UploadEnabled) $('#save-menu-fb').disable(true);
+      });
+
+      $('#file-fb-2').on('filedeleted', function(event) {
+        console.log("filedeleted2");
+        pagina2UploadEnabled = false;
+        if (!pagina1UploadEnabled) $('#save-menu-fb').disable(true);
+      });
+
+      $('#file-fb').on('fileremoved', function(event) {
+        console.log("fileremoved1");
+        pagina1UploadEnabled = false;
+        if (!pagina2UploadEnabled) $('#save-menu-fb').disable(true);
+      });
+
+      $('#file-fb-2').on('fileremoved', function(event) {
+        console.log("fileremoved2");
+        pagina2UploadEnabled = false;
+        if (!pagina1UploadEnabled) $('#save-menu-fb').disable(true);
       });
 
       $(".save-card").click(function(){
@@ -169,7 +299,8 @@
 
       function uploadImages()
       {
-        $('#file-fb').fileinput('upload');
+        if (pagina1UploadEnabled) $('#file-fb').fileinput('upload');
+        if (pagina2UploadEnabled) $('#file-fb-2').fileinput('upload');
         $("#myModal").modal('hide');
       }
     </script>

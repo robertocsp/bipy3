@@ -11,6 +11,7 @@ from cliente.models import Cliente
 from loja.models import Loja
 from notificacao.models import Notificacao
 from fb_acesso.models import Fb_acesso
+from upload_cardapio.models import Cardapio
 from bipy3.forms import LoginForm
 
 from django.contrib.auth import authenticate, login, logout
@@ -653,3 +654,22 @@ class PageAccessTokenView(views.APIView):
             logger.error('-=-=-=-=-=-=-=- facebook page_id inexistente: ' +
                          repr(request.data.get('page_id')))
             return Response({"success": False})
+
+
+class CardapioView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def get(self, request, *args, **kwargs):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
+        try:
+            loja = Loja.objects.get(id_loja_facebook=request.GET['id_loja_fb'])
+        except Loja.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
+                         repr(request.GET['id_loja_fb']))
+            return Response({"success": False})
+        cardapios = Cardapio.objects.filter(loja=loja.id).order_by('pagina')
+        cardapio_payload = ['https://sistema.bipy3.com' + cardapio.caminho for cardapio in cardapios]
+        return Response({'success': True, 'cardapio': cardapio_payload})
