@@ -134,24 +134,17 @@ def fb_request(path, loja_id, args=None, post_args=None, json=None, files=None, 
     if post_args is not None or json is not None:
         method = "POST"
 
-    page_info = cache.get(loja_id + 'info')
-    if page_info is None or page_info['access_token'] is None:
+    access_token = cache.get(loja_id + 'pac')
+    if access_token is None:
         access_token = get_page_access_token(loja_id)
         app_log.debug('=========================>>>>> access token call result ' + repr(access_token))
         if access_token:
-            if page_info is None:
-                page_info = {
-                    'access_token': access_token,
-                    'cardapio': None
-                }
-            else:
-                page_info['access_token'] = access_token
-            cache.set(loja_id + 'info', page_info, time=EXPIRACAO_CACHE_LOJA)
+            cache.set(loja_id + 'pac', access_token, time=EXPIRACAO_CACHE_LOJA)
         else:
             # TODO pensar no que fazer em caso de erro.
             return
 
-    args["access_token"] = page_info['access_token']
+    args["access_token"] = access_token
 
     try:
         response = requests.request(method or "GET",
@@ -667,7 +660,8 @@ def get_cardapio(loja_id):
     json_response = response.json()
     app_log.debug(repr(json_response))
     if json_response['success']:
-        return json_response['cardapio']
+        if len(json_response['cardapio']) > 0:
+            return json_response['cardapio']
     return None
 
 
@@ -842,17 +836,11 @@ def sender_lock(sender_id):
 
 
 def atualiza_cardapio(loja_id, cardapio):
-    page_info = cache.get(loja_id + 'info')
-    app_log.debug('atualiza_cardapio:: ' + repr(page_info))
-    if page_info is None:
-        app_log.debug('=========================>>>>> cardapio ' + repr(cardapio))
-        page_info = {
-            'access_token': None,
-            'cardapio': cardapio
-        }
+    app_log.debug('atualiza_cardapio:: ' + repr(cardapio))
+    if cardapio is None:
+        cache.delete(loja_id + 'cardapio')
     else:
-        page_info['cardapio'] = cardapio
-    cache.set(loja_id + 'info', page_info, time=EXPIRACAO_CACHE_LOJA)
+        cache.set(loja_id + 'cardapio', cardapio, time=EXPIRACAO_CACHE_LOJA)
 
 
 @flask_app.route("/webhook", methods=['GET', 'POST'])
@@ -866,12 +854,6 @@ def webhook():
         output = request.json
         app_log.debug(output)
         entry = output['entry'][0]
-        if 'cardapio' in entry:
-            app_log.debug('atualiza_cardapio:: ')
-            atualiza_cardapio(entry['recipient']['id'], entry['cardapio'])
-            resp = Response('success', status=200, mimetype='text/plain')
-            resp.status_code = 200
-            return resp
         if 'messaging' not in entry:
             resp = Response('success', status=200, mimetype='text/plain')
             resp.status_code = 200
@@ -1172,34 +1154,26 @@ def passo_cardapio_impresso(message, sender_id, loja_id, conversa):
 
 
 def passo_cardapio_digital(message, sender_id, loja_id, conversa):
-    page_info = cache.get(loja_id + 'info')
-    if page_info is None or page_info['cardapio'] is None or len(page_info['cardapio']) == 0:
-        passo_cardapio_impresso(message, sender_id, loja_id, conversa)
+    cardapios = cache.get(loja_id + 'cardapio')
+    conversa['passo'] = 0
+    tarefas = []
+    for cardapio in cardapios:
+        app_log.debug('cardapio digital:: ' + repr(cardapio))
+        tarefas.append(send_image_url_message.si(sender_id, loja_id, cardapio))
+    if len(cardapios) == 1:
+        bot = get_mensagem('cardapio3')
     else:
-        conversa['passo'] = 0
-        tarefas = []
-        for cardapio in page_info['cardapio']:
-            app_log.debug('cardapio digital:: ' + repr(cardapio))
-            tarefas.append(send_image_url_message.si(sender_id, loja_id, cardapio))
-        if len(page_info['cardapio']) == 1:
-            bot = get_mensagem('cardapio3')
-        else:
-            bot = get_mensagem('cardapio4')
-        tarefas.append(send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu()))
-        chain(tarefas)()
+        bot = get_mensagem('cardapio4')
+    tarefas.append(send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu()))
+    chain(tarefas)()
 
 
 def passo_cardapio(message, sender_id, loja_id, conversa):
-    page_info = cache.get(loja_id + 'info')
-    app_log.debug('passo_cardapio 1:: ' + repr(page_info))
-    if page_info is None or page_info['cardapio'] is None:
-        cardapio = get_cardapio(loja_id)
-        app_log.debug('passo_cardapio 2:: ' + repr(cardapio))
-        if cardapio is not None:
-            atualiza_cardapio(loja_id, cardapio)
-            page_info = cache.get(loja_id + 'info')
-            app_log.debug('passo_cardapio 3:: ' + repr(page_info))
-    if page_info is None or page_info['cardapio'] is None or len(page_info['cardapio']) == 0:
+    app_log.debug('passo_cardapio 1:: ')
+    cardapio = get_cardapio(loja_id)
+    app_log.debug('passo_cardapio 2:: ' + repr(cardapio))
+    atualiza_cardapio(loja_id, cardapio)
+    if cardapio is None:
         app_log.debug('passo_cardapio 4:: ')
         passo_cardapio_impresso(message, sender_id, loja_id, conversa)
     else:
