@@ -108,7 +108,6 @@ class FileFieldView(FormView):
             cardapios = Cardapio.objects.filter(loja=id_loja, pagina=page)
             if cardapios:
                 success_files = [cardapio.as_dict() for cardapio in cardapios]
-                self.update_cardapio_bot(request, id_loja)
             else:
                 success_files = []
             if not failure_message:
@@ -131,23 +130,4 @@ class FileFieldView(FormView):
         page = request.POST['page']
         Cardapio.objects.filter(chave=dir_to_delete, loja=id_loja, pagina=page).delete()
         shutil.rmtree(os.path.join(CARDAPIO_BASE_DIR, dir_to_delete + str(page)))
-        self.update_cardapio_bot(request, id_loja)
         return JsonResponse({'success': True})
-
-    def update_cardapio_bot(self, request, id_loja):
-        cardapios = Cardapio.objects.filter(loja=id_loja).order_by('pagina')
-        cardapio_payload = ['https://sistema.bipy3.com' + cardapio.caminho for cardapio in cardapios]
-        data = {
-            'entry': [
-                {
-                    'recipient': {
-                        'id': request.session['id_fb_loja']
-                    },
-                    'cardapio': cardapio_payload
-                }
-            ]
-        }
-        url = 'https://localhost:5002/webhook'
-        headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(data), headers=headers, verify=False)
-        logger.debug('------======------- response: ' + repr(response))
