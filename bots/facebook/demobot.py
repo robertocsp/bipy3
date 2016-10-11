@@ -878,6 +878,10 @@ def webhook():
             return resp
         event = entry['messaging']
         for x in event:
+            if x.get('message') and x['message'].get('is_echo'):
+                resp = Response(u'mensagem de echo', status=200, mimetype='text/plain')
+                resp.status_code = 200
+                return resp
             sender_id = None
             loja_id = None
             if x.get('sender') and x['sender']['id'] and x.get('recipient') and x['recipient']['id']:
@@ -1236,7 +1240,7 @@ def passo_pedir_cardapio(message, sender_id, loja_id, conversa):
     set_variaveis(conversa,
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None))
-    if conversa['mesa'] is None or conversa['mesa'][0] is None:
+    if conversa['mesa'] is None:
         define_sim_nao(conversa, 3, define_passo, 19, define_payload, 'pedir_cardapio')
         mensagem_mesa(conversa, loja_id, sender_id)
     else:
