@@ -1177,14 +1177,16 @@ def passo_cardapio_digital(message, sender_id, loja_id, conversa):
         passo_cardapio_impresso(message, sender_id, loja_id, conversa)
     else:
         conversa['passo'] = 0
+        tarefas = []
         for cardapio in page_info['cardapio']:
             app_log.debug('cardapio digital:: ' + repr(cardapio))
-            send_image_url_message.delay(sender_id, loja_id, cardapio)
+            tarefas.append(send_image_url_message.si(sender_id, loja_id, cardapio))
         if len(page_info['cardapio']) == 1:
             bot = get_mensagem('cardapio3')
         else:
             bot = get_mensagem('cardapio4')
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+        tarefas.append(send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu()))
+        chain(tarefas)()
 
 
 def passo_cardapio(message, sender_id, loja_id, conversa):
