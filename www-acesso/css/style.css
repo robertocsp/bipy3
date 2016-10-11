@@ -18,7 +18,7 @@ p, a, div, span, label, input, select, button{
 
 .content{
     width: 400px;
-    height: 485px;
+    height: 500px;
     border: 1px solid #aaa;
     border-radius: 5px;
     position: fixed;
