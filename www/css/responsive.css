@@ -95,6 +95,66 @@ RESPONSIVE FIXES
         font-size: 80%;
     }
 
+    .navbar-inverse .navbar-toggle, .app-brief .phone-image, #comofunciona:before {
+        display: none;
+    }
+
+    .meio {
+        width: 96%;
+        padding: 0 2%;
+    }
+
+    #fale.linha .container {
+        width: 100%;
+    }
+
+    #comofunciona.linha{
+        background: rgba(0, 0, 0, .7);
+        min-height: 665px;
+    }
+
+    #fale.linha .container .coluna-fale {
+        width: 90%;
+        margin: 0 auto;
+    }
+
+    footer .copyright {
+        width: 100%;
+    }
+
+    .home {
+        margin-top: 50px;
+    }
+
+    .esquerda {
+        padding-left: 0;
+    }
+
+    .esquerda .col-md-6{
+        margin-bottom: 15px;
+    }
+
+    #home.header{
+        height: 78px;
+        min-height: 78px;
+        margin: 0;
+        padding: 0;
+        background: none;
+    }
+
+    #home.linha{
+        height: 500px;
+        min-height: 500px;
+        padding: 0;
+        margin: 0;
+    }
+
+    #home:before {
+        display: none;
+    }
+
+    .app-brief .phone-image{}
+
     body {
         font-size: 15px;
         line-height: 26px;
