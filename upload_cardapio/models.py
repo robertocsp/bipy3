@@ -13,11 +13,13 @@ class Cardapio(models.Model):
     tamanho = models.FloatField('tamanho', blank=False, null=False)
     caminho = models.CharField(max_length=200, blank=False, null=False)
     loja = models.ForeignKey(Loja, null=True, blank=True)
+    pagina = models.IntegerField(blank=False, null=False, default=0)
 
     def as_dict(self):
         return {
             'chave': self.chave,
             'nome': self.nome,
             'tamanho': self.tamanho,
-            'caminho': self.caminho
+            'caminho': self.caminho,
+            'pagina': self.pagina
         }

@@ -21,6 +21,7 @@ from bipy3.views import *
 from dashboard.views import *
 from pedido.views import *
 from upload_cardapio.views import *
+from download_cardapio.views import *
 
 urlpatterns = [
     url(r'^$', login_geral, name='login_geral'),
@@ -43,9 +44,11 @@ urlpatterns = [
     url(r'^bipy3/api/rest/notificacao_lida[/]?$', views.NotificacaoLidaView.as_view(), name='notificacao_lida_view'),
     url(r'^bipy3/api/rest/acesso_bot[/]?$', views.AcessoBotView.as_view(), name='acesso_bot_view'),
     url(r'^bipy3/api/rest/page_access_token[/]?$', views.PageAccessTokenView.as_view(), name='page_access_token_view'),
+    url(r'^bipy3/api/rest/cardapio[/]?$', views.CardapioView.as_view(), name='cardapio_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^upload/$', upload, name='upload'),
     url(r'^upload-cardapio/$', FileFieldView.as_view(), name='upload-cardapio'),
+    url(r'^download-cardapio/$', download_cardapio, name='download-cardapio'),
     url(r'^termos-e-condicoes-de-uso/$', termos, name='termos'),
     url(r'^relacionamento/$', relacionamento, name='relacionamento')]
 
