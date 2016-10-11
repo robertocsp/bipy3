@@ -135,31 +135,7 @@
             initialPreview.push(successFile.caminho);
             initialPreviewConfig.push({caption: successFile.nome, size: successFile.tamanho, width: '120px', key: successFile.chave});
         }
-        $(fileInputId).fileinput('refresh', {
-          language: 'pt-BR',
-          fileActionSettings: {
-            showUpload: false,
-            showRemove: true
-          },
-          uploadAsync: false,
-          showUpload: false,
-          showRemove: false,
-          uploadUrl: '/upload-cardapio/',
-          uploadExtraData: {page: page},
-          deleteUrl: '/upload-cardapio/',
-          deleteExtraData: {action: 'delete', page: page},
-          allowedFileTypes: ['image'],
-          allowedFileExtensions : ['jpg', 'png','gif'],
-          maxFileSize: 1024,
-          maxFileCount: 1,
-          previewZoomSettings: {image: {width: "auto", height: "100%"}},
-          validateInitialCount: true,
-          overwriteInitial: false,
-          initialPreviewShowDelete: true,
-          initialPreviewAsData: true,
-          initialPreview: initialPreview,
-          initialPreviewConfig: initialPreviewConfig
-        }).fileinput('enable');
+        initFileInput(fileInputId, initialPreview, initialPreviewConfig, page);
       }
 
       $('#file-fb').on('filebatchuploadsuccess', function(event, data, previewId, index) {
@@ -168,6 +144,7 @@
         console.log('File batch upload success');
         pagina1UploadEnabled = false;
         if (!pagina2UploadEnabled) $('#save-menu-fb').disable(true);
+        $('#file-fb').fileinput('destroy');
         refreshFileInput('#file-fb', data.response.success_files, 1);
       });
 
@@ -177,6 +154,7 @@
         console.log('File batch upload success');
         pagina2UploadEnabled = false;
         if (!pagina1UploadEnabled) $('#save-menu-fb').disable(true);
+        $('#file-fb-2').fileinput('destroy');
         refreshFileInput('#file-fb-2', data.response.success_files, 2);
       });
 
