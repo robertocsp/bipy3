@@ -396,6 +396,19 @@ def get_elements_menu(conversa):
                 }
             ]
         })
+    menu.append(
+        {
+            'title': u'Peça a conta',
+            'image_url': 'https://sistema.bipy3.com/static/bipy3/img/atualizar_pedido.jpg',
+            'subtitle': u'Quando estiver satisfeito(a) deixa que eu peço para trazerem sua conta.',
+            'buttons': [
+                {
+                    'type': 'postback',
+                    'title': u'Pedir a conta',
+                    'payload': 'pedir_conta'
+                }
+            ]
+        })
     '''
     menu.append(
         {
@@ -405,6 +418,46 @@ def get_elements_menu(conversa):
         })
     '''
     return menu
+
+
+def get_quickreply_cardapio_digital(conversa):
+    menu = []
+    possui_itens_pedido = (len(conversa['itens_pedido']) > 0)
+    mesa_definida = (conversa['mesa'] is not None)
+    pedido_andamento = (conversa['datahora_inicio_pedido'] is not None)
+    if possui_itens_pedido and mesa_definida and pedido_andamento:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Enviar pedido',
+                'payload': 'finalizar_pedido'
+            })
+    if mesa_definida and pedido_andamento:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Pedir mais coisas',
+                'payload': 'pedir_mais'
+            })
+    if possui_itens_pedido and mesa_definida and pedido_andamento:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Atualizar pedido',
+                'payload': 'menu_rever_pedido'
+            })
+    menu.append(
+        {
+            'content_type': 'text',
+            'title': u'Novo pedido',
+            'payload': 'menu_novo_pedido'
+        })
+    menu.append(
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
+        })
 
 
 def get_quickreply_pedido():
@@ -423,6 +476,11 @@ def get_quickreply_pedido():
             'content_type': 'text',
             'title': u'Atualizar pedido',
             'payload': 'menu_rever_pedido'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
         }
     ]
 
@@ -448,6 +506,11 @@ def get_quickreply_pedido2():
             'content_type': 'text',
             'title': u'Começar novo pedido',
             'payload': 'menu_novo_pedido2'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
         }
     ]
 
@@ -473,6 +536,11 @@ def get_quickreply_finalizar_pedido():
             'content_type': 'text',
             'title': u'Começar novo pedido',
             'payload': 'menu_novo_pedido2'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
         }
     ]
 
@@ -1164,7 +1232,7 @@ def passo_cardapio_digital(message, sender_id, loja_id, conversa):
         bot = get_mensagem('cardapio3')
     else:
         bot = get_mensagem('cardapio4')
-    tarefas.append(send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu()))
+    tarefas.append(send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_cardapio_digital(conversa)))
     chain(tarefas)()
 
 
