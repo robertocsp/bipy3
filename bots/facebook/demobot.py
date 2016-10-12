@@ -458,6 +458,7 @@ def get_quickreply_cardapio_digital(conversa):
             'title': u'Voltar ao menu',
             'payload': 'voltar_menu'
         })
+    return menu
 
 
 def get_quickreply_pedido():
