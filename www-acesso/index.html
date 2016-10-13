@@ -22,7 +22,7 @@
       loggedIn(response);
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
-      //document.getElementById('status').innerHTML = 'É necessário realizar o login no aplicativo para poder utilizar o Marvin.';
+      //document.getElementById('status').innerHTML = 'É necessário realizar o login no aplicativo para poder utilizar o Marviin.';
       $(".acesso-texto").show();
     } else {
       // The person is not logged into Facebook, so we're not sure if
@@ -101,7 +101,7 @@
       }
       if (notGranted.length)
       {
-        document.getElementById('permissao-pagina').innerHTML = 'Para poder ter acesso ao Marvin, é preciso dar as ' +
+        document.getElementById('permissao-pagina').innerHTML = 'Para poder ter acesso ao Marviin, é preciso dar as ' +
         'permissões solicitadas.<br>Estas permissões somente serão usadas para enviar e receber mensagens pela página ' +
         'a ser selecionada após a liberação das permissões.<br>Para dar as permissões necessárias, clique no botão abaixo.' +
         '<br><input type="button" name="permissao" value="Dar permissões" onclick="rerequest(\''+ notGranted.join(',') +'\');" />';
@@ -113,13 +113,13 @@
            if(response.data.length > 0)
            {
               var nomeLoja = '<label>Nome da loja no dashboard: </label><input type="text" name="nome_loja" value="" id="nome_loja" />';
-              var selecao = '<label>Selecione sua página no Facebook que utilizara o Marvin:</label><select id="pid"><option value="-1">Selecione</option>';
+              var selecao = '<label>Selecione sua página no Facebook que utilizara o Marviin:</label><select id="pid"><option value="-1">Selecione</option>';
               for (var i = 0; i < response.data.length; i++)
               {
                 selecao += '<option value="'+response.data[i].id+'">'+response.data[i].name+'</option>';
               }
               selecao += '</select><br><div class="button"><input type="button" name="selecionar" id="ok" value="Enviar" onclick="sendPage();" /></div>';
-              document.getElementById('permissao-pagina').innerHTML = '<br><label class="text-into">Preencha os dados abaixo para comecar a usar o Marvin:</label>' + nomeLoja + '<br>' + selecao;
+              document.getElementById('permissao-pagina').innerHTML = '<br><label class="text-into">Preencha os dados abaixo para comecar a usar o Marviin:</label>' + nomeLoja + '<br>' + selecao;
 
               $(".acesso-texto").hide();
            }
@@ -189,7 +189,7 @@
              function(data) {
         document.getElementById('nome_loja').value = '';
         document.getElementById('pid').value = '-1';
-        alert('Bem-vindo(a) à mais avançada forma de atendimento.\nBem-vindo(a) ao Marvin!');
+        alert('Bem-vindo(a) à mais avançada forma de atendimento.\nBem-vindo(a) ao Marviin!');
       })
       .fail(function(data) {
         alert(JSON.parse(data.responseText).message);
@@ -204,7 +204,7 @@
 -->
     <div class="content">
         <img src="img/logo-header.png" width="350" height="" />
-        <p class="acesso-texto">Para se cadastrar e comecar a utilizar o Marvin, acesse nosso sistema com sua conta do Facebook</p>
+        <p class="acesso-texto">Para se cadastrar e comecar a utilizar o Marviin, acesse nosso sistema com sua conta do Facebook</p>
         <input type="hidden" id="uac" name="uac" value="" />
         <div id="status"></div>
 
