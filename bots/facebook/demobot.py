@@ -436,7 +436,7 @@ def get_quickreply_cardapio_digital(conversa):
         menu.append(
             {
                 'content_type': 'text',
-                'title': u'Pedir mais coisas',
+                'title': u'+ itens ao pedido',
                 'payload': 'pedir_mais'
             })
     if possui_itens_pedido and mesa_definida and pedido_andamento:
