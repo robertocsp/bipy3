@@ -85,7 +85,7 @@ ul, li{
 .navbar-header a span{
     display: block;
     float: left;
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 400;
 }
 
@@ -812,7 +812,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 .dialogo ul{
     overflow-y: auto;
     overflow-x: hidden;
-    /*height: 379px;*/
+    height: 177px;
     padding: 0;
     margin-bottom: 0;
     width: 100%;
@@ -1352,7 +1352,7 @@ h4, h5{
 
 .mesa-detalhe span{
     text-overflow: ellipsis;
-    max-width: 115px;
+    max-width: 201px;
     display: block;
     float: right;
     margin: 13px 0 0 3px;
@@ -1388,6 +1388,10 @@ h4, h5{
 
 .notifyjs-corner .notifyjs-bipy3-fbmessenger time{
     color: #777;
+}
+
+textarea.form-control.msg-users{
+    height: 130px;
 }
 
 

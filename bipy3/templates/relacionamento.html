@@ -8,7 +8,7 @@
   <div class="page-header">
     <h1><i class="fa fa-list"></i> Relacionamento com os Clientes</h1>
   </div>
-    <div class="filtros-pedidos">
+    <div class="filtros-pedidos"><!--
       <div class="col-md-6 border-right">
         <h4><i class="fa fa-filter"></i> Filtrar</h4><br>
         <div class="form-group">
@@ -41,14 +41,14 @@
               </button>
           </div>
         </div>
-      </div>
+      </div>-->
         <div class="form-group col-md-6">
          <form action="/pedidos/" method="get" onsubmit="$('#data_hora_btn_filtro').replaceWith($('<img src=\'/static/bipy3/img/loading.gif\'></img>'))">
           <div class="col-md-12">
-            <h4 class="font17"><i class="fa fa-comments-o"></i> Enviar mensagem para os clientes selecionados abaixo:</h4><br>
+            <h4 class="font17"><i class="fa fa-comments-o"></i> Enviar mensagem para seus clientes:</h4><br>
           </div>
           <div class="col-md-12">
-              <textarea type="text" value="" placeholder="Digite aqui a mensagem..." class="form-control"></textarea>
+              <textarea type="text" value="" placeholder="Digite aqui a mensagem..." class="form-control msg-users"></textarea>
           </div>
 
           <div class="col-md-12"><br><br>
@@ -58,7 +58,7 @@
           </div>
          </form>
       </div>
-    </div>
+    </div><!--
     <div class="dnd">
         <div class="linha-btn">
             <select class="form-control status-combo" id="sel1">
@@ -68,7 +68,7 @@
               <option value="concluido">Data ultima interacao mais antigas</option>
             </select><br>
         </div><br>
-      <!--Coluna de usuarios-->
+
 
       <div class="coluna">
         <h3 class="info">
@@ -92,7 +92,7 @@
                     <i class="logo open-dialogo"></i>
                   </label>
 
-                  <!-- inicio dialogo messenger. Em relaçao ao telegram, alterar a classe abaixo para mudar o layout-->
+                  <!-- inicio dialogo messenger. Em relaçao ao telegram, alterar a classe abaixo para mudar o layout
 
                   <div class="dialogo messeger">
                     <a href="javascript:void(0);" class="close">X</a>
@@ -131,14 +131,14 @@
               </ul>
             </div>
 
-            <!-- Fim dialogo-->
+            <!-- Fim dialogo
           </li>
         </ul>
       </div>
     </div>
   </div>
   <div class="bg"></div>
-<br><br>
+<br><br>-->
 {% endblock %}
 
 {% block scripts %}
