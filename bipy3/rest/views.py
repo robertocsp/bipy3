@@ -88,12 +88,12 @@ def valida_chamada_interna(request):
     return None
 
 
-class AdicionarClienteView(views.APIView):
+class ClienteView(views.APIView):
     authentication_classes = (BasicAuthentication,)
     permission_classes = (IsAdminUser,)
     parser_classes = (JSONParser,)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         nao_valido = valida_chamada_interna(request)
         if nao_valido:
             return nao_valido
@@ -104,8 +104,46 @@ class AdicionarClienteView(views.APIView):
             cliente.chave_facebook = request.data.get('id_cliente')
         cliente.nome = request.data.get('nome_cliente', None)
         cliente.foto = request.data.get('foto_cliente', None)
+        cliente.genero = request.data.get('genero', None)
         cliente.save()
         return Response({"success": True})
+
+
+class ClienteTouchView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, fbpk=None):
+        logger.debug('-=-=-=- 1 -=-=-=-' + repr(fbpk))
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
+        try:
+            cliente = Cliente.objects.get(chave_facebook=fbpk)
+            cliente.save()
+        except Cliente.DoesNotExist:
+            pass
+        return Response({"success": True})
+
+
+class PedidoChatView(views.APIView):
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, uid=None):
+        if 'id_loja' not in request.session:
+            return Response({"success": False, "type": 403, "message": u'Sessão inválida.'},
+                            status=status.HTTP_403_FORBIDDEN)
+        id_loja = request.session['id_loja']
+        numero = int(uid[8:])
+        data_pedido = datetime.strptime(uid[:8], '%Y%m%d')
+        pedido = Pedido.objects.filter(loja=id_loja, numero=numero, data=data_pedido).select_related('cliente')
+        if pedido:
+            for um_pedido in pedido:
+                pedido_chat = {'origem': um_pedido.origem}
+                return Response({'success': True, 'chat': pedido_chat})
+        else:
+            return Response({'success': False})
 
 
 class EnviarPedidoView(views.APIView):
@@ -252,9 +290,14 @@ class EnviarMensagemView(views.APIView):
         data_pedido = datetime.strptime(uid[:8], '%Y%m%d')
         id_loja = request.session['id_loja']
         pedido = self.atualiza_historico(data_pedido, numero, 'bot', request.data.get('message'), id_loja)
-        if not pedido:
-            return Response({"success": False})
-        chave_facebook = pedido.cliente.chave_facebook
+        try:
+            chave_facebook = pedido.cliente.chave_facebook
+        except AttributeError:
+            if pedido is None:
+                return fail_response(400, u'Pedido não encontrado.')
+            elif pedido == 1:
+                return fail_response(500, u'Não é possível enviar mensagem para um pedido realizado a mais de 24 '
+                                          u'horas.')
         logger.debug('-=-=-=-=-=-=-=- fb uid: ' + chave_facebook)
         data = {
             'entry': [
@@ -290,6 +333,13 @@ class EnviarMensagemView(views.APIView):
                 return None
             else:
                 for um_pedido in pedido:
+                    data_hora_filtro = datetime.today() - timedelta(days=1)
+                    data_hora_pedido = datetime.combine(um_pedido.data, um_pedido.hora)
+                    logger.debug('-=-=-=-=-=-=-=- data e hora pedido: ' + repr(data_hora_pedido))
+                    logger.debug('-=-=-=-=-=-=-=- data e hora filtro: ' + repr(data_hora_filtro))
+                    if data_hora_pedido < data_hora_filtro:
+                        logger.debug('-=-=-=-=-=-=-=- mais de 24 horas')
+                        return 1
                     if not um_pedido.historico:
                         um_pedido.historico = []
                     um_pedido.historico.append({ator: mensagem})

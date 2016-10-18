@@ -609,7 +609,8 @@ def get_quickreply_cardapio():
 def get_mensagem(id_mensagem, **args):
     mensagens = {
         'ola':        Template(u'Olá $arg1, como posso ajudá-lo(a)?'),
-        'getstarted': Template(u'Como posso ajudá-lo(a), $arg1?'),
+        'getstarted': Template(u'Legal, $arg1, vamos começar. Navegue lateralmente pelas opções abaixo, e veja como '
+                               u'posso ajudá-lo(a).'),
         'menu':       Template(u'Digite a palavra menu para saber em como posso ajudá-lo(a). '
                                u'Você poderá digitá-la novamente a qualquer momento.'),
         'mesa':       Template(u'Por favor, digite sua mesa.'),
@@ -648,6 +649,8 @@ def get_mensagem(id_mensagem, **args):
         'cardapio2':  Template(u'Deseja a versão digital ou quer que lhe traga o impresso?'),
         'cardapio3':  Template(u'Segue, acima, imagem do cardápio.'),
         'cardapio4':  Template(u'Seguem, acima, 2 imagens do cardápio.'),
+        'cardapio5':  Template(u'Desculpe, ficarei devendo a versão digital, mas já pedi para trazerem o cardápio '
+                               u'impresso para você. Em que posso ajudá-lo(a) agora?'),
         'garcom':     Template(u'Perfeito, logo logo ele(a) estará aí. Como posso ajudá-lo(a) agora?'),
         'suspensao':  Template(u'Sua resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
         'conta':      Template(u'Ok, já avisei para trazerem sua conta.\nMuito obrigado(a), espero que sua experiência '
@@ -719,7 +722,8 @@ def editar_pedido(message, conversa):
     return True
 
 
-def get_cardapio(loja_id):
+@celery_app.task(bind=True, soft_time_limit=10)
+def get_cardapio(self, loja_id):
     data = {}
     pass
     data['chave_bot_api_interna'] = CHAVE_BOT_API_INTERNA
@@ -734,7 +738,19 @@ def get_cardapio(loja_id):
     return None
 
 
-@celery_app.task(bind=True, soft_time_limit=20)
+@celery_app.task(bind=True, soft_time_limit=10)
+def touch_cliente(self, sender_id):
+    data = {}
+    pass
+    data['chave_bot_api_interna'] = CHAVE_BOT_API_INTERNA
+    url = 'http://localhost:8888/bipy3/api/rest/cliente/' + sender_id + '/touch'
+    headers = {'content-type': 'application/json',
+               'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    app_log.debug(repr(response))
+
+
+@celery_app.task(bind=True, soft_time_limit=10)
 def salva_se_nao_existir(self, sender_id, user):
     data = {}
     pass
@@ -742,6 +758,7 @@ def salva_se_nao_existir(self, sender_id, user):
     data['id_cliente'] = sender_id
     data['nome_cliente'] = user['first_name'] + ' ' + user['last_name']
     data['foto_cliente'] = user['profile_pic']
+    data['genero'] = user['gender']
     url = 'http://localhost:8888/bipy3/api/rest/cliente'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
@@ -749,7 +766,7 @@ def salva_se_nao_existir(self, sender_id, user):
     app_log.debug(repr(response))
 
 
-@celery_app.task(bind=True, soft_time_limit=20)
+@celery_app.task(bind=True, soft_time_limit=10)
 def enviar_pedido(self, sender_id, loja_id, conversa):
     if conversa['mesa'] is None:
         return
@@ -780,7 +797,7 @@ def resposta_dashboard(message=None, payload=None, sender_id=None, loja_id=None,
         envia_resposta.delay(conversa, loja_id, sender_id, message)
 
 
-@celery_app.task(bind=True, soft_time_limit=20)
+@celery_app.task(bind=True, soft_time_limit=10)
 def envia_resposta(self, conversa, loja_id, sender_id, message):
     data = {}
     pass
@@ -799,7 +816,7 @@ def envia_resposta(self, conversa, loja_id, sender_id, message):
     app_log.debug(repr(response))
 
 
-@celery_app.task(bind=True, soft_time_limit=20)
+@celery_app.task(bind=True, soft_time_limit=10)
 def troca_mesa_dashboard(self, sender_id, loja_id, conversa):
     data = {}
     pass
@@ -816,7 +833,7 @@ def troca_mesa_dashboard(self, sender_id, loja_id, conversa):
     app_log.debug(repr(response))
 
 
-@celery_app.task(bind=True, soft_time_limit=20)
+@celery_app.task(bind=True, soft_time_limit=10)
 def notificacao_dashboard(self, sender_id, loja_id, conversa, metodo_api):
     data = {}
     pass
@@ -948,6 +965,7 @@ def webhook():
                 with sender_lock(sender_id) as lock:
                     if lock:
                         app_log.debug('lock acquired:: ' + sender_id)
+                        touch_cliente.delay(sender_id)
                         conversa = cache.get(sender_id)
                         app_log.debug('alguma conversa no cache:: ' + repr(conversa))
                         if conversa is not None:
@@ -991,6 +1009,9 @@ def webhook():
                                         in saudacao:
                                     conversa['passo'] = 0
                                     passo_ola(message, sender_id, loja_id, conversa)
+                                elif u'inicio' in unicodedata.normalize('NFKD', message) \
+                                        .encode('ASCII', 'ignore').lower():
+                                    passo_inicio(sender_id, loja_id, conversa)
                                 elif u'menu' in unicodedata.normalize('NFKD', message)\
                                         .encode('ASCII', 'ignore').lower():
                                     conversa['passo'] = 1
@@ -1077,10 +1098,14 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
     elif payload == 'cardapio_digital':
         passo_cardapio_digital(message, sender_id, loja_id, conversa)
     elif payload == 'menu_get_started':
-        conversa['passo'] = 0
-        bot1 = get_mensagem('getstarted', arg1=conversa['usuario']['first_name'])
-        chain(send_text_message.si(sender_id, loja_id, bot1),
-              send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+        passo_inicio(sender_id, loja_id, conversa)
+
+
+def passo_inicio(sender_id, loja_id, conversa):
+    conversa['passo'] = 0
+    bot1 = get_mensagem('getstarted', arg1=conversa['usuario']['first_name'])
+    chain(send_text_message.si(sender_id, loja_id, bot1),
+          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def define_sim_nao(conversa, passo, passo_sim_func, passo_sim_var, passo_nao_func, passo_nao_var):
@@ -1217,9 +1242,9 @@ def pre_requisito_pedido(sender_id, loja_id, conversa):
     return True
 
 
-def passo_cardapio_impresso(message, sender_id, loja_id, conversa):
+def passo_cardapio_impresso(message, sender_id, loja_id, conversa, texto_id=None):
     conversa['passo'] = 20
-    mensagem_sucesso(sender_id, loja_id, conversa, 'cardapio')
+    mensagem_sucesso(sender_id, loja_id, conversa, (texto_id if texto_id else 'cardapio'))
 
 
 def passo_cardapio_digital(message, sender_id, loja_id, conversa):
@@ -1239,16 +1264,23 @@ def passo_cardapio_digital(message, sender_id, loja_id, conversa):
 
 def passo_cardapio(message, sender_id, loja_id, conversa):
     app_log.debug('passo_cardapio 1:: ')
-    cardapio = get_cardapio(loja_id)
-    app_log.debug('passo_cardapio 2:: ' + repr(cardapio))
-    atualiza_cardapio(loja_id, cardapio)
-    if cardapio is None:
+    try:
+        cardapio = get_cardapio.delay(loja_id).get()
+        app_log.debug('passo_cardapio 2:: ' + repr(cardapio))
+        atualiza_cardapio(loja_id, cardapio)
+        if cardapio is None:
+            app_log.debug('passo_cardapio 3:: ')
+            passo_cardapio_impresso(message, sender_id, loja_id, conversa)
+        else:
+            conversa['passo'] = 27
+            bot = get_mensagem('cardapio2')
+            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_cardapio())
+    except SoftTimeLimitExceeded:
         app_log.debug('passo_cardapio 4:: ')
-        passo_cardapio_impresso(message, sender_id, loja_id, conversa)
-    else:
-        conversa['passo'] = 27
-        bot = get_mensagem('cardapio2')
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_cardapio())
+        passo_cardapio_impresso(message, sender_id, loja_id, conversa, texto_id='cardapio5')
+    except Exception as e:
+        app_log.debug('passo_cardapio 5:: ' + repr(e))
+        passo_cardapio_impresso(message, sender_id, loja_id, conversa, texto_id='cardapio5')
 
 
 def passo_confirma_mesa(message, sender_id, loja_id):

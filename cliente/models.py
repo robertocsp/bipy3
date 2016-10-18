@@ -15,6 +15,7 @@ class Cliente(models.Model):
     foto = models.CharField('foto', max_length=255, null=True, blank=True)
     data_interacao = models.DateTimeField(null=True)
     mensagens = models.IntegerField('numero', default=0)
+    genero = models.CharField('genero', max_length=20, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''

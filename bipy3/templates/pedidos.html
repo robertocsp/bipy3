@@ -127,7 +127,7 @@
         <div class="{{if origem == 'fbmessenger'}}messeger {{/if}}detalhe-pedido-icon">
           <label class="interacao status-label">
             <strong><i class="fa fa-desktop"></i> Interação:</strong>
-            <i class="logo open-dialogo {{= card_uid }}_dialogo"></i>
+            <i class="logo open-dialogo {{= card_uid }}_dialogo" data-uid="{{= card_uid }}"></i>
             <i class="fa fa-wpforms open-lista-pedidos"></i>
           </label>
 
@@ -153,7 +153,7 @@
                     <a href="javascript:void(0);" class="list-group-item border-4 detalhes-itens mesa-item">
                         <label class="status-label">
                             <strong><i class="fa fa-desktop"></i> Interação:</strong>
-                            <i class="logo open-dialogo {{= card_uid }}_dialogo"></i>
+                            <i class="logo open-dialogo {{= card_uid }}_dialogo" data-uid="{{= card_uid }}"></i>
                             <i class="fa fa-wpforms open-lista-pedidos"></i>
                         </label>
                         <span class="border">border</span>
@@ -207,7 +207,7 @@
              {{else typeof bot != 'undefined'}}
               <li class="est">
                   <div class="balao">
-                    <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                    <h4 class="media-heading"> {{ request.session.nome_loja }}</h4>
                     <p>{{= bot}}</p>
                   </div>
               </li>
@@ -260,7 +260,7 @@
          {{else typeof bot != 'undefined'}}
           <li class="est">
               <div class="balao">
-                <h4 class="media-heading"> Bar Demonstração Indoor</h4>
+                <h4 class="media-heading"> {{ request.session.nome_loja }}</h4>
                 <p>{{= bot}}</p>
               </div>
           </li>
@@ -297,6 +297,13 @@
         {
             alert('Sessão inválida. Realize o login novamente.');
             window.location.href = '/?next='+window.location.pathname;
+        }
+        else if (data.status === 500)
+        {
+            $.tmpl($('#template-message'), {bot: data.responseJSON.message}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
+            $this.parent().find("input").val('');
+            var objDiv = document.getElementById($this.attr("data-uid") + '_messages');
+            objDiv.scrollTop = objDiv.scrollHeight;
         }
       })
       .always(function () {
@@ -359,6 +366,8 @@
     // Abrir dialogo
     $('.coluna').on('click', '.open-dialogo', function() {
         $(this).parent('.status-label').parent(".detalhe-pedido-icon").find('div.dialogo').show();
+        var objDiv = document.getElementById($(this).attr('data-uid') + '_messages');
+        objDiv.scrollTop = objDiv.scrollHeight;
         $('.bg').show();
     });
 
@@ -366,6 +375,8 @@
     $('.coluna').on('click', '.lista-pedidos .open-dialogo', function() {
         $('.lista-pedidos').hide();
         $(this).closest(".detalhe-pedido-icon").find('div.dialogo').show();
+        var objDiv = document.getElementById($(this).attr('data-uid') + '_messages');
+        objDiv.scrollTop = objDiv.scrollHeight;
     });
 
     // Abrir lista de pedidos
@@ -652,53 +663,7 @@
                 objDiv.scrollTop = objDiv.scrollHeight;
 			}
 		});
-		{% if notificacoes %}
-		{% for notificacao in notificacoes %}
-            {% if notificacao.info.origem == 'chat' %}
-                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong><br /> enviou uma mensagem';
-                var notifyImage = '../../static/bipy3/img/default_user.png';
-                {% if 'foto_cliente' in notificacao.info %}
-                    notifyImage = '{{notificacao.info.foto_cliente}}';
-                {% endif %}
-                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, '{{notificacao.info.uid}}', '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
-            {% elif notificacao.info.origem == 'troca_mesa' %}
-                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong><br /> trocou da mesa {{notificacao.info.mesa_anterior}} para {{notificacao.info.mesa}}';
-                var notifyImage = '../../static/bipy3/img/default_user.png';
-                {% if 'foto_cliente' in notificacao.info %}
-                    notifyImage = '{{notificacao.info.foto_cliente}}';
-                {% endif %}
-                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
-            {% elif notificacao.info.origem == 'cardapio' %}
-                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> solicitou o cardápio';
-                var notifyImage = '../../static/bipy3/img/default_user.png';
-                {% if 'foto_cliente' in notificacao.info %}
-                    notifyImage = '{{notificacao.info.foto_cliente}}';
-                {% endif %}
-                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
-            {% elif notificacao.info.origem == 'conta' %}
-                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> pediu a conta';
-                var notifyImage = '../../static/bipy3/img/default_user.png';
-                {% if 'foto_cliente' in notificacao.info %}
-                    notifyImage = '{{notificacao.info.foto_cliente}}';
-                {% endif %}
-                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
-            {% elif notificacao.info.origem == 'garcom' %}
-                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> chamou o garçom';
-                var notifyImage = '../../static/bipy3/img/default_user.png';
-                {% if 'foto_cliente' in notificacao.info %}
-                    notifyImage = '{{notificacao.info.foto_cliente}}';
-                {% endif %}
-                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
-            {% elif notificacao.info.origem == 'fbmessenger' %}
-                var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> fez um novo pedido';
-                var notifyImage = '../../static/bipy3/img/default_user.png';
-                {% if 'foto_cliente' in notificacao.info %}
-                    notifyImage = '{{notificacao.info.foto_cliente}}';
-                {% endif %}
-                notify('bipy3', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
-            {% endif %}
-		{% endfor %}
-		{% endif %}
+		{% include "includes/snippets/notificacoes_servidor.html" with notificacoes=notificacoes %}
 	});
 </script>
 

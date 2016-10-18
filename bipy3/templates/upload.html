@@ -281,6 +281,12 @@
         if (pagina2UploadEnabled) $('#file-fb-2').fileinput('upload');
         $("#myModal").modal('hide');
       }
+
+      $(document).ready(function($) {
+        //Notificacoes ===========
+        {% include "includes/snippets/notificacoes_cliente.html" %}
+        {% include "includes/snippets/notificacoes_servidor.html" with notificacoes=notificacoes %}
+      });
     </script>
 
 {% endblock %}
