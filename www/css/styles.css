@@ -245,6 +245,11 @@ margin-top:8px;
     padding-bottom: 15px;
 }
 
+#home .section-header {
+    width: 600px;
+    margin: 0 auto;
+}
+
 .section-header h2 {
     margin-bottom: 20px;
 }
@@ -313,10 +318,7 @@ header .full-screen {
 }
 
 .sticky-navigation .navbar-header img {
-    width: 172px;
-    height: 93px;
-    -webkit-backface-visibility: hidden;
-    margin-top: -13px;
+
 }
 
 .sticky-navigation .main-navigation .current a {
@@ -1049,7 +1051,16 @@ footer{
     margin: 0 auto;
     border-radius: 9px;
     line-height: 80px;
-    height: 78px;
+}
+
+#home .section-description.container.home{
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+}
+
+.geral .navbar-fixed-top, .navbar-fixed-bottom {
+    position: absolute;
 }
 
 .hot-site-logo{
@@ -1083,12 +1094,15 @@ h3{
 }
 
 #video{
-	display: none;
-	position: absolute;
-    top: -160px;
-    left: 200px;
-    z-index: 10001;
-    width: 700px;
+    display: none;
+    position: fixed;
+    top: 78px;
+    left: 0;
+    z-index: 1031;
+    width: 560px;
+    right: 0;
+    bottom: 0;
+    margin: auto;
 }
 
 .linha #fecha-video span{

@@ -29,7 +29,7 @@
                     <a href="javascript:void(0);" class="list-group-item">
                        <div class="cabecalho">
                             <img class="media-object img-circle" src="{% if pedido.cliente.foto %}{{ pedido.cliente.foto }}{% else %}../../static/bipy3/img/default_user.png{% endif %}" width="40" height="40" alt="" >
-                            <p>{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span class="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
+                            <p class="tempo-minuto">{{ pedido.cliente.nome }}<br> <span class="ultimo">Pedido feito há <span class="{{ card_uid }}" data-minutes-passed="{{ minutos_resultado }}">{{ minutos_resultado }} minutos</span></span></p>
                        </div>
                     </a>
                     <a href="javascript:void(0);" class="list-group-item mesa-item">
