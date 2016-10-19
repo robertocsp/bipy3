@@ -29,9 +29,9 @@ p, a, div, span, label, input, select, button{
     margin: auto;
 }
 
-.content img{
-    margin: 0 0 0 45px;
-    width: 300px;
+.content img {
+    margin: 40px 0 40px 124px;
+    width: 160px;
 }
 
 .acesso-texto{
