@@ -31,10 +31,5 @@ def cadastro(request):
 
 
 @login_required
-def relacionamento(request):
-    return render(request, 'relacionamento.html')
-
-
-@login_required
 def termos(request):
     return render(request, 'termos.html')

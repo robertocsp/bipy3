@@ -131,7 +131,7 @@ def historico_pedidos(request):
             .order_by('-data', '-hora').select_related('cliente')
     else:
         pedidos_resultado = Pedido.objects.filter(loja=id_loja).order_by('-data', '-hora').select_related('cliente')
-    paginator = Paginator(pedidos_resultado, 10)  # Show 25 contacts per page
+    paginator = Paginator(pedidos_resultado, 50)  # Show 25 contacts per page
 
     page = request.POST.get('pagina')
     logger.debug('=-=-=--=- pagina::: ' + repr(page))
@@ -144,8 +144,10 @@ def historico_pedidos(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         pedidos_paginado = paginator.page(paginator.num_pages)
     logger.debug('=-=-=--=- total de paginas::: ' + repr(paginator.num_pages))
+    notificacoes = Notificacao.objects.filter(loja=id_loja, dt_visto__isnull=True).order_by('dt_criado')
     return render_to_response('historico.html', {'pedidos': pedidos_paginado,
                                                  'filtros': {'data_filtro': data_filtro, 'hora_filtro': hora_filtro,
                                                              'nome_cliente_filtro': nome_cliente_filtro,
-                                                             'num_pedido_filtro': num_pedido_filtro}},
+                                                             'num_pedido_filtro': num_pedido_filtro},
+                                                 'notificacoes': notificacoes},
                               context_instance=RequestContext(request))

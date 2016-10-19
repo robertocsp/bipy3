@@ -55,6 +55,7 @@ INSTALLED_APPS = (
     'notificacao',
     'fb_acesso',
     'upload_cardapio',
+    'relacionamento',
 )
 
 MIDDLEWARE_CLASSES = (

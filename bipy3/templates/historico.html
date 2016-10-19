@@ -174,11 +174,13 @@
     </nav>
     {% endif %}
 </div>
-
+<!-- inicio dialogo bot -->
+<div class="content-dialog"></div>
+<div class="bg"></div>
 {% endblock %}
 
 {% block scripts %}
-
+    {% include "includes/snippets/chat_jquery_template.html" %}
     <script type="text/javascript">
       function setPagina(pagina)
       {
@@ -205,6 +207,9 @@
             language: 'pt-BR'
         });
 
+        //Notificacoes ===========
+        {% include "includes/snippets/notificacoes_cliente.html" %}
+        {% include "includes/snippets/notificacoes_servidor.html" with notificacoes=notificacoes %}
       });
 
     </script>

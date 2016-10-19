@@ -11,12 +11,12 @@ from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from upload_cardapio.models import Cardapio
 from .forms import UploadCardapioForm
+from notificacao.models import Notificacao
 
 import logging
 import os
 import json
 import shutil
-import requests
 
 logger = logging.getLogger('django')
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,7 +33,9 @@ def upload(request):
     cardapios2 = Cardapio.objects.filter(loja=id_loja, pagina=2)
     if not cardapios2:
         cardapios2 = []
-    return render_to_response('upload.html', {'cardapios': cardapios, 'cardapios2': cardapios2},
+    notificacoes = Notificacao.objects.filter(loja=id_loja, dt_visto__isnull=True).order_by('dt_criado')
+    return render_to_response('upload.html', {'cardapios': cardapios, 'cardapios2': cardapios2,
+                                              'notificacoes': notificacoes},
                               context_instance=RequestContext(request))
 
 

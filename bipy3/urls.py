@@ -22,6 +22,11 @@ from dashboard.views import *
 from pedido.views import *
 from upload_cardapio.views import *
 from download_cardapio.views import *
+from relacionamento.views import *
+
+import logging
+
+logger = logging.getLogger('django')
 
 urlpatterns = [
     url(r'^$', login_geral, name='login_geral'),
@@ -32,8 +37,11 @@ urlpatterns = [
     url(r'^historico/$', historico_pedidos, name='historico'),
     url(r'^home/$', home, name='Home'),
     url(r'^bipy3/api/rest/login[/]?$', views.LoginView.as_view(), name='login_view'),
-    url(r'^bipy3/api/rest/cliente[/]?$', views.AdicionarClienteView.as_view(), name='adicionar_cliente_view'),
+    url(r'^bipy3/api/rest/cliente[/]?$', views.ClienteView.as_view(), name='adicionar_cliente_view'),
+    url(r'^bipy3/api/rest/cliente/(?P<fbpk>[0-9]+)/touch[/]?$', views.ClienteTouchView.as_view(),
+        name='touch_cliente_view'),
     url(r'^bipy3/api/rest/pedido[/]?$', views.EnviarPedidoView.as_view(), name='enviar_pedido_view'),
+    url(r'^bipy3/api/rest/pedido/(?P<uid>[0-9]+)/chat[/]?$', views.PedidoChatView.as_view(), name='enviar_pedido_view'),
     url(r'^bipy3/api/rest/status[/]?$', views.StatusPedidoView.as_view(), name='status_pedido_view'),
     url(r'^bipy3/api/rest/mensagem[/]?$', views.EnviarMensagemView.as_view(), name='enviar_mensagem_view'),
     url(r'^bipy3/api/rest/mensagem_bot[/]?$', views.EnviarMensagemBotView.as_view(), name='enviar_mensagem_bot_view'),
@@ -51,6 +59,3 @@ urlpatterns = [
     url(r'^download-cardapio/$', download_cardapio, name='download-cardapio'),
     url(r'^termos-e-condicoes-de-uso/$', termos, name='termos'),
     url(r'^relacionamento/$', relacionamento, name='relacionamento')]
-
-
-

@@ -1,0 +1,36 @@
+<script id="template-chat" type="text/x-jquery-tmpl">
+{% verbatim %}
+  <div class="dialogo {{if origem == 'fbmessenger'}}messeger {{/if}}">
+    <a href="javascript:void(0);" class="close">X</a>
+    <div class="cabecalho-chat">
+      <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span class="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
+    </div>
+    <ul id="{{= card_uid }}_messages">
+    {{each mensagem}}
+     {{if typeof cliente != 'undefined'}}
+      <li class="cons">
+          <img class="media-object img-circle" src="{{if typeof $data.foto_cliente != 'undefined'}}{{= $data.foto_cliente}}{{else}}../../static/bipy3/img/default_user.png{{/if}}" width="40" height="40" alt="">
+          <div class="balao">
+            <h4 class="media-heading"> {{= $data.nome_cliente}}</h4>
+            <p>{{= cliente}}</p>
+          </div>
+      </li>
+     {{else typeof bot != 'undefined'}}
+      <li class="est">
+          <div class="balao">
+            <h4 class="media-heading"> {{ request.session.nome_loja }}</h4>
+            <p>{{= bot}}</p>
+          </div>
+      </li>
+     {{/if}}
+    {{/each}}
+    </ul>
+    <div class="box-teclado">
+      <label>
+        <input type="text" placeholder="Mensagem..." name="texto">
+      </label>
+      <i class="btn-send" id="{{= card_uid }}_btn-send" data-uid="{{= card_uid }}">Enviar</i>
+    </div>
+  </div>
+{% endverbatim %}
+ </script>
