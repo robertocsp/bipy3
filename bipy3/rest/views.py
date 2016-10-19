@@ -668,7 +668,7 @@ class AcessoBotView(views.APIView):
           "setting_type": "greeting",
           "greeting": {
             "text": u"Olá {{user_first_name}}, muito prazer, me chamo Marviin. Seja bem-vindo(a) a uma nova forma de "
-                    u"atendimento."
+                    u"atendimento. Clique em começar ou digite início."
           }
         }
         url_greeting_text = 'https://graph.facebook.com/v2.7/me/thread_settings?access_token=' + pac
