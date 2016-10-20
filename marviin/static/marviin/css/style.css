@@ -1402,6 +1402,25 @@ textarea.form-control.msg-users{
     height: 130px;
 }
 
+.sel-msg{
+    text-align: center;
+    width: 100%;
+}
+
+.sel-msg a{
+    margin: 20px 40px 0 0;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.div-input-1, .div-input-2, .tmsg-1, .tmsg-2, .btn-msg-1, .btn-msg-2{
+    display: none;
+    float: left;
+}
+
+.msg-1 h4, .msg-2 h4{
+    text-align: center;
+}
 
 @media only screen and (max-width: 1024px){
     .around{
