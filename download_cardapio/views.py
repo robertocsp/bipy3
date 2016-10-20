@@ -10,9 +10,8 @@ import os
 import json
 
 logger = logging.getLogger('django')
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CARDAPIO_BASE_DIR = os.path.join(os.path.join(os.path.join(
-    os.path.join(os.path.dirname(BASE_DIR), 'bipy3'), 'bipy3'), 'marviin'), 'cardapios')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CARDAPIO_BASE_DIR = os.path.join(BASE_DIR, 'marviin_cardapios')
 
 
 def download_cardapio(request):
