@@ -1,0 +1,63 @@
+.notifyjs-marviin-base {
+	position: relative;
+    height: 71px;
+    color:#444;
+    border-radius: 5px;
+    border-color: transparent;
+    -webkit-box-shadow: 0px 1px 7px 0px rgba(0,0,0,0.71);
+    -moz-box-shadow: 0px 1px 7px 0px rgba(0,0,0,0.71);
+    box-shadow: 0px 1px 7px 0px rgba(0,0,0,0.71);
+    margin-bottom: 7px;
+}
+
+    .notifyjs-marviin-base .image {
+        margin-left: 4px;
+        display: table;
+        position: absolute;
+        height: auto;
+        width: auto;
+        left: 26px;
+        top: 40px;
+
+        -moz-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        -o-transform: translate(-50%, -50%);
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+
+    .notifyjs-marviin-base .text-wrapper {
+        display: inline-block;
+        vertical-align: top;
+        text-align: left;
+        margin: -9px 10px 10px 60px;
+        clear: both;
+        width: 72%;
+    }
+
+    .notifyjs-marviin-base .title {
+        font-size: 14px;
+        font-weight: bold;
+        font-family: "Roboto",Helvetica,Arial,sans-serif;
+        color: #777;
+    }
+
+    .notifyjs-marviin-base .text {
+        font-size: 14px;
+        font-weight: normal;
+        vertical-align: middle;
+        font-family: "Roboto",Helvetica,Arial,sans-serif;
+        padding-bottom: 10px;
+        color: #fff;
+        line-height: 17px;
+    }
+
+    time{
+        color: #fff;
+        font-size: 11px;
+        font-weight: bold;
+        float: left;
+        margin: 5px 5px 10px 0;
+        width: 95%;
+        text-align: right;
+    }

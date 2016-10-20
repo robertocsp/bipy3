@@ -1,0 +1,1523 @@
+@font-face {
+    font-family: 'copa';
+    src: url('../fonts/CopaseticNF.eot');
+    src: url('../fonts/CopaseticNF.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/CopaseticNF.woff') format('woff'),
+        url('../fonts/CopaseticNF.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../fonts/roboto/Roboto-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html, body, div, p, span, strong, label, a, h1, h2, h3, h4, h5, h6, input, select, button{
+    font-family: "Roboto";
+}
+
+body, html{
+	height: 100%;
+    width: 100%;
+}
+
+body {
+    color: #333;
+    width: 100%;
+    height: 100%;
+    background-attachment: fixed;
+}
+/*
+body .navbar-default{
+    background-color: rgb(210, 92, 92);
+    border-color: rgb(210, 92, 92);
+    border-radius: 0;
+}*/
+/*
+body .navbar-default ul.navbar-nav > li > a{
+    color: #fff;
+}
+
+body .navbar-default ul.navbar-nav > li.active > a, body .navbar-default ul.navbar-nav > li > a:hover, body .navbar-default ul.navbar-nav > li.active > a:hover,
+body .navbar-default ul.navbar-nav > li > a:focus, .navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>.open>a:focus, .navbar-default .navbar-nav>.open>a:hover{
+    background-color: rgb(170, 92, 92) !important;
+    color: #fff;
+}
+*/
+.page-header h1{
+    color: #aaa;
+}
+
+label{
+	color: #aaa;
+	font-weight: normal;
+}
+
+.text-red{
+    color: #c9302c;
+}
+
+.text-verde{
+    color: #5cb85c;
+}
+
+.text-laranja{
+    color: #f0ad4e;
+}
+
+.text-azul{
+    color: #337ab7;
+}
+
+ul, li{
+	list-style: none;
+	margin-top: 0;
+	padding: 0;
+}
+
+.navbar-header a{
+    width: 310px;
+}
+
+.navbar-header a span{
+    display: block;
+    float: left;
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.navbar-header a img{
+    margin: -15px 0 0 0;
+    float: left;
+    width: 108px;
+    height: 55px;
+}
+
+.navbar-header a span.menor{
+    font-size: 20px;
+    margin: 5px 0 0 0px;
+}
+
+.logo-login a img{
+    width: 438px;
+    margin-left: -105px;
+}
+
+.geral{
+	height: 100%;
+}
+
+.geral p, .geral a, .geral h1{
+	color: #aaa;
+}
+
+.geral a{
+	text-decoration: underline;
+}
+
+.left-login, .right-login{
+	height: 100%;
+}
+
+.left-login{
+	background-image: url('../img/telegram-login-2.jpg');
+	background-size: cover;
+	opacity: 1;
+}
+
+.right-login{
+	background: rgba(75,192,192,1);
+}
+
+.right-login h1{
+    color: #fff;
+    font-family: 'copa';
+    margin: 80px auto 0 auto;
+    width: 250px;
+    text-decoration: underline;
+}
+
+.right-login h1 span:first-child{
+    color: #fff;
+    font-size: 72px;
+    float: left;
+}
+
+.right-login h1 span:last-child{
+    color: #fff;
+    font-size: 30px;
+    margin: 37px 31px 0 0;
+    float:right;
+}
+
+.left-login h1{
+	margin: 240px auto 0 auto;
+    color: #EF5350;
+    font-size: 49px;
+    width: 321px;
+}
+
+.form-login form{
+	margin: 45px auto 60px auto;
+    width: 300px;
+}
+
+.no-padding{
+    padding: 0;
+}
+
+.font17{
+    font-size: 17px;
+}
+
+.font22{
+    font-size: 22px;
+}
+
+.form-login .btn-primary, .form-login .btn-primary:hover, .filtros-pedidos .btn-primary.btn-verde, .filtros-pedidos .btn-primary.btn-verde:hover{
+    color: #fff;
+    background-color: rgba(75,192,192,1);
+    border-color: rgba(75,192,192,1);
+}
+
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+    background-color: rgba(75,192,192,1);
+    border-color: rgba(75,192,192,1);
+}
+
+.pagination {
+    display: block;
+    margin: 40px auto;
+    width: 420px;
+}
+
+
+.current{
+    float: left;
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: #aaa;
+    margin: 0 0 20px 0;
+    font-size: 16px;
+}
+
+.form-login .btn-border-white{
+    border: 1px solid #fff;
+    border-color: #fff !important;
+}
+
+.loading-login{
+    width: 35px;
+    height: 35px;
+    /*float: right;*/
+    margin-right: 175px;
+    text-indent: -999em;
+    background: url('../img/loaders2.gif') no-repeat 0 0;
+    background-size: 35px 35px;
+}
+
+.geral p, .geral a, .geral a:hover{
+    color: #fff;
+}
+
+footer{
+	text-align: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    right: 0;
+}
+
+.footer{
+    width: 100%;
+    clear: both;
+    border-top: 1px solid #cecece;
+    text-align: center;
+    padding: 30px;
+    margin: 20px 0 0 0;
+}
+
+.footer p{
+    color: #aaa;
+}
+
+footer p{
+	line-height: 25px;
+	font-size: 12px;
+}
+
+.navbar-nav li.user a.dropdown-toggle{
+    padding-bottom: 5px;
+}
+
+/*Upload*/
+
+.upload h2.fb{
+	color: #aaa;
+	height: 53px;
+}
+
+.upload h2.tel{
+	color: #aaa;
+	height: 53px;
+}
+
+.circulo{
+	border: 1px solid #aaa;
+	border-radius: 50px;
+	width: 60px;
+	height: 60px;
+	text-align: center;
+    margin: 0 auto 24px auto;
+}
+
+.circulo span{
+	color: #aaa;
+	font-size: 30px;
+	margin: 14px auto 0 auto;
+}
+
+.texto-intro{
+	width: 700px;
+	margin: 10px auto;
+}
+
+.texto-intro label{
+	text-align: center;
+	font-size: 13px;
+}
+
+.dnd{
+    float: left;
+    width: 100%;
+}
+
+.coluna{
+    width: 220px;
+    margin: 0 10px 0 0;
+    float: left;
+    background: #eee;
+    border-bottom: 1px solid #dedede;
+    min-height: 500px;
+    padding-top: 5px;
+    border-radius: 5px;
+}
+
+.coluna:last-child{
+    margin-right: 0;
+}
+
+.droptrue{
+    float: left;
+    width: 100%;
+    min-height: 300px;
+
+}
+
+.droptrue > li{
+    width: 196px;
+    background: #fff;
+    margin: 0 0 20px 12px;
+    border-radius: 5px;
+    float: left;
+    height: 190px;
+}
+
+.col-active .expandi{
+    margin-right: 12px;
+}
+
+.coluna-normal .info .status-label span{
+    display: none;
+}
+
+.coluna-normal .info label{
+    padding-left: 8px;
+}
+
+.coluna-normal .info label.expandi{
+    padding-left: 15px;
+}
+
+.coluna.coluna-normal .info .status-label {
+    width: 14px;
+}
+
+.coluna-normal .conteudo-pedido, .coluna-normal .footer-pedido, .coluna-normal .cabecalho p{
+    display: none;
+}
+
+.droptrue li ul li{
+    margin: 12px 0px 0px 6px;
+    width: 94%;
+    height: 26px;
+    float: left;
+    height: 23px;
+}
+
+.droptrue li .dialogo ul li{
+    height: auto;
+}
+
+.droptrue li ul li:first-child{
+    margin-top: 10px;
+    float: left;
+}
+
+.btn-expandir-tela{
+    float: left;
+    display: block;
+    margin: 0 20px 0 0;
+}
+
+.status-combo{
+    width: 200px;
+    float: left;
+    margin-right: 20px;
+}
+
+.linha-btn strong, .linha-btn span{
+    color: #666;
+}
+
+.todo{
+    position: absolute;
+    background: #fff;
+    padding:20px;
+}
+
+.todo .coluna{
+    width: 19.2%;
+}
+
+.linha-btn{
+    float: left;
+    width: 100%;
+    margin: 0 0 10px 0;
+}
+
+.btn-expandir-tela i{
+    font-size: 20px;
+}
+
+.droptrue li ul li:last-child{
+    margin: 6px 0 8px 6px;
+}
+
+.droptrue li .header-pedido:hover, .droptrue li .header-pedido:focus{
+    cursor: move;
+}
+
+.dnd .coluna:first-child{
+    border-left: 1px solid #dedede;
+}
+
+.droptrue li.sortable-placeholder{
+    border: 1px dashed #dedede;
+    background: #fff;
+}
+
+#solicitado{
+    /*background: rgba(240,173,78, .3);*/
+}
+
+#em-processo{
+    /*background: rgba(51,122,183, .3);*/
+}
+
+#entregue{
+    /*background: rgba(92,184,92, .6);*/
+}
+
+#concluido{
+    /*background: rgba(92,184,92, .3);*/
+}
+
+#cancelado{
+    /*background: rgba(201,48,44, .3);*/
+}
+
+.status-list{
+    float: left;
+    width: 100%;
+    padding-top: 3px;
+}
+
+.status-list.status-list-detalhe{
+    float: none;
+    width: 100%;
+    padding-top: 0px;
+    height: 30px;
+}
+
+.status-list-detalhe label i{
+    font-size: 26px;
+}
+
+.status-mini{
+    font-size: 8px;
+    display: block;
+    margin-top: -2px;
+}
+
+.status-list label{
+    float: left;
+    width: 20%;
+    text-align: center;
+    font-size: 21px;
+}
+
+#solicitado .status-list label.solicitado, label.solicitado:hover{
+    color: #f0ad4e;
+    font-weight: bold;
+}
+
+#em-processo .status-list label.em-processo, label.em-processo:hover{
+    color: #337ab7;
+    font-weight: bold;
+}
+
+#concluido .status-list label.concluido, label.concluido:hover{
+    color: #5cb85c;
+    font-weight: bold;
+}
+
+#entregue .status-list label.entregue, label.entregue:hover{
+    color: #5cb85c;
+    font-weight: bold;
+}
+
+#cancelado .status-list label.cancelado, label.cancelado:hover{
+    color: #c9302c;
+    font-weight: bold;
+}
+
+label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.entregue:hover, label.cancelado:hover{
+    cursor: pointer;
+}
+
+.coluna .info .status-label{
+    width: 82%;
+    text-transform: uppercase;
+}
+
+.coluna .info .expandi{
+    float: right;
+    width: 31px;
+    font-size: 20px;
+}
+
+.status-list label.ativo{
+    font-weight: bold;
+    color: #000;
+}
+
+.status-list label input{
+    display: none;
+}
+
+.coluna h3{
+    font-size: 14px;
+    margin: 0;
+}
+
+.coluna .cabecalho{
+    background: #cecece;
+    float: left;
+    width: 100%;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.coluna .cabecalho img{
+    float: left;
+    margin: 5px;
+}
+
+.coluna .cabecalho p{
+    color: #fff;
+    width: 143px;
+    float: left;
+    margin: 10px 0 0 0;
+    font-weight: bold;
+    line-height: 14px;
+}
+
+.coluna .cabecalho p.tempo-minuto{
+    width: 200px;
+}
+
+.coluna .cabecalho p .ultimo{
+    font-size: 11px;
+    font-weight: normal;
+}
+
+.coluna .footer-pedido{
+    float: left;
+    width: 100%;
+    height: 80px;
+}
+
+.coluna .details-list{
+    height: 80px;
+    width: 100%;
+    border-top: 1px solid #cecece;
+    border-bottom: 1px solid #cecece;
+    padding-bottom: 14px;
+    position: relative;
+
+}
+
+.coluna .detalhe-pedido-icon .status-label i.open-dialogo{
+    float: left;
+    display: block;
+    width: 30px;
+    margin-right: 7px;
+    height: 30px;
+}
+
+.coluna .detalhe-pedido-icon .lista-pedidos .status-label i.open-dialogo{
+    margin-top: 5px;
+}
+
+.coluna .detalhe-pedido-icon .detalhes-itens .status-label i{
+
+}
+
+.coluna .detalhe-pedido-icon .detalhes-itens .status-label i.fa-wpforms{
+    font-size: 27px;
+    padding-top: 6px;
+}
+
+.coluna .detalhe-pedido-icon .detalhes-itens .status-label i.mesa-numero{
+    font-size: 27px;
+    padding-top: 1px;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.coluna .detalhe-pedido-icon .status-label i.logo{
+    border: 0;
+}
+
+.coluna .detalhe-pedido-icon .status-label.interacao i.open-lista-pedidos{
+    margin-right: 0px;
+    font-size: 27px;
+    line-height: 16px;
+    text-align: center;
+    width: 32px;
+    border: 0;
+}
+
+.coluna .detalhe-pedido-icon .status-label i.fa-send:before {
+    left: -2px;
+    position: relative;
+}
+
+.coluna .detalhe-pedido-icon i.open-dialogo:hover, .coluna .detalhe-pedido-icon i.open-lista-pedidos:hover{
+    cursor: pointer;
+}
+
+.coluna .detalhe-pedido-icon strong{
+    float: left;
+    margin: 4px 10px 0 0;
+}
+
+.coluna .detalhe-pedido-icon .lista-pedidos strong {
+    margin: 11px 10px 0 0;
+}
+
+.coluna .footer-pedido a.itens-pedido:first-child{
+    margin-left: 42px;
+}
+
+.coluna .footer-pedido a:last-child{
+    margin-right: 0;
+}
+
+.coluna .conteudo-pedido{
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid #dedede;
+    height: 100px;
+}
+
+.coluna .detalhe-conteudo{
+    padding: 10px 0px 0px 10px;
+}
+
+.content-dialog{
+    position: relative;
+}
+
+.coluna .droptrue > li{
+    margin-left: 11px;
+}
+
+.header-pedido{
+    float: left;
+    width: 100%;
+}
+
+
+.coluna-normal .droptrue > li {
+  width: 87%;
+  margin-left: 3px;
+  height: 50px;
+}
+
+.list-group-item{
+    width: 300px;
+}
+
+.lista-pedidos-tela .list-group-item:last-child{
+    border-top-width: 4px;
+    padding-top: 3px;
+}
+
+.list-group-item.border-4{
+    border-bottom-width: 4px;
+}
+
+/*fim nova página*/
+
+.conteudo-pedido .content-dialog .dialogo{
+	width: 360px;
+	height: 270px;
+	padding: 0;
+	position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.pedidos .detalhe .dialogo .dialogo-hist{
+    height: 380px;
+}
+
+.interacao-hist{
+    margin: 20px;
+}
+
+.hist .pedidos .detalhe .dialogo {
+    border: 1px solid #eee;
+}
+
+.dialogo.telegram{
+    background: url('../img/bg-tel.jpg') no-repeat;
+    background-size: cover;
+}
+
+.detalhe-pedido-icon .dialogo{
+    position: absolute;
+    z-index: 100;
+    top: -200px;
+    display: none;
+    left: 212px;
+}
+
+#entregue .detalhe-pedido-icon .dialogo, #cancelado .detalhe-pedido-icon .dialogo{
+    left: -380px;
+}
+
+.detalhe-pedido-icon .dialogo.messeger{
+    background: #fff;
+    border: 1px solid #dedede;
+
+}
+
+.messeger .logo{
+    background-image: url(../img/fb-messeger.png);
+    background-repeat: no-repeat;
+    background-size: 31px;
+    background-position: 0 0;
+}
+
+.detalhe-pedido-icon .lista-pedidos{
+    display: none;
+    width: 300px;
+    height: 400px;
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+#cancelado .detalhe-pedido-icon .lista-pedidos {
+    right: 204px;
+}
+
+.detalhe-pedido-icon .dialogo.messeger .box-teclado{
+    left: 0;
+}
+
+.coluna .detalhe-pedido-icon a.close{
+    position: absolute;
+    top: -13px;
+    right: -11px;
+    margin: 0;
+    width: 30px;
+    height: 30px;
+    z-index: 100;
+    background: url(../img/fechar.png) no-repeat 0 0;
+    background-size: 30px 30px;
+    opacity: 1;
+    text-indent: -999em;
+}
+
+.lista-pedidos-tela .lista-pedidos .list-group .list-group-item:first-child{
+    height: 52px;
+    padding: 0px;
+}
+
+.border{
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 14px 14px 14px;
+    border-color: transparent transparent #ddd transparent;
+    display: block;
+    position: absolute;
+    text-indent: -999em;
+    left: 140px;
+    top: 33px;
+}
+
+.bg{
+    display: none;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .7);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.dialogo.fechado{
+    height: 385px;
+}
+
+.lista-pedidos{
+    /*height: 540px;*/
+    padding: 0;
+    min-height: 250px;
+}
+
+.dialogo ul{
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 177px;
+    padding: 0;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.status{
+    width: 360px;
+    height: 540px;
+    padding: 0;
+}
+
+.status label{
+    width: 200px;
+    text-align: left;
+}
+
+.status .btn-group .btn{
+    border-radius: 0;
+}
+
+.status .btn-group .btn:first-child{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px !important;
+}
+
+.status .btn-group .btn:last-child{
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.status .active i.ok:before{
+    content: "\f00c";
+}
+
+.status .active i.ok{
+    float: right;
+    margin-top: 3px;
+}
+
+.dialogo ul li{
+	margin-bottom: 5px;
+	float: left;
+	width: 100%;
+}
+
+.dialogo ul li span{
+    font-size: 12px;
+    color: #aaa;
+    width: 100%;
+    text-align: center;
+    display: block;
+}
+
+.dialogo.telegram ul li span{
+    color: #999;
+}
+
+.dialogo.telegram ul li span.bico{
+    color: #fff;
+}
+
+.dialogo ul li:first-child{
+    margin-top: 20px;
+}
+
+.img-circle{
+	border-radius: 50px;
+}
+
+.est{
+    margin-left: 10px;
+}
+
+.est .img-circle{
+    float: left;
+}
+
+.cons .img-circle{
+    float: right;
+}
+
+.est .media-heading, .cons .media-heading{
+    color: #3f51b5;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.est .media-heading{
+    margin-top: -20px;
+}
+
+.cons .media-heading{
+	margin: 3px 0px 5px 0px;
+}
+
+.cons .media-heading{
+	color: red;
+}
+
+.balao{
+    max-width: 72%;
+    background: #dcf8c6;
+    float: left;
+    margin-left: 9px;
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+
+.est .balao:before{
+	content: '';
+    display: inline-block;
+    position: relative;
+    border-color: transparent transparent #dcf8c6 transparent;
+    border-width: 9px;
+    border-style: solid;
+    margin-left: 0;
+    margin-top: 0;
+    transform: rotate(47deg);
+    -ms-transform: rotate(47deg);
+    -webkit-transform: rotate(47deg);
+    left: -15px;
+}
+
+.telegram .est .balao:before{
+    top: -6px;
+}
+
+.balao p{
+	margin-bottom: 0;
+	font-size: 12px;
+}
+
+.telegram .est .balao p{
+    margin-top: -24px;
+}
+
+.cons .balao{
+	float: right;
+    margin: 0 9px 0 0;
+    background: #fff;
+}
+
+.coluna .telegram .cons .balao {
+    margin: 0px -7px 0 0;
+}
+
+.messeger .cons .balao{
+    color: #000;
+    background: #eee;
+    border-top-left-radius: 13px;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 13px;
+    margin-top: 10px;
+}
+
+.messeger .est .balao{
+    border-top-left-radius: 0;
+    border-top-right-radius: 13px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 13px;
+    background: #0084ff;
+    color: #fff;
+}
+
+.messeger .est .balao:before{
+    border: 0;
+    display: none;
+}
+
+.messeger .media-heading, .messeger .est .media-object, .dialogo.messeger .bico{
+    display: none;
+}
+
+.bico{
+    content: '';
+    display: inline-block;
+    float: right;
+    border-color: transparent transparent #fff transparent;
+    border-width: 9px;
+    border-style: solid;
+    margin: -25px 0 0 0px;
+	transform: rotate(160deg);
+    -ms-transform: rotate(160deg);
+    -webkit-transform: rotate(160deg);
+
+}
+
+.box-teclado {
+    position: absolute;
+    bottom: 1px;
+    z-index: 999;
+    width: 358px;
+    background: #fff;
+    height: 40px;
+    border-bottom-left: 5px;
+    border-bottom-right: 5px;
+    left: 16px;
+}
+
+.coluna .box-teclado{
+    left: 0;
+}
+
+.messeger .box-teclado{
+    border-top: 1px solid #dedede;
+}
+
+.box-teclado input[type="text"] {
+    height: 40px;
+    border: 0;
+    padding-left: 10px;
+    font-size: 16px;
+    width: 300px;
+    border: none;
+    outline: none;
+    outline-offset: 0;
+    -webkit-appearance: none;
+}
+
+.messeger .box-teclado input[type="text"]{
+    height: 39px;
+}
+
+.box-teclado i {
+    float: right;
+    margin: 8px 8px 0 0;
+    color: #0084ff;
+    font-size: 15px;
+    font-style: normal;
+}
+
+.messeger .box-teclado i{
+    color: #0084ff;
+}
+
+.box-teclado i:hover{
+    cursor: pointer;
+}
+
+.bs-docs-section .bs-callout-warning {
+    border-left-color: #aaa;
+}
+
+.bs-callout {
+    padding: 5px 10px;
+    margin: 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+
+.detalhe-left{
+    border-right: 1px solid #dedede;
+}
+
+h4, h5{
+    color: #aaa;
+}
+
+.infos{
+    border-bottom: 2px solid #ddd;
+    height: 45px;
+    float: left;
+    width: 100%;
+}
+
+.infos label{
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 40px;
+    width: 222px;
+    text-align: center;
+}
+
+.pedidos #accordion .info{
+    height: 45px;
+    float: left;
+    width: 100%;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid #eee;
+    background: transparent;
+}
+
+#accordion .ui-state-default .ui-icon{
+    background: transparent;
+}
+
+.pedidos #accordion .info:focus{
+    border: 0;
+    outline: none;
+    border-bottom: 1px solid #eee;
+}
+
+.info:hover{
+    cursor: pointer;
+}
+
+.pedidos #accordion .detalhe{
+    float: left;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #eee;
+    padding: 0;
+    display: none;
+}
+
+.info label{
+    font-weight: normal;
+    line-height: 40px;
+    width: 222px;
+    padding-left: 15px;
+}
+
+.info label:hover{
+    cursor: pointer;
+}
+
+.status-label i{
+    padding-top: 5px;
+}
+
+.filtros-pedidos{
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 40px;
+    float: left;
+    width: 100%;
+}
+
+.pedidos{
+    margin-bottom: 60px;
+        float: left;
+}
+
+#accordion{
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid #dedede;
+}
+
+.container .page-header {
+    margin: 0px 0 20px;
+}
+
+.date{
+    max-width: 130px;
+    float: left;
+    margin-right: 10px;
+}
+
+.infos .pedido-title, .infos .origem, .infos .hora, .info .pedido-title, .info .origem, .info .hora, .info .telegram, .info .messenger{
+    width: 111px;
+}
+
+.infos .cliente, .info .cliente{
+    width: 353px;
+}
+
+.infos .status-label, .info .status-label{
+    width: 152px;
+}
+
+.hist .info label{
+    text-align: center;
+}
+
+.info .telegram, .info .messenger, .infos .origem{
+    width: 151px
+}
+
+/*home*/
+
+.pedidos-box{
+    width: 230px;
+    margin: 0 0 30px 0;
+    border: 1px solid #eee;
+    padding: 20px 10px 20px 0;
+    float: right;
+    -webkit-box-shadow: 0px 2px 28px 9px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 2px 28px 9px rgba(0,0,0,0.75);
+    box-shadow: 0px 2px 28px 9px rgba(0,0,0,0.75);
+}
+
+.bullet-box{
+    width: 70px;
+    float: left;
+    font-size: 50px;
+    text-align: center;
+    color: #aaa;
+}
+
+.text-box{
+    text-align: center;
+    float:left;
+    width: 145px;
+    font-size: 16px;
+}
+
+.text-box strong{
+    font-size: 35px;
+}
+
+.lista-graficos h4{
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.img-cadapio{
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.cabecalho-chat{
+    clear: both;
+    width: 100%;
+    background: #0084ff;
+    height: 50px;
+    margin: 0;
+    padding: 0;    
+}
+
+.telegram .cabecalho-chat{
+    background: #5682a3;
+}
+
+.telegram .cabecalho-chat img{
+    float: left;
+    margin: 5px;
+}
+
+.cabecalho-chat p{
+    padding: 6px 0 0 14px;
+    color: #fff;
+    font-weight: bold;
+    display: block;
+}
+
+.telegram .cabecalho-chat p{
+    padding: 9px 0 0 14px;
+    line-height: 15px;
+}
+
+.cabecalho-chat .ultimo{
+    font-weight: normal;
+    font-size: 12px;
+}
+
+.telegram ul li .media-object, .telegram ul li .media-heading{
+    display: none;
+}
+
+/*Usuario*/
+
+.form-user label{
+    font-weight: bold;
+}
+
+/*tela relacionamento*/
+
+.dias{
+    width: 50px;
+    margin-top: -6px;
+}
+
+.label-margin{
+    margin-top: 8px;
+}
+
+.relacionamento .coluna h3 span{
+    font-size: 20px;
+}
+
+.relacionamento .coluna{
+    width: 100%;
+    margin-top: 30px;
+}
+
+.relacionamento .border-right{
+    border-right: 1px solid #eee;
+}
+
+.relacionamento .coluna .conteudo-pedido {
+    height: 70px;
+}
+
+.relacionamento .droptrue li ul li:last-child {
+    margin: 0px 0 8px 6px;
+}
+
+.relacionamento .droptrue > li {
+    height: 121px;
+}
+
+.relacionamento .detalhe-pedido-icon .dialogo {
+    top: 360px;
+}
+
+.icon-push{
+    position: absolute;
+    top: 42px;
+    z-index: 10;
+    left: 35px;
+    background-image: url(../img/fb-messeger.png);
+    background-repeat: no-repeat;
+    background-size: 25px;
+    background-position: 0 0;
+    width: 25px;
+    height: 25px;
+}
+
+.icon-push:before{
+    font-size: 19px;
+}
+
+.ui-datepicker-div{
+    width: 270px;
+}
+
+.novo-pedido .notifyjs-marviin-base .text, .chamar-garcom .notifyjs-marviin-base .text, .menu .notifyjs-marviin-base .text{
+    color: #fff;
+}
+
+.mesa span{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 115px;
+    display: block;
+    float: right;
+    margin: 3px 0 0 3px;
+}
+
+.mesa-detalhe span{
+    text-overflow: ellipsis;
+    max-width: 201px;
+    display: block;
+    float: right;
+    margin: 13px 0 0 3px;
+}
+
+.mesa-item{
+    padding: 0px 15px;
+}
+
+.notifyjs-marviin-garcom{
+    background-color: #5cb07f;
+}
+
+.notifyjs-marviin-cardapio{
+    background-color: #7c557c;
+}
+
+.notifyjs-marviin-fbmessenger{
+    background-color: #fff;
+}
+
+.notifyjs-marviin-conta{
+    background-color: #f55d49;
+}
+
+.notifyjs-marviin-troca_mesa{
+    background-color: #0bc0c2;
+}
+
+.notifyjs-marviin-chat{
+    background-color: #0bc0c2;
+}
+
+.notifyjs-corner .notifyjs-marviin-fbmessenger .text{
+    color: #777;
+}
+
+.notifyjs-corner .notifyjs-marviin-fbmessenger time{
+    color: #777;
+}
+
+textarea.form-control.msg-users{
+    height: 130px;
+}
+
+
+@media only screen and (max-width: 1024px){
+    .around{
+        overflow-y: hidden;
+        overflow-x: scroll;
+        width: 998px;
+    }
+
+}
+
+@media only screen and (min-width: 968px) and (max-width: 1024px){
+    .coluna {
+        width: 197px;
+        margin: 0 3px 0 0;
+    }
+
+    .todo .coluna{
+        width: 19.7%;
+    }
+
+    .coluna .droptrue > li {
+        margin-left: 5px;
+        width: 188px;
+    }
+
+    .todo .coluna .droptrue > li {
+        width: 188px;
+    }
+
+    .coluna.coluna-normal .droptrue > li {
+        margin-left: 5px;
+        width: 84%;
+    }
+
+    .coluna.coluna-normal .cabecalho img {
+        float: left;
+        margin: 7px 5px 7px 3px;
+        width: 34px;
+        height: 34px;
+    }
+
+    .todo {
+        padding: 5px;
+    }
+
+    .coluna .cabecalho p {
+        width: 133px;
+    }
+
+    .around{
+        margin-left: -30px;
+    }
+}
+
+@media only screen and (max-width: 768px){
+
+    .left-login{ display: none;}
+
+    .right-login { padding-top: 100px;}
+
+    .dnd {
+        width: 1170px;
+    }
+
+    .around{
+        width: 750px;
+    }
+
+    .navbar-header a {
+        width: 100px;
+    }
+
+    .navbar-header a img {
+        margin: -10px 0 0 -8px;
+        float: left;
+        width: 82px;
+        height: 46px;
+    }
+
+    .navbar-header a span.nome-loja{display: none;}
+
+}
+
+@media only screen and (max-width: 640px){
+    .around {
+        width: 100%;
+    }
+
+    .form-login form {
+        margin: 0 auto;
+        width: auto;
+    }
+
+    .logo-login a img {
+        width: 100%;
+        margin: 0 auto 20px auto;
+    }
+
+    .right-login {
+        padding-top: 20px;
+    }
+
+    .linha-btn, .expandi{
+        display: none;
+    }
+
+    .conteudo-pedido .content-dialog .dialogo {
+        width: 300px;
+        height: 275px;
+    }
+
+    .box-teclado {
+        width: 299px;
+    }
+
+    .box-teclado input[type="text"] {
+        width: 240px;
+    }
+}
