@@ -55,7 +55,7 @@ cache = memcache.Client(['127.0.0.1:11211'])
 
 FACEBOOK_GRAPH_URL = "https://graph.facebook.com/v2.7"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-with open(os.path.join(os.path.join(BASE_DIR, 'bipy3_conf'), 'keys.txt')) as keys_file:
+with open(os.path.join(os.path.join(BASE_DIR, 'marviin_conf'), 'keys.txt')) as keys_file:
     for line in keys_file:
         key_value_pair = line.strip().split('=')
         if key_value_pair[0] == 'super_user_user':
@@ -185,7 +185,7 @@ def fb_request(path, loja_id, args=None, post_args=None, json=None, files=None, 
 
 def get_page_access_token(page_id):
     payload = {'chave_bot_api_interna': CHAVE_BOT_API_INTERNA, 'page_id': page_id}
-    url = 'http://localhost:8888/bipy3/api/rest/page_access_token'
+    url = 'http://localhost:8888/marviin/api/rest/page_access_token'
     headers = {'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.get(url, params=payload, headers=headers)
     res_json = response.json()
@@ -319,7 +319,7 @@ def get_elements_menu(conversa):
         menu.append(
             {
                 'title': u'Envie seu pedido',
-                'image_url': 'https://sistema.bipy3.com/static/bipy3/img/enviar_pedido.jpg',
+                'image_url': 'https://sistema.marviin.com.br/static/marviin/img/enviar_pedido.jpg',
                 'subtitle': u'Envie seu pedido para iniciarmos seu preparo.',
                 'buttons': [
                     {
@@ -333,7 +333,7 @@ def get_elements_menu(conversa):
         menu.append(
             {
                 'title': u'Adicione itens ao pedido',
-                'image_url': 'https://sistema.bipy3.com/static/bipy3/img/adicionar_itens.jpg',
+                'image_url': 'https://sistema.marviin.com.br/static/marviin/img/adicionar_itens.jpg',
                 'subtitle': u'Adicione itens ao pedido que você já começou a montar.',
                 'buttons': [
                     {
@@ -347,7 +347,7 @@ def get_elements_menu(conversa):
         menu.append(
             {
                 'title': u'Atualize seu pedido',
-                'image_url': 'https://sistema.bipy3.com/static/bipy3/img/atualizar_pedido.jpg',
+                'image_url': 'https://sistema.marviin.com.br/static/marviin/img/atualizar_pedido.jpg',
                 'subtitle': u'Atualize os itens já adicionados ao seu pedido.',
                 'buttons': [
                     {
@@ -360,7 +360,7 @@ def get_elements_menu(conversa):
     menu.append(
         {
             'title': u'Realize um novo pedido',
-            'image_url': 'https://sistema.bipy3.com/static/bipy3/img/novo-pedido.jpg',
+            'image_url': 'https://sistema.marviin.com.br/static/marviin/img/novo-pedido.jpg',
             'subtitle': u'Monte um novo pedido por aqui, é bem fácil.',
             'buttons': [
                 {
@@ -373,7 +373,7 @@ def get_elements_menu(conversa):
     menu.append(
         {
             'title': u'Peça o cardápio',
-            'image_url': 'https://sistema.bipy3.com/static/bipy3/img/pedir-cardapio.jpg',
+            'image_url': 'https://sistema.marviin.com.br/static/marviin/img/pedir-cardapio.jpg',
             'subtitle': u'Peça nosso cardápio para auxiliá-lo(a) na montagem de seu pedido.',
             'buttons': [
                 {
@@ -386,7 +386,7 @@ def get_elements_menu(conversa):
     menu.append(
         {
             'title': u'Chame o garçom',
-            'image_url': 'https://sistema.bipy3.com/static/bipy3/img/chamar-garcom.jpg',
+            'image_url': 'https://sistema.marviin.com.br/static/marviin/img/chamar-garcom.jpg',
             'subtitle': u'Precisando de ajuda, pode deixar que peço para ele(a) ir aí.',
             'buttons': [
                 {
@@ -399,7 +399,7 @@ def get_elements_menu(conversa):
     menu.append(
         {
             'title': u'Peça a conta',
-            'image_url': 'https://sistema.bipy3.com/static/bipy3/img/atualizar_pedido.jpg',
+            'image_url': 'https://sistema.marviin.com.br/static/marviin/img/atualizar_pedido.jpg',
             'subtitle': u'Quando estiver satisfeito(a) deixa que eu peço para trazerem sua conta.',
             'buttons': [
                 {
@@ -728,7 +728,7 @@ def get_cardapio(self, loja_id):
     pass
     data['chave_bot_api_interna'] = CHAVE_BOT_API_INTERNA
     data['id_loja_fb'] = loja_id
-    url = 'http://localhost:8888/bipy3/api/rest/cardapio'
+    url = 'http://localhost:8888/marviin/api/rest/cardapio'
     response = requests.get(url, auth=(SUPER_USER_USER, SUPER_USER_PASSWORD), params=data)
     json_response = response.json()
     app_log.debug(repr(json_response))
@@ -743,7 +743,7 @@ def touch_cliente(self, sender_id):
     data = {}
     pass
     data['chave_bot_api_interna'] = CHAVE_BOT_API_INTERNA
-    url = 'http://localhost:8888/bipy3/api/rest/cliente/' + sender_id + '/touch'
+    url = 'http://localhost:8888/marviin/api/rest/cliente/' + sender_id + '/touch'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -759,7 +759,7 @@ def salva_se_nao_existir(self, sender_id, user):
     data['nome_cliente'] = user['first_name'] + ' ' + user['last_name']
     data['foto_cliente'] = user['profile_pic']
     data['genero'] = user['gender']
-    url = 'http://localhost:8888/bipy3/api/rest/cliente'
+    url = 'http://localhost:8888/marviin/api/rest/cliente'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -780,7 +780,7 @@ def enviar_pedido(self, sender_id, loja_id, conversa):
     data['foto_cliente'] = conversa['usuario']['profile_pic']
     data['itens_pedido'] = conversa['itens_pedido']
     data['mesa'] = conversa['mesa'][0]
-    url = 'http://localhost:8888/bipy3/api/rest/pedido'
+    url = 'http://localhost:8888/marviin/api/rest/pedido'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -809,7 +809,7 @@ def envia_resposta(self, conversa, loja_id, sender_id, message):
     data['foto_cliente'] = conversa['usuario']['profile_pic']
     data['cliente'] = message
     data['uid'] = conversa['uid']
-    url = 'http://localhost:8888/bipy3/api/rest/mensagem_bot'
+    url = 'http://localhost:8888/marviin/api/rest/mensagem_bot'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -826,7 +826,7 @@ def troca_mesa_dashboard(self, sender_id, loja_id, conversa):
     data['mesa'] = conversa['mesa'][0]
     if len(conversa['mesa']) == 2:
         data['mesa_anterior'] = conversa['mesa'][1]
-    url = 'http://localhost:8888/bipy3/api/rest/troca_mesa'
+    url = 'http://localhost:8888/marviin/api/rest/troca_mesa'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -843,7 +843,7 @@ def notificacao_dashboard(self, sender_id, loja_id, conversa, metodo_api):
     data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name']
     data['foto_cliente'] = conversa['usuario']['profile_pic']
     data['mesa'] = conversa['mesa'][0]
-    url = 'http://localhost:8888/bipy3/api/rest/pede_'+metodo_api
+    url = 'http://localhost:8888/marviin/api/rest/pede_'+metodo_api
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(SUPER_USER_USER + ':' + SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)

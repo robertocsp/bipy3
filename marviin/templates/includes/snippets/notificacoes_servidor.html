@@ -1,0 +1,49 @@
+{% load pedido_tags %}
+
+{% if notificacoes %}
+{% for notificacao in notificacoes %}
+    {% if notificacao.info.origem == 'chat' %}
+        var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong><br /> enviou uma mensagem';
+        var notifyImage = '../../static/marviin/img/default_user.png';
+        {% if 'foto_cliente' in notificacao.info %}
+            notifyImage = '{{notificacao.info.foto_cliente}}';
+        {% endif %}
+        notify('marviin', '{{notificacao.info.origem}}', notifyText, notifyImage, '{{notificacao.info.uid}}', '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+    {% elif notificacao.info.origem == 'troca_mesa' %}
+        var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong><br /> trocou da mesa {{notificacao.info.mesa_anterior}} para {{notificacao.info.mesa}}';
+        var notifyImage = '../../static/marviin/img/default_user.png';
+        {% if 'foto_cliente' in notificacao.info %}
+            notifyImage = '{{notificacao.info.foto_cliente}}';
+        {% endif %}
+        notify('marviin', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+    {% elif notificacao.info.origem == 'cardapio' %}
+        var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> solicitou o cardápio';
+        var notifyImage = '../../static/marviin/img/default_user.png';
+        {% if 'foto_cliente' in notificacao.info %}
+            notifyImage = '{{notificacao.info.foto_cliente}}';
+        {% endif %}
+        notify('marviin', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+    {% elif notificacao.info.origem == 'conta' %}
+        var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> pediu a conta';
+        var notifyImage = '../../static/marviin/img/default_user.png';
+        {% if 'foto_cliente' in notificacao.info %}
+            notifyImage = '{{notificacao.info.foto_cliente}}';
+        {% endif %}
+        notify('marviin', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+    {% elif notificacao.info.origem == 'garcom' %}
+        var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> chamou o garçom';
+        var notifyImage = '../../static/marviin/img/default_user.png';
+        {% if 'foto_cliente' in notificacao.info %}
+            notifyImage = '{{notificacao.info.foto_cliente}}';
+        {% endif %}
+        notify('marviin', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+    {% elif notificacao.info.origem == 'fbmessenger' %}
+        var notifyText = '<strong>{{notificacao.info.nome_cliente}}</strong> da <strong class="{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}_notificacao_mesa">mesa {{notificacao.info.mesa}}</strong><br /> fez um novo pedido';
+        var notifyImage = '../../static/marviin/img/default_user.png';
+        {% if 'foto_cliente' in notificacao.info %}
+            notifyImage = '{{notificacao.info.foto_cliente}}';
+        {% endif %}
+        notify('marviin', '{{notificacao.info.origem}}', notifyText, notifyImage, undefined, '{{notificacao.cliente_id}}_{{notificacao.loja_id}}_{{notificacao.uuid}}', '{% hora_notificacao notificacao.dt_criado %}');
+    {% endif %}
+{% endfor %}
+{% endif %}
