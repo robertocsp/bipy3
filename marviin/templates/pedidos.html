@@ -395,6 +395,7 @@
       $(this).closest('li').hide("300");
       $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
       $(this).closest('li').remove();
+      sendMessageBindClick($(this).find("input").attr("data-uid"));
       mudaStatus($(this).find("input").attr("data-uid"), $(this).find("input").attr("name"));
     });
 
@@ -410,6 +411,7 @@
       $(this).closest('li').hide("300");
       $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
       $(this).closest('li').remove();
+      sendMessageBindClick($(this).find("input").attr("data-uid"));
       mudaStatus($(this).find("input").attr("data-uid"), $(this).find("input").attr("name"));
     });
 
