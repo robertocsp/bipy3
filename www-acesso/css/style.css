@@ -17,8 +17,8 @@ p, a, div, span, label, input, select, button{
 }
 
 .content{
-    width: 400px;
-    height: 500px;
+    width: 412px;
+    height: 540px;
     border: 1px solid #aaa;
     border-radius: 5px;
     position: fixed;
@@ -30,7 +30,7 @@ p, a, div, span, label, input, select, button{
 }
 
 .content img {
-    margin: 40px 0 40px 124px;
+    margin: 30px 0 30px 124px;
     width: 160px;
 }
 
