@@ -685,7 +685,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 
 /*fim nova página*/
 
-.conteudo-pedido .content-dialog .dialogo{
+.conteudo-pedido .content-dialog .dialogo, .dialogo.paginas{
 	width: 360px;
 	height: 270px;
 	padding: 0;
@@ -726,7 +726,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     left: -380px;
 }
 
-.detalhe-pedido-icon .dialogo.messeger{
+.detalhe-pedido-icon .dialogo.messeger, .dialogo.paginas.messeger{
     background: #fff;
     border: 1px solid #dedede;
 
@@ -756,11 +756,11 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     right: 204px;
 }
 
-.detalhe-pedido-icon .dialogo.messeger .box-teclado{
+.detalhe-pedido-icon .dialogo.messeger .box-teclado, .dialogo.paginas .box-teclado{
     left: 0;
 }
 
-.coluna .detalhe-pedido-icon a.close{
+.coluna .detalhe-pedido-icon a.close, .dialogo.paginas .close{
     position: absolute;
     top: -13px;
     right: -11px;
