@@ -6,6 +6,12 @@ function receiveMessage(msg) {
     console.log(input);
     if(input.origem === 'chat')
     {
+        if($('#' + input.uid + '_messages')[0])
+        {
+            $.tmpl($('#template-message'), input).appendTo($('#' + input.uid + '_messages'));
+            var objDiv = document.getElementById(input.uid + '_messages');
+            objDiv.scrollTop = objDiv.scrollHeight;
+        }
         var notifyText = '<strong>'+input.nome_cliente+'</strong><br /> enviou uma mensagem';
         var notifyImage = '../../static/marviin/img/default_user.png';
         if (input.foto_cliente)
@@ -72,6 +78,13 @@ function receiveMessage(msg) {
         }
         notify('marviin', input.origem, notifyText, notifyImage, undefined, input.notificacao_uuid);
     }
+    else if(input.origem === 'sync_status')
+    {
+        if($('#' + input.uid + '_messages')[0])
+        {
+            defineTimer(input);
+        }
+    }
     else if(input.origem === 'sync_chat')
     {
         var element = $('#' + input.uid + '_btn-send');
@@ -119,6 +132,12 @@ $(function() {
                         console.log(input);
                         $("#content-dialog").empty();
                         $.tmpl($('#template-chat'), input).appendTo($('#content-dialog'));
+                        $('.' + input.card_uid).attr('data-minutes-passed', input.minutos_passados);
+                        $('.' + input.card_uid).html(input.minutos_passados + ' minuto' + (input.minutos_passados > 1 ? 's' : ''));
+                        if(input.start)
+                        {
+                            startInterval(input.card_uid);
+                        }
                         sendMessageBindClick(input.card_uid);
                         $('.'+input.card_uid+'_dialogo').show();
                         $('.bg').show();

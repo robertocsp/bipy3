@@ -11,6 +11,7 @@ from cliente.models import Cliente
 from loja.models import Loja
 from notificacao.models import Notificacao
 from fb_acesso.models import Fb_acesso
+from pedido.templatetags.pedido_tags import minutos_passados
 from upload_cardapio.models import Cardapio
 from marviin.forms import LoginForm
 
@@ -25,6 +26,7 @@ from datetime import datetime, timedelta, date
 import json
 import logging
 import requests
+import pedido.templatetags.pedido_tags
 
 logger = logging.getLogger('django')
 
@@ -140,8 +142,12 @@ class PedidoChatView(views.APIView):
         pedido = Pedido.objects.filter(loja=id_loja, numero=numero, data=data_pedido).select_related('cliente')
         if pedido:
             for um_pedido in pedido:
+                minutos = minutos_passados(um_pedido.data, um_pedido.hora)
                 pedido_chat = {'origem': um_pedido.origem, 'nome_cliente': um_pedido.cliente.nome, 'card_uid': uid,
-                               'historico_mensagem': um_pedido.historico, 'foto_cliente': um_pedido.cliente.foto}
+                               'historico_mensagem': um_pedido.historico, 'foto_cliente': um_pedido.cliente.foto,
+                               'minutos_passados': minutos,
+                               'start': False if um_pedido.status == 'entregue' or um_pedido.status == 'cancelado'
+                               else True}
                 return Response({'success': True, 'chat': pedido_chat})
         else:
             return Response({'success': False})

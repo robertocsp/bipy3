@@ -722,6 +722,10 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     left: 212px;
 }
 
+.dialogo.paginas{
+    z-index: 100;
+}
+
 #entregue .detalhe-pedido-icon .dialogo, #cancelado .detalhe-pedido-icon .dialogo{
     left: -380px;
 }
@@ -800,7 +804,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;
+    z-index: 50;
 }
 
 .dialogo.fechado{

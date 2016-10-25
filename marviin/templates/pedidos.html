@@ -250,27 +250,6 @@
 
 {% include "includes/snippets/common_js_pedido.html" %}
 <script type="text/javascript">
-  var pedidos_interval = {};
-  function startInterval(card_uid) {
-    var intervalId = setInterval(function() {
-        minutesPassed = parseInt($('.' + card_uid).attr('data-minutes-passed'));
-        minutesPassed += 1;
-        $('.' + card_uid).attr('data-minutes-passed', minutesPassed);
-        $('.' + card_uid).html(minutesPassed + ' minuto' + (minutesPassed > 1 ? 's' : ''));
-    }, 60000);
-    pedidos_interval[card_uid] = intervalId;
-  }
-  function defineTimer(data)
-  {
-      if (data.stop && pedidos_interval[data.uid] !== undefined)
-      {
-        clearInterval(pedidos_interval[data.uid]);
-        delete pedidos_interval[data.uid];
-      } else if (data.start && pedidos_interval[data.uid] === undefined)
-      {
-        startInterval(data.uid);
-      }
-  }
   function mudaStatus(uid, status)
   {
       sync_uid = generateUUID();
@@ -319,9 +298,6 @@
     $('#pedido-de').datepicker({
         dateFormat: 'dd/mm/yy'
     });
-
-    // Seta altura do background quando a janela do dialogo é exibida
-    $(".bg").height($(document).height());
 
     // Botão fechar box
     $('.coluna').on('click', '.close, .bg', function() {
