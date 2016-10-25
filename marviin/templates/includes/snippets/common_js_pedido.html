@@ -1,0 +1,119 @@
+ <script id="template-message" type="text/x-jquery-tmpl">
+{% verbatim %}
+         {{if typeof cliente != 'undefined'}}
+          <li class="cons">
+              <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/marviin/img/default_user.png{{/if}}" width="40" height="40" alt="">
+              <div class="balao">
+                <h4 class="media-heading"> {{= nome_cliente}}</h4>
+                <p>{{= cliente}}</p>
+              </div>
+          </li>
+         {{else typeof bot != 'undefined'}}
+          <li class="est">
+              <div class="balao">
+                <h4 class="media-heading"> {{ request.session.nome_loja }}</h4>
+                <p>{{= bot}}</p>
+              </div>
+          </li>
+         {{/if}}
+{% endverbatim %}
+ </script>
+
+<script type="text/javascript">
+    var sync_uid;
+    $(document).ready(function($) {
+        var ws4redis = WS4Redis({
+            uri: '{{ WEBSOCKET_URI }}{{ request.session.id_loja }}?subscribe-broadcast',
+            receive_message: receiveMessage,
+            heartbeat_msg: {{ WS4REDIS_HEARTBEAT }}
+        });
+    });
+    function messageSuccess($this, message)
+    {
+        $.tmpl($('#template-message'), {bot: message}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
+        $this.parent().find("input").val('');
+        var objDiv = document.getElementById($this.attr("data-uid") + '_messages');
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
+    function sendMessageBindClick(card_uid) {
+        $("#" + card_uid + "_btn-send").click(function(){
+          var $this = $(this);
+          var message = $(this).parent().find("input").val();
+          if ($.trim(message) === '')
+          {
+            return;
+          }
+          $this.hide();
+          sync_uid = generateUUID();
+          $.post('/marviin/api/rest/mensagem',
+                 {uid: $(this).attr("data-uid"), message: message, sync_uid: sync_uid},
+                 function(data) {
+            console.log(data);
+            messageSuccess($this, message);
+          })
+          .fail(function(data) {
+            if (data.status === 403)
+            {
+                alert('Sessão inválida. Realize o login novamente.');
+                window.location.href = '/?next='+window.location.pathname;
+            }
+            else if (data.status === 500)
+            {
+                $.tmpl($('#template-message'), {bot: data.responseJSON.message}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
+                $this.parent().find("input").val('');
+                var objDiv = document.getElementById($this.attr("data-uid") + '_messages');
+                objDiv.scrollTop = objDiv.scrollHeight;
+            }
+          })
+          .always(function () {
+            $this.show();
+          });
+        });
+    }
+
+    $.notify.addStyle("marviin", {
+        html:
+            "<div>" +
+                "<span data-notify-html='notifyUUID' />" +
+                "<span data-notify-html='uidchat' />" +
+                "<time data-notify-html='time' />" +
+                "<div class='image' data-notify-html='image'/>" +
+                "<div class='text-wrapper'>" +
+                    "<div class='text' data-notify-html='text'/>" +
+                "</div>" +
+                "<span class='icon-push'></span>" +
+            "</div>"
+    });
+    function notify(style, className, notifyText, notifyImage, uidchat, notifyUUID, notifyTime) {
+        if (!notifyTime)
+        {
+            notifyTime = new Date();
+            var horas = notifyTime.getHours()+'';
+            if (horas.length === 1)
+                horas = '0'+horas;
+            var minutos = notifyTime.getMinutes()+'';
+            if (minutos.length === 1)
+                minutos = '0'+minutos;
+            notifyTime = horas+':'+minutos;
+        }
+        var notifyParams = {
+            text: notifyText,
+            image: "<img class='img-circle' width='40px' src='"+notifyImage+"'/>",
+            time: notifyTime
+        };
+        if (uidchat)
+        {
+            notifyParams.uidchat = $('<input type="hidden" name="uidchat" value="'+uidchat+'" />');
+        }
+        notifyParams.notifyUUID = $('<input type="hidden" name="notifyUUID" value="'+notifyUUID+'" />');
+        $.notify(notifyParams, {
+            style: style,
+            className: className,
+            autoHide: false,
+            autoHideDelay: 9000,
+            clickToHide: true,
+            order: 'fifo'
+        });
+
+    }
+</script>

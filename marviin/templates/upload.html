@@ -52,12 +52,16 @@
     </div>
 </div>
 </div>
-
+<!-- inicio dialogo bot -->
+<div id="content-dialog" class="content-dialog"></div>
+<div class="bg"></div>
 
 {% endblock %}
 
 {% block scripts %}
-
+    {% include "includes/snippets/chat_jquery_template.html" %}
+    {% include "includes/snippets/common_js_pedido.html" %}
+    {% include "includes/snippets/notificacoes_cliente.html" %}
     <script type="text/javascript">
        var pagina1UploadEnabled = false;
        var pagina2UploadEnabled = false;
@@ -284,7 +288,6 @@
 
       $(document).ready(function($) {
         //Notificacoes ===========
-        {% include "includes/snippets/notificacoes_cliente.html" %}
         {% include "includes/snippets/notificacoes_servidor.html" with notificacoes=notificacoes %}
       });
     </script>

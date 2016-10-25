@@ -1,12 +1,12 @@
 <script id="template-chat" type="text/x-jquery-tmpl">
 {% verbatim %}
-  <div class="dialogo paginas {{if origem == 'fbmessenger'}}messeger {{/if}}">
+  <div id="{{= card_uid }}_dialogo" class="dialogo paginas {{if origem == 'fbmessenger'}}messeger {{/if}}" style="z-index: 2">
     <a href="javascript:void(0);" class="close">X</a>
     <div class="cabecalho-chat">
       <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span class="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
     </div>
     <ul id="{{= card_uid }}_messages">
-    {{each mensagem}}
+    {{each historico_mensagem}}
      {{if typeof cliente != 'undefined'}}
       <li class="cons">
           <img class="media-object img-circle" src="{{if typeof $data.foto_cliente != 'undefined'}}{{= $data.foto_cliente}}{{else}}../../static/marviin/img/default_user.png{{/if}}" width="40" height="40" alt="">

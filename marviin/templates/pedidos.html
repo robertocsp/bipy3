@@ -195,7 +195,7 @@
               <p>{{= nome_cliente}}<br> <span class="ultimo">Pedido feito há <span class="{{= card_uid}}" data-minutes-passed="0">0 minutos</span></span></p>
             </div>
             <ul id="{{= card_uid }}_messages">
-            {{each mensagem}}
+            {{each historico_mensagem}}
              {{if typeof cliente != 'undefined'}}
               <li class="cons">
                   <img class="media-object img-circle" src="{{if typeof $data.foto_cliente != 'undefined'}}{{= $data.foto_cliente}}{{else}}../../static/marviin/img/default_user.png{{/if}}" width="40" height="40" alt="">
@@ -247,27 +247,8 @@
   </li>
 {% endverbatim %}
  </script>
- <script id="template-message" type="text/x-jquery-tmpl">
-{% verbatim %}
-         {{if typeof cliente != 'undefined'}}
-          <li class="cons">
-              <img class="media-object img-circle" src="{{if typeof foto_cliente != 'undefined'}}{{= foto_cliente}}{{else}}../../static/marviin/img/default_user.png{{/if}}" width="40" height="40" alt="">
-              <div class="balao">
-                <h4 class="media-heading"> {{= nome_cliente}}</h4>
-                <p>{{= cliente}}</p>
-              </div>
-          </li>
-         {{else typeof bot != 'undefined'}}
-          <li class="est">
-              <div class="balao">
-                <h4 class="media-heading"> {{ request.session.nome_loja }}</h4>
-                <p>{{= bot}}</p>
-              </div>
-          </li>
-         {{/if}}
-{% endverbatim %}
- </script>
 
+{% include "includes/snippets/common_js_pedido.html" %}
 <script type="text/javascript">
   var pedidos_interval = {};
   function startInterval(card_uid) {
@@ -279,44 +260,8 @@
     }, 60000);
     pedidos_interval[card_uid] = intervalId;
   }
-  function sendMessageBindClick(card_uid) {
-    $("#" + card_uid + "_btn-send").click(function(){
-      var $this = $(this);
-      $this.hide();
-      $.post('/marviin/api/rest/mensagem',
-             {uid: $(this).attr("data-uid"), message: $(this).parent().find("input").val()},
-             function(data) {
-        console.log(data);
-        $.tmpl($('#template-message'), {bot: $this.parent().find("input").val()}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
-        $this.parent().find("input").val('');
-        var objDiv = document.getElementById($this.attr("data-uid") + '_messages');
-        objDiv.scrollTop = objDiv.scrollHeight;
-      })
-      .fail(function(data) {
-        if (data.status === 403)
-        {
-            alert('Sessão inválida. Realize o login novamente.');
-            window.location.href = '/?next='+window.location.pathname;
-        }
-        else if (data.status === 500)
-        {
-            $.tmpl($('#template-message'), {bot: data.responseJSON.message}).appendTo($('#' + $this.attr("data-uid") + '_messages'));
-            $this.parent().find("input").val('');
-            var objDiv = document.getElementById($this.attr("data-uid") + '_messages');
-            objDiv.scrollTop = objDiv.scrollHeight;
-        }
-      })
-      .always(function () {
-        $this.show();
-      });
-    });
-  }
-  function mudaStatus(uid, status)
+  function defineTimer(data)
   {
-      $.post('/marviin/api/rest/status',
-           {uid: uid, status: status},
-           function(data) {
-      console.log(data);
       if (data.stop && pedidos_interval[data.uid] !== undefined)
       {
         clearInterval(pedidos_interval[data.uid]);
@@ -325,6 +270,15 @@
       {
         startInterval(data.uid);
       }
+  }
+  function mudaStatus(uid, status)
+  {
+      sync_uid = generateUUID();
+      $.post('/marviin/api/rest/status',
+           {uid: uid, status: status, sync_uid: sync_uid},
+           function(data) {
+      console.log(data);
+      defineTimer(data);
     })
     .fail(function(data) {
       if (data.status === 403)
@@ -333,6 +287,18 @@
         window.location.href = '/?next='+window.location.pathname;
       }
     });
+  }
+  function mudaColuna($this)
+  {
+      $this.parent(".status-list").find("input").prop("checked", false);
+      $this.find("input").prop("checked", true);
+
+      //clona e copia o box com o pedido para a coluna do status escolhido
+      $destino = $this.attr("class");
+      $this.closest('li').hide("300");
+      $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $this.closest('li').html() + "</li>");
+      $this.closest('li').remove();
+      sendMessageBindClick($this.find("input").attr("data-uid"));
   }
   $(document).ready(function($) {
     //drag and drop pedidos
@@ -387,15 +353,7 @@
 
     // Troca de colunas no clique dos botoes de status
     $('.coluna').on('click', '.status-list-detalhe-del label', function() {
-      $(this).parent(".status-list").find("input").prop("checked", false);
-      $(this).find("input").prop("checked", true);
-
-      //clona e copia o box com o pedido para a coluna do status escolhido
-      $destino = $(this).attr("class");
-      $(this).closest('li').hide("300");
-      $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
-      $(this).closest('li').remove();
-      sendMessageBindClick($(this).find("input").attr("data-uid"));
+      mudaColuna($(this));
       mudaStatus($(this).find("input").attr("data-uid"), $(this).find("input").attr("name"));
     });
 
@@ -403,15 +361,7 @@
     $('.coluna').on('click', '.status-list-detalhe label', function() {
       $("div.lista-pedidos").hide();
       $(".bg").hide();
-      $(this).parent(".status-list").find("input").prop("checked", false);
-      $(this).find("input").prop("checked", true);
-
-      //clona e copia o box com o pedido para a coluna do status escolhido
-      $destino = $(this).attr("class");
-      $(this).closest('li').hide("300");
-      $('#' + $destino).append("<li class='ui-state-default ui-sortable-handle'>" + $(this).closest('li').html() + "</li>");
-      $(this).closest('li').remove();
-      sendMessageBindClick($(this).find("input").attr("data-uid"));
+      mudaColuna($(this));
       mudaStatus($(this).find("input").attr("data-uid"), $(this).find("input").attr("name"));
     });
 
@@ -488,17 +438,12 @@
             }, 1500 );
         }
     });
-
-    var ws4redis = WS4Redis({
-        uri: '{{ WEBSOCKET_URI }}{{ request.session.id_loja }}?subscribe-broadcast',
-        receive_message: receiveMessage,
-        heartbeat_msg: {{ WS4REDIS_HEARTBEAT }}
-    });
+  });
 
     // attach this function to an event handler on your site
-    function sendMessage() {
-        ws4redis.send_message('A message');
-    }
+    //function sendMessage() {
+    //    ws4redis.send_message('A message');
+    //}
 
     // receive a message though the websocket from the server
     function receiveMessage(msg) {
@@ -584,58 +529,27 @@
             }
             notify('marviin', input.origem, notifyText, notifyImage, undefined, input.notificacao_uuid);
         }
+        else if(input.origem === 'sync_status')
+        {
+            if (input.sync_uid !== sync_uid)
+            {
+                mudaColuna($($('label[class='+input.status_pedido+']:has(input[data-uid='+input.uid+'])')[0]));
+                defineTimer(input);
+            }
+        }
+        else if(input.origem === 'sync_chat')
+        {
+            var element = $('#' + input.uid + '_btn-send');
+            if (input.sync_uid !== sync_uid && element[0])
+            {
+                messageSuccess(element, input.message);
+            }
+        }
     }
-
-  });
 </script>
 
 <script type="text/javascript">
     //Notificacao
-    $.notify.addStyle("marviin", {
-        html:
-            "<div>" +
-                "<span data-notify-html='notifyUUID' />" +
-                "<span data-notify-html='uidchat' />" +
-                "<time data-notify-html='time' />" +
-                "<div class='image' data-notify-html='image'/>" +
-                "<div class='text-wrapper'>" +
-                    "<div class='text' data-notify-html='text'/>" +
-                "</div>" +
-                "<span class='icon-push'></span>" +
-            "</div>"
-    });
-    function notify(style, className, notifyText, notifyImage, uidchat, notifyUUID, notifyTime) {
-        if (!notifyTime)
-        {
-            notifyTime = new Date();
-            var horas = notifyTime.getHours()+'';
-            if (horas.length === 1)
-                horas = '0'+horas;
-            var minutos = notifyTime.getMinutes()+'';
-            if (minutos.length === 1)
-                minutos = '0'+minutos;
-            notifyTime = horas+':'+minutos;
-        }
-        var notifyParams = {
-            text: notifyText,
-            image: "<img class='img-circle' width='40px' src='"+notifyImage+"'/>",
-            time: notifyTime
-        };
-        if (uidchat)
-        {
-            notifyParams.uidchat = $('<input type="hidden" name="uidchat" value="'+uidchat+'" />');
-        }
-        notifyParams.notifyUUID = $('<input type="hidden" name="notifyUUID" value="'+notifyUUID+'" />');
-        $.notify(notifyParams, {
-            style: style,
-            className: className,
-            autoHide: false,
-            autoHideDelay: 9000,
-            clickToHide: true,
-            order: 'fifo'
-        });
-
-    }
     $(function() {
 		$(document).on("notify-hide", ".notifyjs-wrapper", function(e) {
 			var notifyUUID = $(this).find('input[name="notifyUUID"]');
