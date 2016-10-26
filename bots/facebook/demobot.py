@@ -19,6 +19,8 @@ from logging import Formatter
 from celery import Celery, chain
 from celery.exceptions import SoftTimeLimitExceeded
 from contextlib import contextmanager
+from itertools import product
+from string import ascii_lowercase
 
 try:
     from urllib.parse import parse_qs, urlencode
@@ -82,9 +84,12 @@ POSTBACK_MAP = {
     'pedir_mais': u'+ itens ao pedido',
     'menu_rever_pedido': u'Atualizar pedido',
     'menu_get_started': u'Menu principal',
+    'editar_item_': u'Editar item',
+    'remover_item_': u'Remover item',
+    'vermais_offset_': u'Ver mais itens',
 }
 ROBOT_ICON = u'\U0001f4bb'
-# ULTIMO PASSO = 27
+# ULTIMO PASSO = 31
 
 
 class GraphAPIError(Exception):
@@ -548,6 +553,21 @@ def get_quickreply_finalizar_pedido():
     ]
 
 
+def get_quickreply_atualizar_pedido():
+    return [
+        {
+            'content_type': 'text',
+            'title': u'Voltar',
+            'payload': 'menu_rever_pedido'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
+        }
+    ]
+
+
 def get_quickreply_voltar_menu():
     return [
         {
@@ -637,11 +657,7 @@ def get_mensagem(id_mensagem, **args):
         'pedido3':    Template(u'Por favor, pode digitar. :)'),
         'pedido4':    Template(u'$arg1, já existe um pedido sendo montado. Deseja continuar este pedido ou começar um '
                                u'novo?'),
-        'rever':      Template(u'Digite o número entre parênteses seguido da quantidade e, se precisar, descrição. '
-                               u'Para remover o item, coloque quantidade 0.'),
-        'rever1':     Template(u'Desculpe, mas não consegui editar o item do seu pedido. Coloque o número entre '
-                               u'parênteses seguido da quantidade e, se precisar, descrição.'),
-        'rever2':     Template(u'Não existe um pedido sendo montado no momento. Como posso auxiliá-lo(a)?'),
+        'rever2':     Template(u'Pedido se encontra vazio de itens. Como posso auxiliá-lo(a)?'),
         'auxilio':    Template(u'Em que posso ajudá-lo(a)?'),
         'auxilio1':   Template(u'Em que posso ajudá-lo(a) agora?'),
         'auxilio2':   Template(u'Anotado. Como posso ajudá-lo(a) agora?'),
@@ -674,8 +690,17 @@ def define_mesa(mesa, conversa):
     return True
 
 
-def anota_pedido(message, conversa):
-    erros = []
+def anota_pedido(message, conversa, i_edicao=None):
+    pedido = estrutura_pedido(message)
+    app_log.debug('=========================>>>>> 3 ' + repr(conversa['itens_pedido']))
+    if i_edicao is not None:
+        del conversa['itens_pedido'][int(i_edicao)]
+    conversa['itens_pedido'] += pedido
+    app_log.debug('=========================>>>>> 4 ' + repr(conversa['itens_pedido']))
+    return True
+
+
+def estrutura_pedido(message):
     pedido = []
     app_log.debug('=========================>>>>> 1 ' + repr(pedido))
     itens_pedido = message.splitlines()
@@ -697,31 +722,7 @@ def anota_pedido(message, conversa):
                     'descricao': item_pedido[1],
                     'quantidade': quantidade[0]
                 })
-    app_log.debug('=========================>>>>> 3 ' + repr(conversa['itens_pedido']))
-    conversa['itens_pedido'] += pedido
-    app_log.debug('=========================>>>>> 4 ' + repr(conversa['itens_pedido']))
-    return True if len(erros) == 0 else '\n'.join(erros)
-
-
-def editar_pedido(message, conversa):
-    item_pedido = message.strip().split(' ', 2)
-    if len(item_pedido) < 2:
-        return False
-    i = [int(qtde) for qtde in [item_pedido[0]] if qtde.isdigit()]
-    if len(i) != 1:
-        return False
-    quantidade = [int(qtde) for qtde in [item_pedido[1]] if qtde.isdigit()]
-    if len(quantidade) == 1:
-        if quantidade[0] > 0:
-            if len(item_pedido) == 3:
-                conversa['itens_pedido'][i[0] - 1]['descricao'] = item_pedido[2]
-            conversa['itens_pedido'][i[0] - 1]['quantidade'] = quantidade[0]
-        else:
-            del conversa['itens_pedido'][i[0] - 1]
-    else:
-        conversa['itens_pedido'][i[0] - 1]['descricao'] = item_pedido[1]
-        conversa['itens_pedido'][i[0] - 1]['quantidade'] = 1
-    return True
+    return pedido
 
 
 @celery_app.task(bind=True, soft_time_limit=10)
@@ -986,7 +987,7 @@ def webhook():
                                 'passo_nao': None,
                                 'usuario': user,
                                 'mesa': None,
-                                'mesa_aux': None,
+                                'aux': None,
                                 'itens_pedido': [],
                                 'nao_entendidas': 0,
                                 'datahora_inicio_pedido': None,
@@ -1036,7 +1037,7 @@ def webhook():
                                     message = x['message']['text']
                                 else:
                                     payload = x['postback'].get('payload')
-                                    message = POSTBACK_MAP[payload]
+                                    message = next(v for k, v in POSTBACK_MAP.items() if payload.startswith(k))
                                 app_log.debug(payload)
                                 if conversa['suspensa'] > 0:
                                     resposta_dashboard(message=message, payload=payload, sender_id=sender_id,
@@ -1065,6 +1066,16 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
     elif payload == 'menu_rever_pedido':
         conversa['passo'] = 16
         passo_rever_pedido_2(message, sender_id, loja_id, conversa)
+    elif payload.startswith('editar_item_'):
+        conversa['passo'] = 28
+        passo_editar_item(message, sender_id, loja_id, conversa, payload[len('editar_item_'):])
+    elif payload.startswith('remover_item_'):
+        # passos 29 e 31 definidos dentro do método
+        passo_remover_item(message, sender_id, loja_id, conversa, payload[len('remover_item_'):])
+    elif payload.startswith('vermais_offset_'):
+        conversa['passo'] = 30
+        conversa['aux'] = int(payload[len('vermais_offset_'):])
+        passo_rever_pedido_2(message, sender_id, loja_id, conversa, offset=conversa['aux'])
     elif payload == 'pedir_conta':
         # passos 24 e 25 definidos dentro do método
         passo_pedir_conta(message, sender_id, loja_id, conversa)
@@ -1085,7 +1096,7 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
         passo_chamar_garcom(message, sender_id, loja_id, conversa)
     elif payload == 'voltar_menu':
         conversa['passo'] = 1
-        conversa['mesa_aux'] = None
+        conversa['aux'] = None
         conversa['passo_sim'] = None
         conversa['passo_nao'] = None
         passo_menu(message, sender_id, loja_id, conversa)
@@ -1124,14 +1135,11 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
     conversa['passo'] = passo
     if passo == 3:
         conversa['passo'] = 26
-        conversa['mesa_aux'] = message
+        conversa['aux'] = message
         passo_confirma_mesa(message, sender_id, loja_id)
     elif passo == 15:
         conversa['passo'] = 2
         passo_trocar_mesa(message, sender_id, loja_id, conversa)
-    elif passo == 4 or passo == 16:
-        # passos 4 e 5 definidos dentro do método
-        passo_rever_pedido(message, sender_id, loja_id, conversa)
     elif passo == 13:
         # passos 6 definido dentro do método
         passo_um(message, sender_id, loja_id, conversa)
@@ -1154,14 +1162,14 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
             conversa['passo'] = 16
             passo_rever_pedido_2(message, sender_id, loja_id, conversa)
     elif passo == 19:
-        define_mesa(conversa['mesa_aux'], conversa)
-        conversa['mesa_aux'] = None
+        define_mesa(conversa['aux'], conversa)
+        conversa['aux'] = None
         passo_cardapio(message, sender_id, loja_id, conversa)
     elif passo == 22:
         passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'garcom', 23)
     elif passo == 25:
         passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'conta', 24)
-    elif passo == 26:
+    elif passo == 26 or passo == 29:
         normalizada = unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower()
         if u'sim' == normalizada:
             conversa['passo_sim'][0](message, sender_id, loja_id, conversa, conversa['passo_sim'][1])
@@ -1172,6 +1180,17 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
         else:
             bot = get_mensagem('sim_nao')
             send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_sim_nao())
+    elif passo == 28 or passo == 31:
+        if pre_requisito_pedido(sender_id, loja_id, conversa):
+            if passo == 28:
+                anota_pedido(message, conversa, i_edicao=conversa['aux'])
+            else:
+                del conversa['itens_pedido'][int(conversa['aux'])]
+            conversa['passo'] = 16
+            set_variaveis(conversa,
+                          itens_pedido=(False, None),
+                          datetime_pedido=(False, None))
+            passo_rever_pedido_2(message, sender_id, loja_id, conversa)
     else:
         conversa['passo'] = 12
         passo_nao_entendido(message, sender_id, loja_id, conversa)
@@ -1205,7 +1224,7 @@ def passo_finalizar_contato(sender_id, loja_id, conversa):
         mensagem_mesa(conversa, loja_id, sender_id)
     elif conversa['passo'] == 15:
         passo_trocar_mesa_2(None, sender_id, loja_id, conversa)
-    elif conversa['passo'] == 4 or conversa['passo'] == 16:
+    elif conversa['passo'] == 16:
         passo_rever_pedido_2(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 13:
         passo_novo_pedido(None, sender_id, loja_id, conversa)
@@ -1224,6 +1243,12 @@ def passo_finalizar_contato(sender_id, loja_id, conversa):
         passo_pedir_conta(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 27:
         passo_cardapio(None, sender_id, loja_id, conversa)
+    elif conversa['passo'] == 28:
+        passo_editar_item(None, sender_id, loja_id, conversa, conversa['aux'])
+    elif conversa['passo'] == 29:
+        passo_remover_item(None, sender_id, loja_id, conversa, conversa['aux'])
+    elif conversa['passo'] == 30:
+        passo_rever_pedido_2(None, sender_id, loja_id, conversa, offset=conversa['aux'])
     conversa['suspensa'] = 0
 
 
@@ -1233,6 +1258,27 @@ def existe_pedido_andamento(sender_id, loja_id, conversa):
         send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido2())
         return True
     return False
+
+
+def passo_editar_item(message, sender_id, loja_id, conversa, i):
+    if pre_requisito_pedido(sender_id, loja_id, conversa):
+        conversa['aux'] = i
+        item = repr(conversa['itens_pedido'][int(i)]['quantidade']) + ' ' + \
+               conversa['itens_pedido'][int(i)]['descricao']
+        bot = u'Digite seu pedido'
+        chain(send_text_message.si(sender_id, loja_id, item, icon=None),
+              send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_atualizar_pedido()))()
+
+
+def passo_remover_item(message, sender_id, loja_id, conversa, i):
+    if pre_requisito_pedido(sender_id, loja_id, conversa):
+        conversa['aux'] = i
+        item = repr(conversa['itens_pedido'][int(i)]['quantidade']) + ' ' + \
+               conversa['itens_pedido'][int(i)]['descricao']
+        bot = u'Remove o item acima?'
+        define_sim_nao(conversa, 29, define_passo, 31, define_payload, 'menu_rever_pedido')
+        chain(send_text_message.si(sender_id, loja_id, item, icon=None),
+              send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_sim_nao()))()
 
 
 def pre_requisito_pedido(sender_id, loja_id, conversa):
@@ -1335,8 +1381,8 @@ def mensagem_sucesso(sender_id, loja_id, conversa, mensagem):
 
 def passo_mesa_dependencia(message, sender_id, loja_id, conversa, mensagem, passo):
     conversa['passo'] = passo
-    define_mesa(conversa['mesa_aux'], conversa)
-    conversa['mesa_aux'] = None
+    define_mesa(conversa['aux'], conversa)
+    conversa['aux'] = None
     set_variaveis(conversa,
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None))
@@ -1380,27 +1426,60 @@ def passo_pedir_mais(message, sender_id, loja_id, conversa):
         send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
 
 
-def passo_rever_pedido_2(message, sender_id, loja_id, conversa):
+def add_item_pedido_menu(menu, i, item, offset=0):
+    if offset == 0:
+        descricao_item = item if len(item) <= 80 else item[:77] + '...'
+        menu.append(
+            {
+                'title': descricao_item,
+                'subtitle': u'Edite ou remova este item.',
+                'buttons': [
+                    {
+                        'type': 'postback',
+                        'title': u'Editar',
+                        'payload': 'editar_item_' + repr(i)
+                    },
+                    {
+                        'type': 'postback',
+                        'title': u'Remover',
+                        'payload': 'remover_item_' + repr(i)
+                    }
+                ]
+            })
+    else:
+        menu.append(
+            {
+                'title': u'Mais itens',
+                'subtitle': u'Clique aqui para mostrar mais itens.',
+                'buttons': [
+                    {
+                        'type': 'postback',
+                        'title': u'Ver mais',
+                        'payload': 'vermais_offset_' + repr(offset)
+                    }
+                ]
+            })
+
+
+def passo_rever_pedido_2(message, sender_id, loja_id, conversa, offset=0):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         if len(conversa['itens_pedido']) > 0:
-            pedidos = None
-            for i, item in enumerate(conversa['itens_pedido']):
-                if pedidos:
-                    pedidos += '\n'
-                else:
-                    pedidos = ''
-                pedidos += '(' + repr(i + 1) + '): ' + repr(item['quantidade']) + ' ' + item['descricao']
+            menu = []
+            limit = 10
+            for i, item in enumerate(conversa['itens_pedido'][(0+offset):(limit+offset)]):
+                add_item_pedido_menu(menu, (i+offset), repr(item['quantidade']) + ' ' + item['descricao'],
+                                     offset=0 if (i/(limit-1) == 0) or len(conversa['itens_pedido']) == (limit+offset)
+                                     else ((limit-1)+offset))
             set_variaveis(conversa,
                           itens_pedido=(False, None),
                           datetime_pedido=(False, None))
-            bot1 = get_mensagem('rever')
-            bot2 = pedidos
-            chain(send_text_message.si(sender_id, loja_id, bot1),
-                  send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_voltar_menu(), icon=None))()
+            bot = 'Clique abaixo para voltar'
+            chain(send_generic_message.si(sender_id, loja_id, menu),
+                  send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu(), icon=None))()
         else:
             bot = get_mensagem('rever2')
             chain(send_text_message.si(sender_id, loja_id, bot),
-                          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_trocar_mesa_2(message, sender_id, loja_id, conversa):
@@ -1447,34 +1526,20 @@ def passo_tres(message, sender_id, loja_id, conversa):
 
 def passo_dois(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
-        is_pedido_anotado = anota_pedido(message, conversa)
-        if is_pedido_anotado is True:
-            conversa['passo'] = 8
-            set_variaveis(conversa,
-                          itens_pedido=(False, None),
-                          datetime_pedido=(False, None))
-            bot = get_mensagem('anotado', arg1=conversa['usuario']['first_name'])
-            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
-        else:
-            conversa['passo'] = 9
-            conversa['nao_entendidas'] += 1
-            if conversa['nao_entendidas'] > 1:
-                bot = get_mensagem('robo')
-                chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
-                                                                                             get_elements_menu(
-                                                                                                 conversa)))()
-            else:
-                bot1 = get_mensagem('qtde', arg1=is_pedido_anotado)
-                bot2 = get_mensagem('qtde1')
-                chain(send_text_message.si(sender_id, loja_id, bot1),
-                      send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_voltar_menu(), icon=None))()
+        anota_pedido(message, conversa)
+        conversa['passo'] = 8
+        set_variaveis(conversa,
+                      itens_pedido=(False, None),
+                      datetime_pedido=(False, None))
+        bot = get_mensagem('anotado', arg1=conversa['usuario']['first_name'])
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
 
 
 def passo_um(message, sender_id, loja_id, conversa):
     # send_image_message(sender_id, loja_id, 'cardapio01.jpg', 'image/jpeg')
     if pre_requisito_pedido(sender_id, loja_id, conversa):
-        define_mesa(conversa['mesa_aux'], conversa)
-        conversa['mesa_aux'] = None
+        define_mesa(conversa['aux'], conversa)
+        conversa['aux'] = None
         conversa['passo'] = 6
         set_variaveis(conversa,
                       itens_pedido=(False, None),
@@ -1489,30 +1554,9 @@ def mensagem_pedido(sender_id, loja_id, conversa):
           send_quickreply_message.si(sender_id, loja_id, bot1, get_quickreply_voltar_menu(), icon=None))()
 
 
-def passo_rever_pedido(message, sender_id, loja_id, conversa):
-    if pre_requisito_pedido(sender_id, loja_id, conversa):
-        if not editar_pedido(message, conversa):
-            conversa['passo'] = 4
-            conversa['nao_entendidas'] += 1
-            if conversa['nao_entendidas'] > 1:
-                bot = get_mensagem('robo')
-                chain(send_text_message.si(sender_id, loja_id, bot),
-                      send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
-            else:
-                bot = get_mensagem('rever1')
-                send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
-        else:
-            conversa['passo'] = 5
-            set_variaveis(conversa,
-                          itens_pedido=(False, None),
-                          datetime_pedido=(False, None))
-            bot = get_mensagem('anotado1')
-            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
-
-
 def passo_trocar_mesa(message, sender_id, loja_id, conversa):
-    define_mesa(conversa['mesa_aux'], conversa)
-    conversa['mesa_aux'] = None
+    define_mesa(conversa['aux'], conversa)
+    conversa['aux'] = None
     if len(conversa['mesa']) == 2 and conversa['mesa'][0] == conversa['mesa'][1]:
         bot = get_mensagem('mesa4')
         chain(send_text_message.si(sender_id, loja_id, bot),

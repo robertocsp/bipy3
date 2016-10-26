@@ -74,6 +74,6 @@ It also links to a more detailed description in the pytz documentation.
 class ItemPedido(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
     pedido = BigForeignKey(Pedido, null=True, blank=True, related_name='itens', on_delete=models.CASCADE)
-    produto = models.CharField('produto', max_length=100, blank=True, null=True)
+    produto = models.CharField('produto', max_length=1000, blank=True, null=True)
     valor = models.FloatField('valor', blank=True, null=True)
     quantidade = models.IntegerField('quantidade', blank=True, null=True)

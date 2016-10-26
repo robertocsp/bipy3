@@ -29,7 +29,7 @@ with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marviin_conf'), 
             FB_APP_SECRET = key_value_pair[1]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
