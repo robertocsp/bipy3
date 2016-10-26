@@ -175,12 +175,14 @@
     {% endif %}
 </div>
 <!-- inicio dialogo bot -->
-<div class="content-dialog"></div>
+<div id="content-dialog" class="content-dialog"></div>
 <div class="bg"></div>
 {% endblock %}
 
 {% block scripts %}
     {% include "includes/snippets/chat_jquery_template.html" %}
+    {% include "includes/snippets/common_js_pedido.html" %}
+    {% include "includes/snippets/notificacoes_cliente.html" %}
     <script type="text/javascript">
       function setPagina(pagina)
       {
@@ -208,7 +210,6 @@
         });
 
         //Notificacoes ===========
-        {% include "includes/snippets/notificacoes_cliente.html" %}
         {% include "includes/snippets/notificacoes_servidor.html" with notificacoes=notificacoes %}
       });
 

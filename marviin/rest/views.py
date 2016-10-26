@@ -11,6 +11,7 @@ from cliente.models import Cliente
 from loja.models import Loja
 from notificacao.models import Notificacao
 from fb_acesso.models import Fb_acesso
+from pedido.templatetags.pedido_tags import minutos_passados
 from upload_cardapio.models import Cardapio
 from marviin.forms import LoginForm
 
@@ -25,6 +26,7 @@ from datetime import datetime, timedelta, date
 import json
 import logging
 import requests
+import pedido.templatetags.pedido_tags
 
 logger = logging.getLogger('django')
 
@@ -140,7 +142,12 @@ class PedidoChatView(views.APIView):
         pedido = Pedido.objects.filter(loja=id_loja, numero=numero, data=data_pedido).select_related('cliente')
         if pedido:
             for um_pedido in pedido:
-                pedido_chat = {'origem': um_pedido.origem}
+                minutos = minutos_passados(um_pedido.data, um_pedido.hora)
+                pedido_chat = {'origem': um_pedido.origem, 'nome_cliente': um_pedido.cliente.nome, 'card_uid': uid,
+                               'historico_mensagem': um_pedido.historico, 'foto_cliente': um_pedido.cliente.foto,
+                               'minutos_passados': minutos,
+                               'start': False if um_pedido.status == 'entregue' or um_pedido.status == 'cancelado'
+                               else True}
                 return Response({'success': True, 'chat': pedido_chat})
         else:
             return Response({'success': False})
@@ -240,10 +247,10 @@ class StatusPedidoView(views.APIView):
             return Response({"success": False, "type": 403, "message": u'Sessão inválida.'},
                             status=status.HTTP_403_FORBIDDEN)
         uid = request.data.get('uid')
-        status_loja = request.data.get('status')
+        status_pedido = request.data.get('status')
         id_loja = request.session['id_loja']
         logger.debug('-=-=-=-=-=-=-=- uid: ' + repr(uid))
-        logger.debug('-=-=-=-=-=-=-=- status: ' + repr(status_loja))
+        logger.debug('-=-=-=-=-=-=-=- status: ' + repr(status_pedido))
         logger.debug('-=-=-=-=-=-=-=- id_loja: ' + repr(id_loja))
         data_pedido = datetime.strptime(uid[:8], '%Y%m%d')
         try:
@@ -253,27 +260,28 @@ class StatusPedidoView(views.APIView):
         except Pedido.MultipleObjectsReturned:
             return Response({"success": False})
         response = {"success": True}
-        if status_loja == 'solicitado':
+        if status_pedido == 'solicitado':
             pedido.status = 'solicitado'
             response['start'] = True
-            response['uid'] = uid
-        elif status_loja == 'em-processo':
+        elif status_pedido == 'em-processo':
             pedido.status = 'emprocessamento'
             response['start'] = True
-            response['uid'] = uid
-        elif status_loja == 'concluido':
+        elif status_pedido == 'concluido':
             pedido.status = 'concluido'
             response['start'] = True
-            response['uid'] = uid
-        elif status_loja == 'entregue':
+        elif status_pedido == 'entregue':
             pedido.status = 'entregue'
             response['stop'] = True
-            response['uid'] = uid
-        elif status_loja == 'cancelado':
+        elif status_pedido == 'cancelado':
             pedido.status = 'cancelado'
             response['stop'] = True
-            response['uid'] = uid
         pedido.save()
+        response['origem'] = 'sync_status'
+        response['uid'] = uid
+        response['sync_uid'] = request.data.get('sync_uid')
+        response['status_pedido'] = status_pedido
+        websocket = ws.Websocket()
+        websocket.publicar_mensagem(id_loja, json.dumps(response))
         return Response(response)
 
 
@@ -323,6 +331,10 @@ class EnviarMensagemView(views.APIView):
         headers = {'content-type': 'application/json'}
         response = requests.post(url, data=json.dumps(data), headers=headers, verify=False)
         logger.debug('------======------- response: ' + repr(response))
+        response_ws = {'origem': 'sync_chat', 'uid': uid, 'sync_uid': request.data.get('sync_uid'),
+                       'message': request.data.get('message')}
+        websocket = ws.Websocket()
+        websocket.publicar_mensagem(id_loja, json.dumps(response_ws))
         return Response({"success": True})
 
     def atualiza_historico(self, data_pedido, numero, ator, mensagem, loja_id):

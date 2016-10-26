@@ -64,6 +64,8 @@ with open(os.path.join(os.path.join(BASE_DIR, 'marviin_conf'), 'keys.txt')) as k
             SUPER_USER_PASSWORD = key_value_pair[1]
         if key_value_pair[0] == 'api-secret':
             CHAVE_BOT_API_INTERNA = key_value_pair[1]
+        if key_value_pair[0] == 'webhook-secret':
+            CHAVE_BOT_WEBHOOK = key_value_pair[1]
 
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
@@ -932,8 +934,8 @@ def atualiza_cardapio(loja_id, cardapio):
 @flask_app.route("/webhook", methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
-        if request.args.get('hub.verify_token') == 'verificacao-muita-segura-do-demo-indoor-bot':
-                return request.args.get("hub.challenge")
+        if request.args.get('hub.verify_token') == CHAVE_BOT_WEBHOOK:
+            return request.args.get("hub.challenge")
         return
     if request.method == 'POST':
         app_log.debug(u'INICIO POST :: ')

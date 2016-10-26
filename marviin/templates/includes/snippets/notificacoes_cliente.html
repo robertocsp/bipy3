@@ -1,9 +1,4 @@
-var ws4redis = WS4Redis({
-    uri: '{{ WEBSOCKET_URI }}{{ request.session.id_loja }}?subscribe-broadcast',
-    receive_message: receiveMessage,
-    heartbeat_msg: {{ WS4REDIS_HEARTBEAT }}
-});
-
+<script type="text/javascript">
 // receive a message though the websocket from the server
 function receiveMessage(msg) {
     console.log('Message from Websocket: ' + msg);
@@ -11,6 +6,12 @@ function receiveMessage(msg) {
     console.log(input);
     if(input.origem === 'chat')
     {
+        if($('#' + input.uid + '_messages')[0])
+        {
+            $.tmpl($('#template-message'), input).appendTo($('#' + input.uid + '_messages'));
+            var objDiv = document.getElementById(input.uid + '_messages');
+            objDiv.scrollTop = objDiv.scrollHeight;
+        }
         var notifyText = '<strong>'+input.nome_cliente+'</strong><br /> enviou uma mensagem';
         var notifyImage = '../../static/marviin/img/default_user.png';
         if (input.foto_cliente)
@@ -77,92 +78,81 @@ function receiveMessage(msg) {
         }
         notify('marviin', input.origem, notifyText, notifyImage, undefined, input.notificacao_uuid);
     }
+    else if(input.origem === 'sync_status')
+    {
+        if($('#' + input.uid + '_messages')[0])
+        {
+            defineTimer(input);
+        }
+    }
+    else if(input.origem === 'sync_chat')
+    {
+        var element = $('#' + input.uid + '_btn-send');
+        if (input.sync_uid !== sync_uid && element[0])
+        {
+            messageSuccess(element, input.message);
+        }
+    }
 }
-$.notify.addStyle("marviin", {
-    html:
-        "<div>" +
-            "<span data-notify-html='notifyUUID' />" +
-            "<span data-notify-html='uidchat' />" +
-            "<time data-notify-html='time' />" +
-            "<div class='image' data-notify-html='image'/>" +
-            "<div class='text-wrapper'>" +
-                "<div class='text' data-notify-html='text'/>" +
-            "</div>" +
-            "<span class='icon-push'></span>" +
-        "</div>"
-});
-function notify(style, className, notifyText, notifyImage, uidchat, notifyUUID, notifyTime) {
-    if (!notifyTime)
-    {
-        notifyTime = new Date();
-        var horas = notifyTime.getHours()+'';
-        if (horas.length === 1)
-            horas = '0'+horas;
-        var minutos = notifyTime.getMinutes()+'';
-        if (minutos.length === 1)
-            minutos = '0'+minutos;
-        notifyTime = horas+':'+minutos;
-    }
-    var notifyParams = {
-        text: notifyText,
-        image: "<img class='img-circle' width='40px' src='"+notifyImage+"'/>",
-        time: notifyTime
-    };
-    if (uidchat)
-    {
-        notifyParams.uidchat = $('<input type="hidden" name="uidchat" value="'+uidchat+'" />');
-    }
-    notifyParams.notifyUUID = $('<input type="hidden" name="notifyUUID" value="'+notifyUUID+'" />');
-    $.notify(notifyParams, {
-        style: style,
-        className: className,
-        autoHide: false,
-        autoHideDelay: 9000,
-        clickToHide: true,
-        order: 'fifo'
+$(function() {
+    // Botão fechar box
+    $('.content-dialog').on('click', '.close, .bg', function() {
+      $(this).parent('.dialogo').hide();
+      $('.bg').hide();
+      $(this).closest('#content-dialog').empty();
     });
 
-}
-$(document).on("notify-hide", ".notifyjs-wrapper", function(e) {
-    var notifyUUID = $(this).find('input[name="notifyUUID"]');
-    if (notifyUUID[0])
-    {
-      $.post('/marviin/api/rest/notificacao_lida',
-             {notificacao_uuid: notifyUUID.val()},
-             function(data) {
-               console.log(data);
-             }
-      )
-      .fail(function(data) {
-        if (data.status === 403)
+    $(document).on("notify-hide", ".notifyjs-wrapper", function(e) {
+        var notifyUUID = $(this).find('input[name="notifyUUID"]');
+        if (notifyUUID[0])
         {
-            alert('Sessão inválida. Realize o login novamente.');
-            window.location.href = '/?next='+window.location.pathname;
-        }
-      });
-    }
-    var uidInput = $(this).find('input[name="uidchat"]');
-    if (uidInput[0])
-    {
-        var uid = uidInput.val();
-        console.log(uid);
-        $.get('/marviin/api/rest/pedido/'+uid+'/chat',
+          $.post('/marviin/api/rest/notificacao_lida',
+                 {notificacao_uuid: notifyUUID.val()},
                  function(data) {
                    console.log(data);
                  }
-        )
-        .fail(function(data) {
+          )
+          .fail(function(data) {
             if (data.status === 403)
             {
                 alert('Sessão inválida. Realize o login novamente.');
                 window.location.href = '/?next='+window.location.pathname;
             }
-        });
-        /*
-        $('.'+uid+'_dialogo').parent('.status-label').parent(".detalhe-pedido-icon").find('div.dialogo').show();
-        $('.bg').show();
-        var objDiv = document.getElementById(uid + '_messages');
-        objDiv.scrollTop = objDiv.scrollHeight;
-        */
-    }
+          });
+        }
+        var uidInput = $(this).find('input[name="uidchat"]');
+        if (uidInput[0])
+        {
+            var uid = uidInput.val();
+            console.log(uid);
+            $.get('/marviin/api/rest/pedido/'+uid+'/chat',
+                     function(data) {
+                        console.log(data);
+                        var input = data.chat;
+                        console.log(input);
+                        $("#content-dialog").empty();
+                        $.tmpl($('#template-chat'), input).appendTo($('#content-dialog'));
+                        $('.' + input.card_uid).attr('data-minutes-passed', input.minutos_passados);
+                        $('.' + input.card_uid).html(input.minutos_passados + ' minuto' + (input.minutos_passados > 1 ? 's' : ''));
+                        if(input.start)
+                        {
+                            startInterval(input.card_uid);
+                        }
+                        sendMessageBindClick(input.card_uid);
+                        $('.'+input.card_uid+'_dialogo').show();
+                        $('.bg').show();
+                        var objDiv = document.getElementById(input.card_uid + '_messages');
+                        objDiv.scrollTop = objDiv.scrollHeight;
+                     }
+            )
+            .fail(function(data) {
+                if (data.status === 403)
+                {
+                    alert('Sessão inválida. Realize o login novamente.');
+                    window.location.href = '/?next='+window.location.pathname;
+                }
+            });
+        }
+    });
 });
+</script>
