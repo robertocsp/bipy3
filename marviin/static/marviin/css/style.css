@@ -1429,6 +1429,18 @@ textarea.form-control.msg-users{
         width: 998px;
     }
 
+    .infos .origem, .info .telegram, .info .messeger{
+        display: none;
+    }
+
+    .infos .cliente, .info .cliente {
+        width: 253px;
+    }
+
+    .infos .status-label, .info .status-label {
+        width: 132px;
+    }
+
 }
 
 @media only screen and (min-width: 968px) and (max-width: 1024px){
