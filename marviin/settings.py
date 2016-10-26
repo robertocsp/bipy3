@@ -31,7 +31,9 @@ with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marviin_conf'), 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', 'sistema.marviin.com.br']
+
+ADMINS = [('Gus', 'gustavo@marviin.com.br')]
 
 LOGIN_URL = '/'
 
