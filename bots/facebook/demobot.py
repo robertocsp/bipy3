@@ -1190,7 +1190,7 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
             set_variaveis(conversa,
                           itens_pedido=(False, None),
                           datetime_pedido=(False, None))
-            passo_rever_pedido_2(message, sender_id, loja_id, conversa)
+            passo_rever_pedido_2(message, sender_id, loja_id, conversa, eh_msg_sucesso=True)
     else:
         conversa['passo'] = 12
         passo_nao_entendido(message, sender_id, loja_id, conversa)
@@ -1461,7 +1461,7 @@ def add_item_pedido_menu(menu, i, item, offset=0):
             })
 
 
-def passo_rever_pedido_2(message, sender_id, loja_id, conversa, offset=0):
+def passo_rever_pedido_2(message, sender_id, loja_id, conversa, offset=0, eh_msg_sucesso=False):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         if len(conversa['itens_pedido']) > 0:
             menu = []
@@ -1473,9 +1473,12 @@ def passo_rever_pedido_2(message, sender_id, loja_id, conversa, offset=0):
             set_variaveis(conversa,
                           itens_pedido=(False, None),
                           datetime_pedido=(False, None))
-            bot = 'Clique abaixo para voltar'
+            if eh_msg_sucesso:
+                bot = u'Alteração realizada com sucesso.'
+            else:
+                bot = 'Clique abaixo para voltar.'
             chain(send_generic_message.si(sender_id, loja_id, menu),
-                  send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu(), icon=None))()
+                  send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu()))()
         else:
             bot = get_mensagem('rever2')
             chain(send_text_message.si(sender_id, loja_id, bot),
