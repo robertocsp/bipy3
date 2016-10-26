@@ -122,13 +122,13 @@ ul, li{
 }
 
 .left-login{
-	background-image: url('../img/img-login.jpg');
+	background-image: url('../img/img-login-2.jpg');
 	background-size: cover;
 	opacity: 1;
 }
 
 .right-login{
-	background: red;
+	background: #aaa;
 }
 
 .right-login h1{
@@ -183,8 +183,8 @@ ul, li{
 }
 
 .form-login .btn-primary, .form-login .btn-primary:hover{
-    background-color: red;
-    border-color: red;
+    background-color: #aaa;
+    border-color: #aaa;
     color: #fff;
 }
 
