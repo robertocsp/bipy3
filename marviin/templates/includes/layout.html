@@ -42,13 +42,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/"><img src="../static/marviin/img/logo-header.png" /> <span class="nome-loja">/ {{ request.session.nome_loja }}</span></a>
+          <a class="navbar-brand" href="/"><img src="../static/marviin/img/login-sistema.png" /> <span class="nome-loja">/ {{ request.session.nome_loja }}</span></a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <!--<li class="{% block  Dashboard %}{% endblock %}"><a href="/home">Dashboard <span class="sr-only">(current)</span></a></li>-->
             <li class="{% block  pedidos %}{% endblock %}"><a href="/pedidos">Pedidos</a></li>
-            <li class="{% block  historico %}{% endblock %}"><a href="/historico">Histórico de pedidos</a></li>
+            <li class="{% block  historico %}{% endblock %}"><a href="/historico">Histórico</a></li>
             <li class="{% block  relacionamento %}{% endblock %}"><a href="/relacionamento">Clientes</a></li>
             <li class="{% block  upload %}{% endblock %}"><a href="/upload">Carregar Cardápio</a>
           </ul>

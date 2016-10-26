@@ -90,10 +90,10 @@ ul, li{
 }
 
 .navbar-header a img{
-    margin: -15px 0 0 0;
+    margin: -12px 4px 0 0;
     float: left;
-    width: 108px;
-    height: 55px;
+    width: 70px;
+    height: 42px;
 }
 
 .navbar-header a span.menor{
@@ -102,8 +102,7 @@ ul, li{
 }
 
 .logo-login a img{
-    width: 438px;
-    margin-left: -105px;
+    width: 255px;
 }
 
 .geral{
@@ -123,13 +122,13 @@ ul, li{
 }
 
 .left-login{
-	background-image: url('../img/telegram-login-2.jpg');
+	background-image: url('../img/img-login.jpg');
 	background-size: cover;
 	opacity: 1;
 }
 
 .right-login{
-	background: rgba(75,192,192,1);
+	background: red;
 }
 
 .right-login h1{
@@ -177,10 +176,16 @@ ul, li{
     font-size: 22px;
 }
 
-.form-login .btn-primary, .form-login .btn-primary:hover, .filtros-pedidos .btn-primary.btn-verde, .filtros-pedidos .btn-primary.btn-verde:hover{
+.filtros-pedidos .btn-primary.btn-verde, .filtros-pedidos .btn-primary.btn-verde:hover{
     color: #fff;
     background-color: rgba(75,192,192,1);
     border-color: rgba(75,192,192,1);
+}
+
+.form-login .btn-primary, .form-login .btn-primary:hover{
+    background-color: red;
+    border-color: red;
+    color: #fff;
 }
 
 .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
@@ -1433,6 +1438,18 @@ textarea.form-control.msg-users{
         width: 998px;
     }
 
+    .infos .origem, .info .telegram, .info .messeger{
+        display: none;
+    }
+
+    .infos .cliente, .info .cliente {
+        width: 253px;
+    }
+
+    .infos .status-label, .info .status-label {
+        width: 132px;
+    }
+
 }
 
 @media only screen and (min-width: 968px) and (max-width: 1024px){
@@ -1498,7 +1515,7 @@ textarea.form-control.msg-users{
     }
 
     .navbar-header a img {
-        margin: -10px 0 0 -8px;
+        margin: -13px 0 0 -8px;
         float: left;
         width: 82px;
         height: 46px;
