@@ -24,7 +24,8 @@
                 <input type="text" name="num_pedido_filtro" id="campo-pedido" placeholder="Número Pedido..." class="field-filter form-control" value="{% if filtros.num_pedido_filtro %}{{filtros.num_pedido_filtro}}{% endif %}">
               </div>
               <div class="col-md-3">
-                <input type="text" name="" id="data-pedido" placeholder="Data do pedido..." class="field-filter form-control" value=""><br>
+                <input type="text" name="data_filtro" id="data-pedido" placeholder="Data do pedido..." class="field-filter form-control" value=""><br>
+                <input type="hidden" name="hora_filtro" value="23:59">
               </div>
               <div class="col-md-12">
                   <button type="button" id="outros_btn_filtro" class="btn btn-primary btn-verde" onclick="$('#outros_btn_filtro').replaceWith($('<img src=\'/static/marviin/img/loading.gif\'></img>'));$('#form-filtros-pedido').submit();">
