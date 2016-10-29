@@ -1438,16 +1438,21 @@ textarea.form-control.msg-users{
         width: 998px;
     }
 
-    .infos .origem, .info .telegram, .info .messeger{
-        display: none;
-    }
-
     .infos .cliente, .info .cliente {
         width: 253px;
     }
 
     .infos .status-label, .info .status-label {
         width: 132px;
+    }
+
+    .content-hist{
+        width: 1170px;
+    }
+
+    .content-container-hist{
+        overflow-x: scroll;
+        width: 100%;
     }
 
 }
@@ -1522,7 +1527,6 @@ textarea.form-control.msg-users{
     }
 
     .navbar-header a span.nome-loja{display: none;}
-
 }
 
 @media only screen and (max-width: 640px){

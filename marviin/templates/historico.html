@@ -6,6 +6,7 @@
 {% load pedido_tags %}
 
 <div class="container hist">
+
   <div class="page-header">
     <h1><i class="fa fa-calendar-o"></i> Histórico de Pedidos</h1>
   </div>
@@ -38,6 +39,8 @@
         </div>
     </div>
   </form>
+    <div class="content-container-hist">
+    <div class="content-hist">
     {% if pedidos %}
     <span class="current">
         Página {{ pedidos.number }} de {{ pedidos.paginator.num_pages }}
@@ -174,6 +177,8 @@
     </nav>
     {% endif %}
 </div>
+</div>
+</dv>
 <!-- inicio dialogo bot -->
 <div id="content-dialog" class="content-dialog"></div>
 <div class="bg"></div>
