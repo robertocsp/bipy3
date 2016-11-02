@@ -1089,7 +1089,7 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
         conversa['passo'] = 0
         passo_finalizar_enviar(message, sender_id, loja_id, conversa)
     elif payload == 'pedir_cardapio':
-        # passos 19 e 20 definidos dentro do método
+        # passos 3, 19, 20, 26 e 27 utilizados nesta ação
         passo_pedir_cardapio(message, sender_id, loja_id, conversa)
     elif payload == 'chamar_garcom':
         # passos 22 e 23 definidos dentro do método
@@ -1164,7 +1164,7 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
     elif passo == 19:
         define_mesa(conversa['aux'], conversa)
         conversa['aux'] = None
-        passo_cardapio(message, sender_id, loja_id, conversa)
+        passo_cardapio_impresso(message, sender_id, loja_id, conversa)
     elif passo == 22:
         passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'garcom', 23)
     elif passo == 25:
@@ -1291,8 +1291,12 @@ def pre_requisito_pedido(sender_id, loja_id, conversa):
 
 
 def passo_cardapio_impresso(message, sender_id, loja_id, conversa, texto_id=None):
-    conversa['passo'] = 20
-    mensagem_sucesso(sender_id, loja_id, conversa, (texto_id if texto_id else 'cardapio'))
+    if conversa['mesa'] is None:
+        define_sim_nao(conversa, 3, define_passo, 19, define_payload, 'cardapio_impresso')
+        mensagem_mesa(conversa, loja_id, sender_id)
+    else:
+        conversa['passo'] = 20
+        mensagem_sucesso(sender_id, loja_id, conversa, (texto_id if texto_id else 'cardapio'))
 
 
 def passo_cardapio_digital(message, sender_id, loja_id, conversa):
@@ -1365,11 +1369,7 @@ def passo_pedir_cardapio(message, sender_id, loja_id, conversa):
     set_variaveis(conversa,
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None))
-    if conversa['mesa'] is None:
-        define_sim_nao(conversa, 3, define_passo, 19, define_payload, 'pedir_cardapio')
-        mensagem_mesa(conversa, loja_id, sender_id)
-    else:
-        passo_cardapio(message, sender_id, loja_id, conversa)
+    passo_cardapio(message, sender_id, loja_id, conversa)
 
 
 def mensagem_sucesso(sender_id, loja_id, conversa, mensagem):
