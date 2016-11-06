@@ -273,6 +273,10 @@ margin-top:8px;
     height: 1px;
 }
 
+.geral .colored-line, .geral .colored-line-left {
+    background: red;
+}
+
 .white-line {
     margin: auto;
     z-index: 1;
@@ -1128,5 +1132,43 @@ h3{
     height: 467px;
 }
 
+.form-estabelecimentos input, .form-estabelecimentos select, .form-estabelecimentos textarea{
+    height: 45px;
+    width: 95%;
+    float: left;
+    border: 0;
+    padding-left: 10px;
+    margin: 0 0 20px 0;
+    background: #fff;
+}
 
+.form-estabelecimentos textarea{
+    height: 150px;
+}
 
+.group-min-fields input{
+    width: 50px;
+    margin: -13px 10px 20px 0;
+    float: left;
+    text-align: center;
+    padding: 0;
+}
+
+.group-min-fields label{
+    margin: 8px 0 8px 0;
+    float: left;
+    line-height: 19px;
+}
+
+#campo2 input, #campo4 input{
+    margin-top: -2px;
+}
+
+.form-estabelecimentos input[type="submit"]{
+    background: red;
+    color: #fff;
+    font-weight: bold;
+    width: 300px;
+    margin: 0 auto;
+    float: none;
+}
