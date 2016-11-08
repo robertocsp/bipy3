@@ -1,5 +1,5 @@
 ﻿<!doctype html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta property="og:image" content="" />
@@ -180,7 +180,7 @@ Com seu cadastro, você ainda ganha um  desconto no mês de adesão ao serviço!
                 </div>
                     <form class="form-estabelecimentos">
                         <div class="col-md-6 wow fadeInRight animated" data-wow-offset="10" data-wow-duration="1.5s">
-                            <input type="text" name="nome" placeholder="Digite aqui o nome estabelecimento..." /><br>
+                            <input type="text" name="nome" required="required" placeholder="Digite aqui o nome estabelecimento..." /><br>
                             <select name="tipo_estabelecimento">
                                 <option value="-1">Selecione o tipo do seu estabelecimento</option>
                                 <option value="bar">Bar</option>
@@ -190,79 +190,92 @@ Com seu cadastro, você ainda ganha um  desconto no mês de adesão ao serviço!
                                 <option value="padaria">Padaria</option>
                                 <option value="outro">Outro</option>
                             </select><br>
-                            <input type="text" name="email" placeholder="Digite aqui o seu email..." /><br>
+                            <input type="email" required="required" name="email" placeholder="Digite aqui o seu email..." /><br>
                             <input class="telefone-estabelecimento" type="text" name="telefone" placeholder="Digite aqui o seu telefone de contato..." /><br>
                             <input class="cep-estabelecimento" type="text" name="cep" placeholder="Digite aqui o CEP do estabelecimento..." /><br>
                             <textarea placeholder="Digite aqui quais os principais problemas de atendimento do seu estabelecimento..."></textarea><br>
-                            <label>Caso tenha duvida ou queira acrescentar algo, ordene com as setas os itens ao lado, priorizando os principais problemas no atendimento do seu estabelecimento.</label>
+
                         </div>
                         <div class="col-md-6 left-align wow fadeInLeft animated" data-wow-offset="10" data-wow-duration="1.5s">
+                            <label>Caso tenha duvida ou queira acrescentar algo, ordene com as setas os itens abaixo, priorizando os principais problemas no atendimento do seu estabelecimento.</label>
                             <div class="group-min-fields">
                                 <label id="campo1">
                                     <input value="1" type="hidden" name="campo1" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Muitos erros na anotação dos pedidos
+                                    <span>Muitos erros na anotação dos pedidos</span>
                                 </label>
                                 <label id="campo2">
                                     <input value="2" type="hidden" name="campo2" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Garçons demoram para conseguir acessar  os clientes e tomar seus pedidos
+                                    <span>Garçons demoram para conseguir acessar  os clientes e tomar seus pedidos</span>
                                 </label>
 
                                 <label id="campo3">
                                     <input value="3" type="hidden" name="campo3" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Perco pedidos por falta de disponibilidade de garçons</label>
+                                    <span>Perco pedidos por falta de disponibilidade de garçons</span>
+                                </label>
 
                                 <label id="campo4">
                                     <input value="4" type="hidden" name="campo4" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Percebo que os garçons não conseguem ser atenciosos aos clientes e pedidos</label>
+                                    <span>Percebo que os garçons não conseguem ser atenciosos aos clientes e pedidos</span>
+                                </label>
 
                                 <label id="campo5">
                                     <input value="5" type="hidden" name="campo5" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Tenho problema em organizar a fila de pedidos a serem atendidos</label>
+                                    <span>Tenho problema em organizar a fila de pedidos a serem atendidos</span>
+                                </label>
 
                                 <label id="campo6">
                                     <input value="6" type="hidden" name="campo6" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Não consigo oferecer promoções e ofertas aos meus clientes</label>
+                                    <span>Não consigo oferecer promoções e ofertas aos meus clientes</span>
+                                </label>
 
                                 <label id="campo7">
                                     <input value="7" type="hidden" name="campo7" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Gostaria de conhecer o nível de satisfação do meu cliente</label>
+                                    <span>Gostaria de conhecer o nível de satisfação do meu cliente</span>
+                                </label>
 
                                 <label id="campo8">
                                     <input value="8" type="hidden" name="campo8" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Gostaria de oferecer comanda individual para meus clientes</label>
+                                    <span>Gostaria de oferecer comanda individual para meus clientes</span>
+                                </label>
 
                                 <label id="campo9">
                                     <input value="9" type="hidden" name="campo9" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Gostaria de oferecer pagamento via celular para meus clientes</label>
+                                    <span>Gostaria de oferecer pagamento via celular para meus clientes</span>
+                                </label>
 
                                 <label id="campo10">
                                     <input value="10" type="hidden" name="campo10" />
                                     <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
                                     <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
-                                    &nbsp;Gostaria de mapear meus clientes mais fiéis</label>
+                                    <span>Gostaria de mapear meus clientes mais fiéis</span>
+                                </label>
                             </div>
 
                         </div>
-                        <input type="button" value="ENVIAR"/>
+                        <div>
+                            <input id="envia-form" type="submit" value="ENVIAR"/>
+                            <span id="carregando" class="loading-login" style="display: none;">carregando...</span>
+                        </div>
                     </form>
+                </div>
         </div>
       </div>
     </section>

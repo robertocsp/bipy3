@@ -226,4 +226,12 @@ jQuery(function( $ ){
         $('.form-estabelecimentos i.fa-arrow-down').bind('click', setaParaBaixo);
     };
     $('.form-estabelecimentos i.fa-arrow-down').bind('click', setaParaBaixo);
+
+    //Envio
+
+    $('#envia-form').click(function(){
+        if($("form")[0].checkValidity()) {
+            console.log("valid form");
+        }else console.log("invalid form");
+    });
 });

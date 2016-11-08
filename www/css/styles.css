@@ -1133,17 +1133,17 @@ h3{
 }
 
 .form-estabelecimentos input, .form-estabelecimentos select, .form-estabelecimentos textarea{
-    height: 45px;
+    height: 50px;
     width: 95%;
     float: left;
     border: 0;
     padding-left: 10px;
-    margin: 0 0 20px 0;
+    margin: 0 0 30px 0;
     background: #fff;
 }
 
 .form-estabelecimentos textarea{
-    height: 150px;
+    height: 259px;
 }
 
 .group-min-fields input{
@@ -1158,19 +1158,64 @@ h3{
     margin: 8px 0 8px 0;
     float: left;
     line-height: 19px;
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px;
+}
+
+.group-min-fields label:first-child{
+    border-top: 1px solid #ccc;
+    padding-top: 15px;
+    margin-top: 20px;
+}
+
+.group-min-fields label span{
+    display: block;
+    float: left;
+    width: 88%;
+    font-weight: normal;
+}
+
+.form-estabelecimentos i.fa-arrow-up{
+    color: green;
+    float: left;
+    display: block;
+}
+
+.form-estabelecimentos i.fa-arrow-down{
+    color: red;
+    margin: 0 10px 0 7px;
+    float: left;
+    display: block;
 }
 
 #campo2 input, #campo4 input{
     margin-top: -2px;
 }
 
-.form-estabelecimentos input[type="button"]{
+.form-estabelecimentos #campo2 i, .form-estabelecimentos #campo4 i{
+    margin-top: 12px;
+}
+
+.form-estabelecimentos input[type="submit"]{
     background: red;
     color: #fff;
     font-weight: bold;
     width: 300px;
     margin: 0 auto;
     float: none;
+}
+
+.loading-login{
+    width: 35px;
+    height: 35px;
+    text-indent: -999em;
+    background: url(../images/loaders2.gif) no-repeat 0 0;
+    background-size: 35px 35px;
+    display: block;
+    position: relative;
+    top: -41px;
+    left: 500px;
 }
 
 .form-estabelecimentos i{
