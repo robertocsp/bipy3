@@ -149,11 +149,13 @@ $(document).ready(function () {
 /* =================================
 ===  EXPAND COLLAPSE            ====
 =================================== */
-$('.expand-form').simpleexpand({
-    'defaultTarget': '.expanded-contact-form'
+/*
+jQuery(function( $ ){
+    $('.expand-form').simpleexpand({
+        'defaultTarget': '.expanded-contact-form'
+    });
 });
-
-
+*/
 
 /* =================================
 ===  STELLAR                    ====
@@ -176,3 +178,52 @@ if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
   document.querySelector('head').appendChild(msViewportStyle)
 }
 
+jQuery(function( $ ){
+    var SPMaskBehavior = function (val) {
+      return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+    },
+    spOptions = {
+      onKeyPress: function(val, e, field, options) {
+          field.mask(SPMaskBehavior.apply({}, arguments), options);
+      }
+    };
+
+    $('.telefone-estabelecimento').mask(SPMaskBehavior, spOptions);
+    $('.cep-estabelecimento').mask('00000-000');
+
+    var setaParaCima = function () {
+        $('.form-estabelecimentos i.fa-arrow-up').unbind('click');
+        $('.form-estabelecimentos i.fa-arrow-down').unbind('click');
+        var $thisLabel = $(this).siblings('input');
+        var indice = parseInt($thisLabel.val());
+        if (indice > 1)
+        {
+            var $label = $(this).closest('label');
+            var $prevLabel = $label.prev('label');
+            $prevLabel.find('input').val(indice);
+            $thisLabel.val(indice-1);
+            $prevLabel.before($label);
+        }
+        $('.form-estabelecimentos i.fa-arrow-up').bind('click', setaParaCima);
+        $('.form-estabelecimentos i.fa-arrow-down').bind('click', setaParaBaixo);
+    };
+    $('.form-estabelecimentos i.fa-arrow-up').bind('click', setaParaCima);
+
+    var setaParaBaixo = function () {
+        $('.form-estabelecimentos i.fa-arrow-up').unbind('click');
+        $('.form-estabelecimentos i.fa-arrow-down').unbind('click');
+        var $thisLabel = $(this).siblings('input');
+        var indice = parseInt($thisLabel.val());
+        if (indice < 10)
+        {
+            var $label = $(this).closest('label');
+            var $nextLabel = $label.next('label');
+            $nextLabel.find('input').val(indice);
+            $thisLabel.val(indice+1);
+            $nextLabel.after($label);
+        }
+        $('.form-estabelecimentos i.fa-arrow-up').bind('click', setaParaCima);
+        $('.form-estabelecimentos i.fa-arrow-down').bind('click', setaParaBaixo);
+    };
+    $('.form-estabelecimentos i.fa-arrow-down').bind('click', setaParaBaixo);
+});

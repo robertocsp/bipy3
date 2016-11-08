@@ -1164,11 +1164,15 @@ h3{
     margin-top: -2px;
 }
 
-.form-estabelecimentos input[type="submit"]{
+.form-estabelecimentos input[type="button"]{
     background: red;
     color: #fff;
     font-weight: bold;
     width: 300px;
     margin: 0 auto;
     float: none;
+}
+
+.form-estabelecimentos i{
+    cursor: pointer;
 }

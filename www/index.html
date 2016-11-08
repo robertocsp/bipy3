@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="assets/app-icons/styles.css">
     <!--[if lte IE 7]><script src="lte-ie7.js"></script><![endif]-->
 
-    <link href='http://fonts.googleapis.com/css?family=Roboto:100,300,100italic,400,300italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Roboto:100,300,100italic,400,300italic' rel='stylesheet' type='text/css'>
 
     <link rel="stylesheet" href="css/owl.theme.css">
     <link rel="stylesheet" href="css/owl.carousel.css">
@@ -29,7 +29,7 @@
    <link rel="stylesheet" href="css/colors/blue.css"> 
     <link rel="stylesheet" href="css/responsive.css">
 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 </head>
 <body>
@@ -181,45 +181,87 @@ Com seu cadastro, você ainda ganha um  desconto no mês de adesão ao serviço!
                     <form class="form-estabelecimentos">
                         <div class="col-md-6 wow fadeInRight animated" data-wow-offset="10" data-wow-duration="1.5s">
                             <input type="text" name="nome" placeholder="Digite aqui o nome estabelecimento..." /><br>
-                            <select>
-                                <option for="default">Selecione o tipo do seu estabelecimento</option>
-                                <option>Bar</option>
-                                <option>Restaurante</option>
-                                <option>Lanchonete</option>
-                                <option>Hotel</option>
-                                <option>Padaria</option>
-                                <option>Outro</option>
+                            <select name="tipo_estabelecimento">
+                                <option value="-1">Selecione o tipo do seu estabelecimento</option>
+                                <option value="bar">Bar</option>
+                                <option value="restaurante">Restaurante</option>
+                                <option value="lanchonete">Lanchonete</option>
+                                <option value="hotel">Hotel</option>
+                                <option value="padaria">Padaria</option>
+                                <option value="outro">Outro</option>
                             </select><br>
-                            <input type="text" name="nome" placeholder="Digite aqui o seu email..." /><br>
-                            <input type="text" name="nome" placeholder="Digite aqui o seu telefone de contato..." /><br>
-                            <input type="text" name="nome" placeholder="Digite aqui o CEP do estabelecimento..." /><br>
+                            <input type="text" name="email" placeholder="Digite aqui o seu email..." /><br>
+                            <input class="telefone-estabelecimento" type="text" name="telefone" placeholder="Digite aqui o seu telefone de contato..." /><br>
+                            <input class="cep-estabelecimento" type="text" name="cep" placeholder="Digite aqui o CEP do estabelecimento..." /><br>
                             <textarea placeholder="Digite aqui quais os principais problemas de atendimento do seu estabelecimento..."></textarea><br>
-                            <label>Caso tenha duvida ou queira acrescentar algo, numere de 1 a 10 os itens ao lado, priorizando os principais problemas no atendimento no seu estabelecimento.</label>
+                            <label>Caso tenha duvida ou queira acrescentar algo, ordene com as setas os itens ao lado, priorizando os principais problemas no atendimento do seu estabelecimento.</label>
                         </div>
                         <div class="col-md-6 left-align wow fadeInLeft animated" data-wow-offset="10" data-wow-duration="1.5s">
                             <div class="group-min-fields">
-                                <label id="campo1"><input value="1" type="text" name="campo1" />Muitos erros na anotação dos pedidos</label>
-                                <label id="campo2"><input value="2" type="text" name="campo2" />Garçons demoram para conseguir acessar  os clientes e tomar seus pedidos</label><br>
+                                <label id="campo1">
+                                    <input value="1" type="hidden" name="campo1" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Muitos erros na anotação dos pedidos
+                                </label>
+                                <label id="campo2">
+                                    <input value="2" type="hidden" name="campo2" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Garçons demoram para conseguir acessar  os clientes e tomar seus pedidos
+                                </label>
 
-                                <label id="campo3"><input value="3" type="text" name="campo3" />Perco pedidos por falta de disponibilidade de garçons</label><br>
+                                <label id="campo3">
+                                    <input value="3" type="hidden" name="campo3" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Perco pedidos por falta de disponibilidade de garçons</label>
 
-                                <label id="campo4"><input value="4" type="text" name="campo4" />Percebo que os garçons não conseguem ser atenciosos aos clientes e pedidos</label><br>
+                                <label id="campo4">
+                                    <input value="4" type="hidden" name="campo4" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Percebo que os garçons não conseguem ser atenciosos aos clientes e pedidos</label>
 
-                                <label id="campo5"><input value="5" type="text" name="campo5" />Tenho problema em organizar a fila de pedidos a serem atendidos</label><br>
+                                <label id="campo5">
+                                    <input value="5" type="hidden" name="campo5" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Tenho problema em organizar a fila de pedidos a serem atendidos</label>
 
-                                <label id="campo6"><input value="6" type="text" name="campo6" />Não consigo oferecer promoções e ofertas aos meus clientes</label><br>
+                                <label id="campo6">
+                                    <input value="6" type="hidden" name="campo6" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Não consigo oferecer promoções e ofertas aos meus clientes</label>
 
-                                <label id="campo7"><input value="7" type="text" name="campo7" />Gostaria de conhecer o nível de satisfação do meu cliente</label><br>
+                                <label id="campo7">
+                                    <input value="7" type="hidden" name="campo7" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Gostaria de conhecer o nível de satisfação do meu cliente</label>
 
-                                <label id="campo8"><input value="8" type="text" name="campo8" />Gostaria de oferecer comanda individual para meus clientes</label><br>
+                                <label id="campo8">
+                                    <input value="8" type="hidden" name="campo8" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Gostaria de oferecer comanda individual para meus clientes</label>
 
-                                <label id="campo9"><input value="9" type="text" name="campo9" />Gostaria de oferecer pagamento via celular para meus clientes</label><br>
+                                <label id="campo9">
+                                    <input value="9" type="hidden" name="campo9" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Gostaria de oferecer pagamento via celular para meus clientes</label>
 
-                                <label id="campo10"><input value="10" type="text" name="campo10" />Gostaria de mapear meus clientes mais fiéis</label><br>
+                                <label id="campo10">
+                                    <input value="10" type="hidden" name="campo10" />
+                                    <i class="fa fa-arrow-up fa-1x" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down fa-1x" aria-hidden="true"></i>
+                                    &nbsp;Gostaria de mapear meus clientes mais fiéis</label>
                             </div>
 
                         </div>
-                        <input type="submit" value="ENVIAR"/>
+                        <input type="button" value="ENVIAR"/>
                     </form>
         </div>
       </div>
@@ -269,6 +311,7 @@ Com seu cadastro, você ainda ganha um  desconto no mês de adesão ao serviço!
         <script src="js/matchMedia.js"></script>
         <script src="js/jquery.ajaxchimp.min.js"></script>
         <script src="js/jquery.fitvids.js"></script>
+        <script src="js/jquery.mask.min.js"></script>
         <script src="js/custom.js"></script>
 </body>
 </html>
