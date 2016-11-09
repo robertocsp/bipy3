@@ -228,10 +228,53 @@ jQuery(function( $ ){
     $('.form-estabelecimentos i.fa-arrow-down').bind('click', setaParaBaixo);
 
     //Envio
+    function montaDados(jsonArray)
+    {
+        var json_envio = {};
+        for (var i in jsonArray)
+        {
+            if(jsonArray[i].name.startsWith('campo'))
+            {
+                if(json_envio['ordem_campos']===undefined)
+                    json_envio['ordem_campos'] = [];
+                json_envio['ordem_campos'].push($('#'+jsonArray[i].name+' span').html());
+            }
+            else
+            {
+                json_envio[jsonArray[i].name] = jsonArray[i].value;
+            }
+        }
+        return json_envio;
+    }
 
-    $('#envia-form').click(function(){
-        if($("form")[0].checkValidity()) {
-            console.log("valid form");
-        }else console.log("invalid form");
-    });
+    var form_estabelecimentos_function = function(){
+        if($(this)[0].checkValidity()) {
+            $('.form-estabelecimentos').unbind('submit');
+            $('#carregando').show();
+
+            var dados_envio = montaDados($(this).serializeArray());
+
+            $outer_this = $(this);
+            $.post('https://sistema.marviin.com.br/marviin/api/rest/pesquisa_estabelecimento',
+                     {formulario_estabelecimento: JSON.stringify(dados_envio)},
+                     function(data) {
+                       console.log(data);
+                     },
+                     'json'
+            )
+            .fail(function(data) {
+                console.log(data);
+            })
+            .always(function() {
+                $('#carregando').hide();
+                $outer_this[0].reset();
+                $('.form-estabelecimentos').bind('submit', form_estabelecimentos_function);
+            });
+        }
+        else
+        {
+            console.log("invalid form");
+        }
+    };
+    $('.form-estabelecimentos').bind('submit', form_estabelecimentos_function);
 });
