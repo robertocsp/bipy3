@@ -2,11 +2,13 @@
 from django.db import models
 from django.contrib.auth.models import Group
 from jsonfield import JSONField
+from utils import BigAutoField, BigForeignKey
 
 # Create your models here.
 
 
 class Loja(models.Model):
+    id = BigAutoField(primary_key=True, editable=False)
     id_loja_facebook = models.CharField('id_loja_facebook', max_length=128, unique=True, null=True, blank=True)
     nome = models.CharField('nome', max_length=100)
     endereco = models.CharField('endereco', max_length=200, null=True, blank=True)
@@ -36,6 +38,7 @@ class Loja(models.Model):
 
 
 class Questionario(models.Model):
-    loja = models.ForeignKey(Loja, null=False, blank=False)
+    id = BigAutoField(primary_key=True, editable=False)
+    loja = BigForeignKey(Loja, null=False, blank=False)
     descr_problemas = models.TextField('descr_problemas', null=True, blank=True)
     problemas = JSONField('problemas', null=True, blank=True)

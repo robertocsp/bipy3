@@ -14,7 +14,7 @@ logger = logging.getLogger('django')
 class Notificacao(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    loja = models.ForeignKey(Loja, null=False, blank=False)
+    loja = BigForeignKey(Loja, null=False, blank=False)
     info = JSONField()
     dt_criado = models.DateTimeField(null=False)
     dt_visto = models.DateTimeField(null=True)
