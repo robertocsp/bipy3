@@ -326,9 +326,12 @@ header .full-screen {
 }
 
 .sticky-navigation .main-navigation .current a {
-  color: #000000 !important;
   position: relative;
   outline: none;
+}
+
+.sticky-navigation .main-navigation a.active {
+   color: #000000 !important;
 }
 
 .sticky-navigation .main-navigation li a {
@@ -474,7 +477,7 @@ header .intro-section .buttons {
 }
 
 .app-brief .phone-image {
-    max-width: 501px;
+    max-width: 100%;
     margin: auto;
     margin-bottom: 50px;
 }
@@ -895,6 +898,11 @@ footer{
     background: transparent;
 }
 
+#problemas{
+    height: 606px;
+    min-height: 606px;
+}
+
 #comofunciona.linha{
     background: url(../images/bg-1.jpg) no-repeat 0 -150px;
     background-size: cover;
@@ -906,7 +914,7 @@ footer{
 #comofunciona:before{
     background: rgba(0,0,0, .7);
     content: " ";
-    height: 429px;
+    height: 420px;
     width: 100%;
     position: absolute;
     left: 0;
@@ -956,11 +964,6 @@ footer{
     font-family: 'Lane', sans-serif;
 	font-size: 20px;
     padding: 20px;
-}
-
-#oquee.linha{
-	min-height: 400px;
-	background: #fff;
 }
 
 #home{
@@ -1061,10 +1064,6 @@ footer{
     position: absolute;
     z-index: 100;
     width: 100%;
-}
-
-.geral .navbar-fixed-top, .navbar-fixed-bottom {
-    position: absolute;
 }
 
 .hot-site-logo{
@@ -1220,4 +1219,338 @@ h3{
 
 .form-estabelecimentos i{
     cursor: pointer;
+}
+
+.btn-link{
+    color: #fff;
+    font-weight: bold;
+    display: block;
+    float: left;
+    background: red;
+    padding: 20px 30px;
+    margin-top: 40px;
+    font-size: 20px;
+}
+
+.btn-link:hover{
+    color: #fff;
+    font-weight: bold;
+    display: block;
+    float: left;
+    background: red;
+    padding: 20px 30px;
+    margin-top: 40px;
+    text-decoration: underline;
+    font-size: 20px;
+}
+
+.right, .right:hover{
+    float: right;
+}
+
+#oquee p{
+    font-size: 19px;
+}
+
+.coluna{
+    width: 17%;
+    float: left;
+    height: 400px;
+    background-color: #f00;
+    padding: 10px;
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px transparent;
+    position: relative;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-property: transform;
+    transition-property: transform;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.coluna:hover, .coluna:focus, .coluna:active{
+    -webkit-transform: translateY(-15px);
+    transform: translateY(-15px);
+}
+
+.btn-interesse{
+    width: 15%;
+    padding: 0;
+    float: left;
+    height: 400px;
+    background-color: #f00;
+    display: inline-block;
+}
+
+.btn-interesse a{
+    padding: 38px 0;
+    height: 200px;
+    margin-top: 0;
+    display: inline-block;
+    vertical-align: middle;
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px transparent;
+    position: relative;
+    -webkit-transition-property: color;
+    transition-property: color;
+    -webkit-transition-duration: 0.5s;
+    transition-duration: 0.5s;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.btn-interesse a:hover{
+    padding: 38px 0;
+    margin-top: 0;
+    color: white;
+}
+
+.btn-interesse a:hover:before{
+    -webkit-transform: scaleX(1);
+    transform: scaleX(1);
+    -webkit-transition-timing-function: cubic-bezier(0.52, 1.64, 0.37, 0.66);
+    transition-timing-function: cubic-bezier(0.52, 1.64, 0.37, 0.66);
+}
+
+.btn-interesse a:before{
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #2098D1;
+    -webkit-transform: scaleX(0);
+    transform: scaleX(0);
+    -webkit-transform-origin: 0 50%;
+    transform-origin: 0 50%;
+    -webkit-transition-property: transform;
+    transition-property: transform;
+    -webkit-transition-duration: 0.5s;
+    transition-duration: 0.5s;
+    -webkit-transition-timing-function: ease-out;
+    transition-timing-function: ease-out;
+}
+
+.btn-interesse a:first-child{
+    border-bottom: 2px solid #fff;
+}
+
+.coluna h3{
+    margin: 150px 0 0 0;
+    font-weight: bold;
+    background: rgba(0,0,0, .7);
+    float: left;
+    padding: 10px;
+}
+
+.geral .coluna .colored-line{
+    background: #fff;
+    margin-top: 5px;
+}
+
+.pedrap{
+    background: url('../images/cozinha.png') no-repeat 0 0;
+    background-size: 100% 100%;
+}
+
+.cardpalm{
+    background: url('../images/menu.png') no-repeat 0 0;
+    background-size: 100% 100%;
+}
+
+.chamegar{
+    background: url('../images/pedido-mao.png') no-repeat 0 0;
+    background-size: 100% 100%;
+}
+
+.contin{
+    background: url('../images/dashboard.png') no-repeat 0 0;
+    background-size: 100% 100%;
+}
+
+.maiorap{
+    background: url('../images/atendimento.png') no-repeat 0 0;
+    background-size: 100% 100%;
+}
+
+.coluna-video{
+    float: right;
+    width: 50%;
+    margin: 180px 0 0 0;
+}
+
+.coluna-info{
+    float: left;
+    width: 49%;
+    padding: 30px;
+    margin: 80px 0 0 0;
+}
+
+#oquee.linha{
+    min-height: 530px;
+    background: #fff;
+    padding: 0;
+    height: 600px;
+}
+
+.coluna-left{
+    float: left;
+    width: 49%;
+}
+
+.coluna-left img{
+    float: left;
+}
+
+.coluna-right {
+    float: left;
+    width: 49%;
+    padding-top: 170px;
+}
+
+.coluna-right h2{
+    font-size: 30px;
+    font-weight: bold;
+    line-height: 22px;
+}
+
+.linha-infos{
+    float: left;
+    width: 100%;
+    margin: 30px 0 0 0;
+}
+
+.linha-dashboard{
+    width: 1170px;
+    margin: 0 auto;
+    float: none;
+}
+
+.linha-dashboard .coluna-left{
+    margin: 50px 0 50px 0;
+}
+
+.link-mais{
+    width: 100%;
+    float: left;
+}
+
+.link-mais a{
+    float: left;
+    width: 50%;
+    display: block;
+    background: #f00;
+    color: #fff;
+    font-weight: bold;
+    font-size: 17px;
+    padding: 30px 0;
+}
+
+.link-mais a:first-child{
+    border-right: 1px solid #fff;
+}
+
+.estabelecimento #vantagens{
+    margin: 75px 0 0;
+    height: 582px;
+    min-height: 520px;
+}
+
+.estabelecimento #home:before{
+    background: transparent;
+}
+
+.col-left-van{
+    padding: 0;
+}
+
+.estabelecimento .app-brief h2 {
+    margin-top: 35px;
+    margin-bottom: 5px;
+}
+
+.estabelecimento .app-brief .phone-image img {
+    height: 359px;
+    width: 521px;
+    margin: 80px 0 0;
+}
+
+.estabelecimento #estabelecimento{
+    background-color: #ccc !important;
+}
+
+.como-comecar{
+    float: left;
+    width: 100%;
+    margin: 40px 0 50px 5px;
+}
+
+.como-comecar li{
+    float: left;
+    display: block;
+    padding: 20px 30px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 35px;
+    margin: 20px 0 0 0;
+}
+
+.como-comecar li:first-child{
+    background: red;
+    margin-top: 0;
+}
+
+.como-comecar li:last-child{
+    background: #000;
+    font-size: 18px;
+}
+
+.como-comecar li.seg{
+    background: #ccc;
+    font-size: 17px;
+    margin-left: 20px;
+}
+
+.como-comecar li span{
+    width: 40px;
+    height: 40px;
+    float:left;
+    display: block;
+    border-radius: 50px;
+    text-align: center;
+    background: #fff;
+    color: #000;
+    padding: 2px 0 0 0;
+    margin-right: 10px;
+}
+
+.usuario .app-brief h2 {
+    margin-top: 8px;
+}
+
+.como-comecar + p{
+    width: 90%;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.usuario .form-estabelecimentos{
+    width: 500px;
+    margin: 20px auto 40px auto;
+}
+
+.titulo-margin{
+    padding-top: 40px;
 }
