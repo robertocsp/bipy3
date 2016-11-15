@@ -27,13 +27,24 @@ with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marviin_conf'), 
             FB_APP_ID = key_value_pair[1]
         elif key_value_pair[0] == 'app-secret':
             FB_APP_SECRET = key_value_pair[1]
+        elif key_value_pair[0] == 'email-user':
+            EMAIL_USER = key_value_pair[1]
+        elif key_value_pair[0] == 'email-password':
+            EMAIL_PASSWORD = key_value_pair[1]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', 'sistema.marviin.com.br', 'bipy3.com']
+ALLOWED_HOSTS = ['localhost', '.marviin.com.br']
 
 ADMINS = [('Gus', 'gustavo@marviin.com.br')]
+
+# Email configuration
+# EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.marviin.com.br'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = EMAIL_USER
+EMAIL_HOST_PASSWORD = EMAIL_PASSWORD
 
 LOGIN_URL = '/'
 

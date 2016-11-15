@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from marviin.websocket import ws
 from pedido.models import Pedido, ItemPedido
 from cliente.models import Cliente
-from loja.models import Loja
+from loja.models import Loja, Questionario
 from notificacao.models import Notificacao
 from fb_acesso.models import Fb_acesso
 from pedido.templatetags.pedido_tags import minutos_passados
@@ -20,13 +20,13 @@ from django.db import transaction
 from django.db.models import Max, Q
 from django.conf import settings
 from django.http import HttpResponse
+from django.core.mail import EmailMessage
 
 from string import Template
 from datetime import datetime, timedelta, date
 import json
 import logging
 import requests
-import pedido.templatetags.pedido_tags
 
 logger = logging.getLogger('django')
 
@@ -735,3 +735,48 @@ class CardapioView(views.APIView):
         cardapios = Cardapio.objects.filter(loja=loja.id).order_by('pagina')
         cardapio_payload = ['https://sistema.marviin.com.br' + cardapio.caminho for cardapio in cardapios]
         return Response({'success': True, 'cardapio': cardapio_payload})
+
+
+class FormularioInteresseView(views.APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        dados = json.loads(request.data.get('formulario_estabelecimento'))
+        logger.debug('===---=-=--=--=-=-= dados fomrulario::: ' + repr(dados))
+        loja = Loja()
+        loja.nome = dados['nome']
+        loja.nome_contato = dados['contato']
+        loja.tipo_loja = dados['tipo_estabelecimento']
+        loja.email = dados['email']
+        loja.telefone1 = dados['telefone']
+        loja.cep = dados['cep']
+        loja.save()
+        questionario = Questionario()
+        questionario.loja = loja
+        questionario.descr_problemas = dados['descricao_problemas']
+        questionario.problemas = dados['ordem_campos']
+        questionario.save()
+
+        body = u'<h2>Informações fornecidas</h2><br>' \
+               u'<strong>Nome do estabelecimento:</strong> ' + loja.nome + u'<br><br>' \
+               u'<strong>Nome do contato:</strong> ' + loja.nome_contato + u'<br><br>' \
+               u'<strong>Tipo de estabelecimento:</strong> ' + loja.tipo_loja + u'<br><br>' \
+               u'<strong>Email:</strong> ' + loja.email + u'<br><br>' \
+               u'<strong>Telefone:</strong> ' + loja.telefone1 + u'<br><br>' \
+               u'<strong>CEP:</strong> ' + loja.cep + u'<br><br>' \
+               u'<strong>Descrição problemas:</strong> ' + questionario.descr_problemas + u'<br><br>' \
+               u'<strong>Ordem dos principais problemas:</strong><br><ol>'
+        for problema in questionario.problemas:
+            body += u'<li>' + problema + u'</li>'
+        body += u'</ol>'
+
+        msg = EmailMessage(
+            u'[Site] Formulário de interesse',
+            body,
+            'contato@marviin.com.br',
+            ['contato@marviin.com.br']
+        )
+        msg.content_subtype = "html"
+        msg.send()
+
+        return Response({'success': True})

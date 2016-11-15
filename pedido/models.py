@@ -39,7 +39,7 @@ class Pedido(models.Model):
     )
     origem = models.CharField(max_length=20, choices=ORIGEM, blank=True, null=True)
     mesa = models.CharField(max_length=50, blank=True, null=True)
-    loja = models.ForeignKey(Loja, null=True, blank=True)
+    loja = BigForeignKey(Loja, null=True, blank=True)
     cliente = BigForeignKey(Cliente, null=True, blank=True)
 
     def save(self, *args, **kwargs):
