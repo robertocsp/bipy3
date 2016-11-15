@@ -77,6 +77,7 @@ function receiveMessage(msg) {
             notifyImage = input.foto_cliente;
         }
         notify('marviin', input.origem, notifyText, notifyImage, undefined, input.notificacao_uuid);
+        $('#novo_pedido_som')[0].play();
     }
     else if(input.origem === 'sync_status')
     {
