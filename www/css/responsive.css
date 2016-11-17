@@ -95,8 +95,50 @@ RESPONSIVE FIXES
         font-size: 80%;
     }
 
-    .navbar-inverse .navbar-toggle, .app-brief .phone-image, #comofunciona:before {
+    .app-brief .phone-image, #comofunciona:before {
         display: none;
+    }
+
+    .navbar-toggle .icon-bar{
+        background-color: #000;
+    }
+
+    .estabelecimento .navbar {
+        margin-top: 0;
+    }
+
+    .navbar {
+        margin-bottom: 0;
+        top: 0;
+        height: 70px;
+        margin-top: -22px;
+    }
+
+    .navbar-collapse.in {
+        overflow-y: auto;
+        background: #fff;
+        margin-top: -14px;
+        border-top: 1px solid #aaa;
+        width: 101%;
+        margin: -14px 0 0 -2px;
+        z-index: 2000;
+        position: absolute;
+    }
+
+    .navbar-nav>li>a {
+        color: #999;
+    }
+
+    .entenda{
+        display: none;
+    }
+
+    .navbar-nav>li>a.active {
+        color: #000;
+    }
+
+    #home .section-header {
+        width: 100%;
     }
 
     .meio {
@@ -221,7 +263,7 @@ RESPONSIVE FIXES
     }
 
     #oquee.linha {
-        height: 660px;
+        height: 850px;
     }
 
     .btn-interesse {
@@ -254,6 +296,36 @@ RESPONSIVE FIXES
 
     .link-mais a {
         width: 100%;
+    }
+    .estabelecimento #vantagens {
+        margin: 0 0 0;
+        height: auto;
+    }
+
+    #estabelecimento .container{
+        padding: 0;
+    }
+
+    #estabelecimento input, #estabelecimento select, #estabelecimento textarea{
+        width: 100%;
+    }
+
+    .group-min-fields label span {
+        width: 82%;
+    }
+
+    .como-comecar li{
+        line-height: 20px;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .como-comecar li span {
+        padding: 9px 0 0 0;
+    }
+
+    .usuario .form-estabelecimentos {
+        width: 98%;
     }
 
 }
