@@ -100,8 +100,7 @@ RESPONSIVE FIXES
     }
 
     .meio {
-        width: 96%;
-        padding: 0 2%;
+        width: 100%;
     }
 
     #fale.linha .container {
@@ -211,6 +210,52 @@ RESPONSIVE FIXES
         width: 80%;
         margin-bottom: 10px;
     }
+
+    .coluna {
+        width: 100%;
+    }
+
+    .coluna-info {
+        width: 100%;
+        margin-top: 0;
+    }
+
+    #oquee.linha {
+        height: 660px;
+    }
+
+    .btn-interesse {
+        width: 100%;
+    }
+
+    .functions{
+        width: 100%;
+        float: left;
+        margin: 30px 0 0 0;
+    }
+
+    #problemas {
+        height: auto;
+        padding-bottom: 0;
+    }
+
+    .coluna-right{
+        padding-top: 0;
+        width: 100%;
+    }
+
+    .linha-dashboard {
+        width: 100%;
+    }
+
+    .link-mais{
+        padding: 0;
+    }
+
+    .link-mais a {
+        width: 100%;
+    }
+
 }
 
 @media (max-width: 480px) {
@@ -303,4 +348,5 @@ RESPONSIVE FIXES
         font-size: 14px;
         padding: 8px 5px;
     }
+
 }

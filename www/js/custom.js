@@ -9,6 +9,11 @@ jQuery(window).load(function() {
 	jQuery(".preloader").delay(1000).fadeOut("slow");
 })
 
+  if(window.screen.width <= 640){
+        $(".coluna-video, .linha-infos .coluna-left").remove();
+
+  }
+
 /* =================================
 ===  RESPONSIVE VIDEO           ====
 =================================== */
