@@ -33,3 +33,7 @@ def cadastro(request):
 @login_required
 def termos(request):
     return render(request, 'termos.html')
+
+@login_required
+def cadastraCardapio(request):
+    return render(request, 'cad-cardapio.html')

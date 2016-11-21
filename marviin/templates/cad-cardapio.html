@@ -1,0 +1,269 @@
+{% extends "includes/layout.html" %}
+
+{% block upload %}active{% endblock %}
+
+{% block conteudo %}
+
+<div class="container upload">
+    <div class="contem-cardapio">
+        <div class="page-header">
+            <h1><span class="glyphicon glyphicon-cutlery" aria-hidden="true"></span> Controle do Cardápio</h1>
+        </div>
+        <a href="#categoria" class="fancybox btn btn-primary btn-verde"><i class="fa fa-pencil" aria-hidden="true"></i> Adicionar Categoria</a>
+        <a href="#ItemPrincipal" class="fancybox btn btn-primary btn-verde"><i class="fa fa-pencil" aria-hidden="true"></i> Adicionar Item Cardapio</a>
+        <a href="#acompanhamento" class="fancybox btn btn-primary btn-verde"><i class="fa fa-pencil" aria-hidden="true"></i> Adicionar Lista Sub Itens</a>
+        <a href="#taxaentrega" class="fancybox btn btn-primary btn-verde"><i class="fa fa-pencil" aria-hidden="true"></i> Adicionar Taxa de Entrega</a>
+        <a href="#itemGratis" class="fancybox btn btn-primary btn-verde"><i class="fa fa-pencil" aria-hidden="true"></i> Adicionar Item Gratis</a><br>
+        <br>
+             <a class="btn btn-primary" href="javascript: void(0);"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Visualizar Cardápio
+              </a>
+              <br /><br />
+        <div class="lista-cardapio">
+            <div class="col-left">
+                <h2><i class="fa fa-list-ul" aria-hidden="true"></i> lista categoria/Itens principais</h2>
+                <ul class="lista-categoria">
+                    <li class="item-principal">
+                        <div class="sup-categoria">
+                            <span>Pratos</span><span class="right"><a href="#categoria" class="fancybox"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a></span>
+                        </div>
+                        <ul>
+                            <li>
+                                <img class="img-item" src="../static/marviin/img/imagem-test-cardapio.jpg" width="100px" height="100px" />
+                                <div class="conteudo-info">
+                                    <p class="titulo"><strong>File de frango com fritas e farofa</strong></p>
+                                    <p class="preco">R$ 14,50</p>
+                                    <div class="editar-acompanhamento">
+                                        <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#ItemPrincipal"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a>
+                                        <a class="btn btn-default" href="javascript:void(0)" class="abre-acompanhamentos"><i class="fa fa-exchange" aria-hidden="true"></i> Sub Item</a></p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <img class="img-item" src="../static/marviin/img/macarrao-test.jpg" width="100px" height="100px" />
+                                <div class="conteudo-info">
+                                    <p class="titulo"><strong>Espaguete com queijo resvalado e mollho rose</strong></p>
+                                    <p class="preco">R$ 34,50</p>
+                                    <div class="editar-acompanhamento">
+                                        <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#ItemPrincipal"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="item-principal">
+                        <div class="sup-categoria">
+                            <span>Bebidas</span><span class="right"><a href="#categoria" class="fancybox"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a></span>
+                        </div>
+                        <ul>
+                            <li>
+                                <img class="img-item" src="../static/marviin/img/cerveja-gelada.jpg" width="100px" height="100px" />
+                                <div class="conteudo-info">
+                                    <p class="titulo"><strong>Cerveja</strong></p>
+                                    <p class="preco"><span>A partir de</span> R$ 8,90</p>
+                                    <div class="editar-acompanhamento">
+                                        <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#ItemPrincipal"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a>
+                                        <a class="btn btn-default" href="javascript:void(0)" class="abre-acompanhamentos"><i class="fa fa-exchange" aria-hidden="true"></i> Sub Item</a></p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <img class="img-item" src="../static/marviin/img/refris.jpg" width="100px" height="100px" />
+                                <div class="conteudo-info">
+                                    <p class="titulo"><strong>Refrigerante</strong></p>
+                                    <p class="preco"></p>
+                                    <div class="editar-acompanhamento">
+                                        <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#ItemPrincipal"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a>
+                                        <a class="btn btn-default" href="javascript:void(0)" class="abre-acompanhamentos"><i class="fa fa-exchange" aria-hidden="true"></i> Sub Item</a></p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="coluna-right">
+                <h2><i class="fa fa-list" aria-hidden="true"></i> lista Sub Itens - File de frango com...</h2>
+                <div class="conteudo-info">
+                    <p class="titulo"><strong>Acompanhamento pagina 1</strong></p>
+                    <p class="min-item"><strong>Mínimo de itens:</strong> 0</p>
+                    <p class="max-item"><strong>Máximo de itens:</strong> 6</p>
+                    <p class="tipo-item"><strong>Tipo:</strong> Escolha unica</p>
+                    <div class="editar-acompanhamento">
+                        <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#acompanhamento"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a></p>
+                    </div>
+                </div>
+                <div class="conteudo-info">
+                    <p class="titulo"><strong>Acompanhamento pagina 2</strong></p>
+                    <p class="min-item"><strong>Mínimo de itens:</strong> 0</p>
+                    <p class="max-item"><strong>Máximo de itens:</strong> 6</p>
+                    <p class="tipo-item"><strong>Tipo:</strong> Escolha unica</p>
+                    <div class="editar-acompanhamento">
+                        <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#acompanhamento"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a></p>
+                    </div>
+                </div>
+                <div class="conteudo-info">
+                    <p class="titulo"><strong>Acompanhamento pagina 3</strong></p>
+                    <p class="min-item"><strong>Mínimo de itens:</strong> 0</p>
+                    <p class="max-item"><strong>Máximo de itens:</strong> 6</p>
+                    <p class="tipo-item"><strong>Tipo:</strong> Escolha unica</p>
+                    <div class="editar-acompanhamento">
+                        <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#acompanhamento"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="myModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Confirmação</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja modificar seu cardápio?</p>
+                    <p class="text-warning"><small>Confirmando, seu cardápio será alterado</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" onclick="uploadImages()">Confirmar alteração do cardápio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Formularios-->
+<div id="categoria" style="width:600px;display: none;">
+   <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Categoria</h2>
+   <form class="form-horizontal col-md-12"><br><br>
+        <div class="form-group">
+            <div class="">
+                <input type="text" class="form-control" id="nomeCategoria" placeholder="Nome Categoria...">
+            </div><br><br>
+            <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
+            </button>
+            <button type="submit" class="btn btn-default">
+                <span class="glyphicon glyphicon-remove"></span> Excluir
+            </button>
+        </div>
+   </form>
+</div>
+<div id="taxaentrega" style="width:600px;display: none;">
+   <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Taxa de Entrega</h2>
+   <form class="form-horizontal col-md-12"><br><br>
+        <div class="form-group">
+            <div class="">
+                <input type="number" class="form-control min-max" id="nomeCategoria" placeholder="Valor taxa de entrega..."><br>
+            </div><br><br>
+            <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
+            </button>
+            <button type="submit" class="btn btn-default">
+               <span class="glyphicon glyphicon-remove"></span> Excluir
+            </button>
+        </div>
+   </form>
+</div>
+<div id="itemGratis" style="width:600px;display: none;">
+   <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Item gratis</h2>
+   <form class="form-horizontal col-md-12"><br><br>
+        <div class="form-group">
+            <div class="">
+                <input type="text" class="form-control" id="nomeCategoria" placeholder="Descricao..."><br>
+            </div><br><br>
+            <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
+            </button>
+            <button type="submit" class="btn btn-default">
+               <span class="glyphicon glyphicon-remove"></span> Excluir
+            </button>
+        </div>
+   </form>
+</div>
+<div id="ItemPrincipal" style="width:600px;display: none;">
+   <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Item Principal</h2>
+   <form class="form-horizontal col-md-12"><br><br>
+       <div class="form-group">
+        <select class="form-control">
+            <option>Selecione o tipo de item</option>
+            <option>Simples</option>
+            <option>Composto</option>
+        </select><br>
+        <input type="text" class="form-control" id="nomeCategoria" placeholder="Nome Item..."><br>
+        <textarea type="text" class="form-control" id="nomeCategoria" placeholder="Descrição..."></textarea><br>
+        <input type="file" class="form-control" id="inputEmail" placeholder="Imagem"><br>
+        <input type="number" class="form-control" id="nomeCategoria" placeholder="Preço..."><br>
+        <label class="checkbox-inline">
+            <input type="checkbox" value="a partir de"> Inserir termo "A partir de" no preço
+        </label><br><br>
+          <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
+          </button>
+          <button type="submit" class="btn btn-default">
+               <span class="glyphicon glyphicon-remove"></span> Excluir
+          </button>
+      </div>
+   </form>
+</div>
+<div id="acompanhamento" style="width:600px;display: none;">
+   <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Sub Item</h2>
+   <form class="form-horizontal col-md-12"><br>
+       <div class="form-group">
+        <input type="text" class="form-control" id="nomeCategoria" placeholder="Titulo..."><br>
+        <textarea class="form-control" id="nomeCategoria" placeholder="Descrição..."></textarea><br>
+        <input type="number" class="form-control min-max" id="nomeCategoria" placeholder="Mínimo de itens...">
+        <input type="number" class="form-control min-max" id="nomeCategoria" placeholder="Máximo de itens..."><br>
+        <select class="form-control">
+            <option>Selecione o tipo da lista de acompanhamentos</option>
+            <option>Escolha única</option>
+            <option>Multiplas escolhas</option>
+        </select><br>
+        <h3>Itens:</h3><br>
+        <div class="lista-itens-acomp">
+            <div class="item-acomp">
+                <input type='text' class='form-control nome-item' id='nomeCategoria' placeholder='Nome...'>
+                <input type='text' class='form-control preco-item' id='nomeCategoria' placeholder='Preço...'>
+                <a class='btn btn-danger' id='remove'><i class='fa fa-times' aria-hidden='true'></i> Excluir</a>
+            </div>
+        </div>
+        <a class='btn btn-success' id='add'><i class='fa fa-plus' aria-hidden='true'></i> Adicionar Item</a><br><br><br>
+        <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
+        </button>
+        <button type="submit" class="btn btn-default">
+            <span class="glyphicon glyphicon-remove"></span> Excluir
+        </button>
+      </div>
+   </form>
+</div>
+
+<!-- inicio dialogo bot -->
+<div id="content-dialog" class="content-dialog"></div>
+<div class="bg"></div>
+
+{% endblock %}
+
+{% block scripts %}
+    {% include "includes/snippets/chat_jquery_template.html" %}
+    {% include "includes/snippets/common_js_pedido.html" %}
+    {% include "includes/snippets/notificacoes_cliente.html" %}
+    <script type="text/javascript">
+      $(document).ready(function($) {
+        //Notificacoes ===========
+        {% include "includes/snippets/notificacoes_servidor.html" with notificacoes=notificacoes %}
+      });
+
+      $(".fancybox").fancybox({
+        openEffect	: 'none',
+        closeEffect	: 'none'
+      });
+
+      $('#add').on("click", function(){
+        $('.lista-itens-acomp').append("<div class='item-acomp'><input type='text' class='form-control nome-item' id='nomeCategoria' placeholder='Nome...'><input type='text' class='form-control preco-item' id='nomeCategoria' placeholder='Preço...'><a type='text' class='btn btn-danger' id='remove'><i class='fa fa-times' aria-hidden='true'></i> Excluir</a></div>");
+      });
+    </script>
+
+{% endblock %}

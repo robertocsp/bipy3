@@ -57,3 +57,4 @@ function generateUUID() {
     });
     return uuid;
 }
+

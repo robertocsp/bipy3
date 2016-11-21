@@ -59,6 +59,7 @@ urlpatterns = [
         name='pesquisa_estabelecimento_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^upload/$', upload, name='upload'),
+    url(r'^cadastrar-cardapio/$', cadastraCardapio, name='cadastra-cardapio'),
     url(r'^upload-cardapio/$', FileFieldView.as_view(), name='upload-cardapio'),
     url(r'^download-cardapio/$', download_cardapio, name='download-cardapio'),
     url(r'^termos-e-condicoes-de-uso/$', termos, name='termos'),
