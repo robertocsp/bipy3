@@ -15,12 +15,18 @@
         <a href="#taxaentrega" class="fancybox btn btn-primary btn-verde"><i class="fa fa-pencil" aria-hidden="true"></i> Adicionar Taxa de Entrega</a>
         <a href="#itemGratis" class="fancybox btn btn-primary btn-verde"><i class="fa fa-pencil" aria-hidden="true"></i> Adicionar Item Gratis</a><br>
         <br>
-             <a class="btn btn-primary" href="javascript: void(0);"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Visualizar Cardápio
+             <a class="btn btn-primary fancybox" href="#card-princ"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Tela principal
+              </a>
+        <a class="btn btn-primary fancybox" href="#item-unico"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Tela lista escolha unica
+              </a>
+        <a class="btn btn-primary fancybox" href="#multiplos-itens"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Tela lista multiplas escolhas
+              </a>
+        <a class="btn btn-primary fancybox" href="#resumo"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Tela resumo
               </a>
               <br /><br />
         <div class="lista-cardapio">
             <div class="col-left">
-                <h2><i class="fa fa-list-ul" aria-hidden="true"></i> lista categoria/Itens principais</h2>
+                <h2><i class="fa fa-list-ul" aria-hidden="true"></i> lista categoria/Itens Cardapio</h2>
                 <ul class="lista-categoria">
                     <li class="item-principal">
                         <div class="sup-categoria">
@@ -184,9 +190,14 @@
    </form>
 </div>
 <div id="ItemPrincipal" style="width:600px;display: none;">
-   <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Item Principal</h2>
+   <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Item Cardapio</h2>
    <form class="form-horizontal col-md-12"><br><br>
        <div class="form-group">
+        <select class="form-control">
+            <option>Selecione Categoria</option>
+            <option>Pratos</option>
+            <option>Bebidas</option>
+        </select><br>
         <select class="form-control">
             <option>Selecione o tipo de item</option>
             <option>Simples</option>
@@ -209,9 +220,19 @@
    </form>
 </div>
 <div id="acompanhamento" style="width:600px;display: none;">
-   <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Sub Item</h2>
+   <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i>Lista Sub Item</h2>
    <form class="form-horizontal col-md-12"><br>
        <div class="form-group">
+        <select class="form-control">
+            <option>Selecione Categoria</option>
+            <option>Pratos</option>
+            <option>Bebidas</option>
+        </select><br>
+        <select class="form-control">
+            <option>Selecione Item Cardapio</option>
+            <option>File de frango com fritas e farofa</option>
+            <option>Espaguete com queijo resvalado e mollho rose</option>
+        </select><br>
         <input type="text" class="form-control" id="nomeCategoria" placeholder="Titulo..."><br>
         <textarea class="form-control" id="nomeCategoria" placeholder="Descrição..."></textarea><br>
         <input type="number" class="form-control min-max" id="nomeCategoria" placeholder="Mínimo de itens...">
@@ -240,6 +261,192 @@
    </form>
 </div>
 
+        <!-- Tela principal pedido-->
+         <div  class="cardapio-full" id="card-princ" width="320" style="display:none;">
+            <div class="header-cardapio"><label class="nome-tela">Tela Principal</label></div>
+            <ul>
+                <li>
+                    <a href="#item-unico">
+                        <img src="../static/marviin/img/pizza2.jpg" width="60px" height="60px" />
+                        <div class="content-meio">
+                            <p><strong>Pizza de calabrezza</strong></p>
+                            <p class="descri">Calabreza, muzzarela, oregano, molho de tomate e azeitona</p>
+                        </div>
+                        <p class="preco"><span>A partir de</span> R$ 39,90</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="#item-unico">
+                        <img src="../static/marviin/img/pizza.jpg" width="60px" height="60px" />
+                        <div class="content-meio">
+                            <p><strong>Pizza Portuguesa</strong></p>
+                            <p class="descri">Calabreza, muzzarela, oregano, molho de tomate e azeitona</p>
+                        </div>
+                        <p class="preco"><span>A partir de</span> R$ 47,90</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="#item-unico">
+                        <img src="../static/marviin/img/pizza2.jpg" width="60px" height="60px" />
+                        <div class="content-meio">
+                            <p><strong>Pizza de quatro queijos</strong></p>
+                            <p class="descri">Calabreza, muzzarela, oregano, molho de tomate e azeitona</p>
+                        </div>
+                        <p class="preco"><span>A partir de</span> R$ 35,90</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="#item-unico">
+                        <img src="../static/marviin/img/pizza.jpg" width="60px" height="60px" />
+                        <div class="content-meio">
+                            <p><strong>Pizza de napolitana</strong></p>
+                            <p class="descri">Calabreza, muzzarela, oregano, molho de tomate e azeitona</p>
+                        </div>
+                        <p class="preco"><span>A partir de</span> R$ 29,90</p>
+                    </a>
+                </li>
+            </ul>
+         </div>
+
+         <!-- Fim Tela principal-->
+
+
+         <!-- Tela escolha item unico-->
+
+        <div class="cardapio-full" id="item-unico"  width="320" style="display:none;">
+            <div class="header-cardapio"><a href=""><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i></a><label class="nome-tela back">Tela lista escolha única</label></div>
+            <ul class="lista-unica">
+                <li>
+                     <div class="check">
+                        <label class="radio-inline">
+                            <input type="radio" name="genderRadios" value="check">
+                        </label>
+                    </div>
+                    <div class="content-meio">
+                        <p><strong>Pizza Gigante</strong></p>
+                        <p class="descri"></p>
+                    </div>
+                    <p class="preco">R$ 39,90</p>
+                </li>
+                <li>
+                     <div class="check">
+                        <label class="radio-inline">
+                            <input type="radio" name="genderRadios" value="check">
+                        </label>
+                    </div>
+                    <div class="content-meio">
+                        <p><strong>Pizza Media</strong></p>
+                        <p class="descri">Pizza media de 35cm</p>
+                    </div>
+                    <p class="preco"> R$ 47,90</p>
+                </li>
+                <li>
+                     <div class="check">
+                        <label class="radio-inline">
+                            <input type="radio" name="genderRadios" value="check">
+                        </label>
+                    </div>
+                    <div class="content-meio">
+                        <p><strong>Pizza Broto</strong></p>
+                        <p class="descri">Pizza media de 20cm</p>
+                    </div>
+                    <p class="preco"> R$ 47,90</p>
+                </li>
+            </ul>
+            <a href="#multiplos-itens" class="btn btn-primary btn-verde fancybox">Próxima</a>
+         </div>
+         <!--Fim tela escolha item unico-->
+
+
+         <!-- Tela incluir itens multiplos-->
+        <div class="cardapio-full" id="multiplos-itens" width="320" style="display:none;">
+            <div class="header-cardapio"><a href=""><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i></a><label class="nome-tela back">Tela lista escolhas multiplas</label></div>
+            <ul class="lista-unica lista-add">
+                <li>
+                    <div class="add-rem">
+                        <a href="javascript:void(0)" class="btn-qtd add"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
+                        <span class="qtd qtd-1"> 0 </span>
+                        <a href="javascript:void(0)" class="btn-qtd rem"><i class="fa fa-minus-square" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="content-meio">
+                        <p><strong>Mais Queijo</strong></p>
+                        <p class="descri">Duas colheres de oregano</p>
+                    </div>
+                    <p class="preco">R$ 7,90</p>
+                </li>
+                <li>
+                    <div class="add-rem">
+                        <a href="javascript:void(0)" class="btn-qtd add"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
+                        <span class="qtd qtd-1"> 0 </span>
+                        <a href="javascript:void(0)" class="btn-qtd rem"><i class="fa fa-minus-square" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="content-meio">
+                        <p><strong>Mais oregano</strong></p>
+                        <p class="descri">Duas colheres de oregano</p>
+                    </div>
+                    <p class="preco">R$ 3,90</p>
+                </li>
+                <li>
+                    <div class="add-rem">
+                        <a href="javascript:void(0)" class="btn-qtd add"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
+                        <span class="qtd"> 0 </span>
+                        <a href="javascript:void(0)" class="btn-qtd rem"><i class="fa fa-minus-square" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="content-meio">
+                        <p><strong>Mais azeitona</strong></p>
+                        <p class="descri">Duas colheres de oregano</p>
+                    </div>
+                    <p class="preco">R$ 3,90</p>
+                </li>
+                <li>
+                    <div class="add-rem">
+                        <a href="javascript:void(0)" class="btn-qtd add"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
+                        <span class="qtd"> 0 </span>
+                        <a href="javascript:void(0)" class="btn-qtd rem"><i class="fa fa-minus-square" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="content-meio">
+                        <p><strong>Mais molho</strong></p>
+                        <p class="descri">Duas colheres de oregano</p>
+                    </div>
+                    <p class="preco">R$ 1,90</p>
+                </li>
+            </ul>
+            <a href="#resumo" class="btn btn-primary btn-verde fancybox">Próxima</a>
+         </div>
+
+        <!--Fim tela incluir itens multiplos-->
+
+        <!--Tela resumo do pedido-->
+
+        <div class="cardapio-full" id="resumo" width="320" height="450" style="display:none;">
+            <div class="resumo-pedido" id="resumo-pedido">
+                <div class="header-cardapio"><a href=""><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i></a><label class="nome-tela back">Tela de resumo do pedido</label></div>
+                <p class="titulo-resumo"><strong>Pizza de quatro queijos</strong></p>
+                <p class="descri">Pizza gigante de quatro queijos com borda de catupiry resvalada no molho de alho verde azul limao.</p>
+                <p class="itens-add"><i class="fa fa-cart-arrow-down" aria-hidden="true"></i> Itens adicionados:</p>
+                <ul class="lista-itens-mais">
+                    <li>+1 queijo</li>
+                    <li>+1 oregano</li>
+                    <li>+1 Molho</li>
+                </ul>
+                <div class="valor-total">
+                    <p><strong>Total:</strong> 49,90</p>
+                    <div class="add-rem">
+                        <a href="javascript:void(0)" class="btn-qtd add"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
+                        <span class="qtd"> 1 </span>
+                        <a href="javascript:void(0)" class="btn-qtd rem"><i class="fa fa-minus-square" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <textarea class="obs-pedido" placeholder="Observacoes..."></textarea>
+                <div class="btn-encerrar">
+                    <a href="#" class="btn btn-primary btn-verde"><i class="fa fa-cart-plus" aria-hidden="true"></i> Pedir Mais Itens</a>
+                    <a href="#" class="btn btn-primary btn-verde"><i class="fa fa-check" aria-hidden="true"></i> Enviar Pedido</a>
+                </div>
+            </div>
+         </div>
+
+        <!--fim telas de cardapio -->
+
 <!-- inicio dialogo bot -->
 <div id="content-dialog" class="content-dialog"></div>
 <div class="bg"></div>
@@ -261,9 +468,27 @@
         closeEffect	: 'none'
       });
 
+      $('.btn-qtd').on("click", function(){
+
+        qtdAtual = $(this).parent(".add-rem").find("span").text();
+
+        if($(this).hasClass("add")){
+
+            qtdAtual ++;
+            $(this).parent(".add-rem").find("span").text(qtdAtual);
+
+        }else{
+
+            qtdAtual = qtdAtual - 1;
+            $(this).parent(".add-rem").find("span").text(qtdAtual);
+
+        }
+      });
+
       $('#add').on("click", function(){
         $('.lista-itens-acomp').append("<div class='item-acomp'><input type='text' class='form-control nome-item' id='nomeCategoria' placeholder='Nome...'><input type='text' class='form-control preco-item' id='nomeCategoria' placeholder='Preço...'><a type='text' class='btn btn-danger' id='remove'><i class='fa fa-times' aria-hidden='true'></i> Excluir</a></div>");
       });
+
     </script>
 
 {% endblock %}

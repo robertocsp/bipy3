@@ -1573,6 +1573,250 @@ textarea.form-control.msg-users{
     margin: 25px 7px;
 }
 
+.cardapio-full{
+    width: 320px;
+}
+
+.nome-tela{
+    width: 100%;
+    border-bottom: 1px solid #eee;
+    color: #c1161c;
+    font-weight: bold;
+}
+
+.cardapio-full img{
+    float: left;
+    margin: 0 10px 0 0;
+}
+
+.cardapio-full ul li a p, .cardapio-full ul li a span, .cardapio-full ul li a strong{
+    color: #5e5e5e;
+    line-height: 15px;
+}
+
+.cardapio-full ul li a p{
+    color: #aaa;
+}
+
+.test-card{
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #fff;
+}
+
+.cardapio-full .preco{
+    width: 21%;
+}
+
+.cardapio-full .preco span{
+    width: 100%;
+    text-align: center;
+    margin: 5px 0 6px 0;
+    display: block;
+    color: #c1161c;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.cardapio-full  ul li{
+    float: left;
+    min-height: 60px;
+    border-bottom: 1px solid #eee;
+}
+
+.cardapio-full ul li a p.descri{
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.content-meio{
+    float: left;
+    width: 56%;
+    padding-top: 6px;
+}
+
+.cardapio-full .btn-verde{
+    width: 100%;
+    border-radius: 0;
+    padding: 10px 0;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.header-cardapio{
+    float: left;
+    width: 100%;
+    color: #fff;
+    background: #c1161c;
+}
+
+.header-cardapio label, .header-cardapio p, .header-cardapio a{
+    color: #fff;
+}
+
+.header-cardapio a{
+    display: block;
+    float: left;
+    width: 31px;
+    margin: 10px;
+}
+
+.header-cardapio label{
+    float: left;
+    display: block;
+    width: 78%;
+    border: 0;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 15px;
+}
+
+.header-cardapio label.back{
+    margin: 14px 0 0 0;
+}
+
+.lista-unica .preco{
+    margin-top: 20px;
+    width: 22%;
+    color: #aaa;
+}
+
+.lista-unica p strong{
+    margin-top: 13px;
+    float: left;
+    width: 100%;
+}
+
+p.descri{
+    color: #aaa;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.lista-unica .content-meio {
+    float: left;
+    width: 65%;
+}
+
+.cardapio-full ul.lista-unica  li{
+    min-height: auto;
+    width: 100%;
+}
+
+.check{
+    float: left;
+    width: 40px;
+    text-align: center;
+    padding-top: 5px;
+}
+
+.add-rem{
+    float: left;
+    width: 60px;
+    padding: 8px 0 0 5px;
+}
+
+.add-rem .add{
+    color: green;
+}
+
+.add-rem .rem{
+    color: #c1161c;
+}
+
+.qtd{
+    font-size: 16px;
+}
+
+.lista-unica.lista-add .content-meio {
+    float: left;
+    width: 55%;
+}
+
+.lista-unica.lista-add p strong {
+    margin: 3px 0 0 10px;
+}
+
+.lista-unica.lista-add p.descri{
+    margin-left: 10px;
+}
+
+.resumo-pedido p.descri{
+    margin-left: 5px;
+}
+.add-rem i{
+    font-size: 20px;
+}
+
+.lista-itens-mais{
+    float: left;
+    width: 100%;
+    padding-left: 5px;
+}
+
+.itens-add{
+    float: left;
+    width: 100%;
+    padding: 0 0 0 5px;
+}
+
+.valor-total{
+    float: left;
+    width: 100%;
+    padding: 0 0 0 5px;
+}
+
+.cardapio-full .lista-itens-mais li{
+    float: left;
+    width: 100%;
+    color: #aaa;
+    font-size: 13px;
+    border: 0;
+    min-height: 10px;
+}
+
+.cardapio-full .lista-itens-mais li:last-child{
+    border-bottom: 1px solid #eee;
+}
+
+.titulo-resumo{
+    float: left;
+    width: 100%;
+    margin-top: 10px;
+    padding-left: 5px;
+}
+
+.lista-unica.lista-add .preco {
+    margin-top: 12px;
+}
+
+.lista-unica .add-rem p strong{
+    margin-left: 5px;
+}
+
+.resumo-pedido textarea{
+    float: left;
+    width: 100%;
+    height: 65px;
+    margin: 20px 0 0 0;
+}
+
+.btn-encerrar{
+    float: left;
+    width: 100%;
+    margin: 30px 0 0 0;
+}
+
+.btn-encerrar .btn-verde{
+    float: left;
+    width: 49.5%;
+}
+
+.btn-encerrar .btn-verde:last-child{
+    float:right;
+}
+
 @media only screen and (max-width: 1024px){
     .around{
         overflow-y: hidden;
