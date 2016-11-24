@@ -160,6 +160,11 @@ if not os.path.exists(os.path.join(os.path.dirname(BASE_DIR), 'logs')):
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'myformat': {
+            'format': '%(asctime)s,%(levelname)s,%(module)s,%(threadName)s,%(processName)s ::: %(message)s',
+        },
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',

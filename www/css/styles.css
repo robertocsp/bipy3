@@ -1147,7 +1147,7 @@ h3{
     height: 467px;
 }
 
-.form-estabelecimentos input, .form-estabelecimentos select, .form-estabelecimentos textarea{
+.form-site input, .form-site select, .form-site textarea{
     height: 50px;
     width: 95%;
     float: left;
@@ -1157,7 +1157,7 @@ h3{
     background: #fff;
 }
 
-.form-estabelecimentos textarea{
+.form-site textarea{
     height: 259px;
 }
 
@@ -1191,13 +1191,13 @@ h3{
     font-weight: normal;
 }
 
-.form-estabelecimentos i.fa-arrow-up{
+.form-site i.fa-arrow-up{
     color: green;
     float: left;
     display: block;
 }
 
-.form-estabelecimentos i.fa-arrow-down{
+.form-site i.fa-arrow-down{
     color: red;
     margin: 0 10px 0 7px;
     float: left;
@@ -1208,11 +1208,11 @@ h3{
     margin-top: -2px;
 }
 
-.form-estabelecimentos #campo2 i, .form-estabelecimentos #campo4 i{
+.form-site #campo2 i, .form-site #campo4 i{
     margin-top: 12px;
 }
 
-.form-estabelecimentos input[type="submit"]{
+.form-site input[type="submit"]{
     background: red;
     color: #fff;
     font-weight: bold;
@@ -1233,7 +1233,11 @@ h3{
     left: 500px;
 }
 
-.form-estabelecimentos i{
+.form-indicacao-loading{
+    left: 150px;
+}
+
+.form-site i{
     cursor: pointer;
 }
 
@@ -1562,7 +1566,7 @@ h3{
     text-align: center;
 }
 
-.usuario .form-estabelecimentos{
+.usuario .form-site{
     width: 500px;
     margin: 20px auto 40px auto;
 }

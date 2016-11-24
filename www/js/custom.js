@@ -252,16 +252,16 @@ jQuery(function( $ ){
         return json_envio;
     }
 
-    var form_estabelecimentos_function = function(){
-        if($(this)[0].checkValidity()) {
-            $('.form-estabelecimentos').unbind('submit');
+    function envia_form(form, service, form_function) {
+        $form_this = $('.' + form);
+        if($form_this[0].checkValidity()) {
+            $form_this.unbind('submit');
             $('#carregando').show();
 
-            var dados_envio = montaDados($(this).serializeArray());
+            var dados_envio = montaDados($form_this.serializeArray());
 
-            $outer_this = $(this);
-            $.post('https://sistema.marviin.com.br/marviin/api/rest/pesquisa_estabelecimento',
-                     {formulario_estabelecimento: JSON.stringify(dados_envio)},
+            $.post('https://sistema.marviin.com.br/marviin/api/rest/' + service,
+                     {formulario_dados: JSON.stringify(dados_envio)},
                      function(data) {
                        console.log(data);
                      },
@@ -272,14 +272,23 @@ jQuery(function( $ ){
             })
             .always(function() {
                 $('#carregando').hide();
-                $outer_this[0].reset();
-                $('.form-estabelecimentos').bind('submit', form_estabelecimentos_function);
+                $form_this[0].reset();
+                $form_this.bind('submit', form_function);
             });
         }
         else
         {
             console.log("invalid form");
         }
+    }
+
+    var form_estabelecimentos_function = function(){
+        envia_form('form-estabelecimentos', 'pesquisa_estabelecimento', form_estabelecimentos_function);
     };
     $('.form-estabelecimentos').bind('submit', form_estabelecimentos_function);
+
+    var form_indicacao_usuario_function = function(){
+        envia_form('form-indicacao-usuario', 'indicacao_usuario', form_indicacao_usuario_function);
+    };
+    $('.form-indicacao-usuario').bind('submit', form_indicacao_usuario_function);
 });
