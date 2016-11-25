@@ -37,7 +37,7 @@
                 <ul class="nav navbar-nav navbar-right main-navigation">
                     <li><a href="#home" class="active">Home</a></li>
                     <li><a href="/estabelecimento/index.html">Para seu estabelecimento</a></li>
-                    <li><a href="/para-voce/index.html">Para Você</a></li>
+                    <li><a href="/usuario/index.html">Para Você</a></li>
                     <li><a href="#fale">Contato</a></li>
                 </ul>
             </div>
@@ -78,16 +78,16 @@
                 <h2 class="dark-text">Indique um estabelecimento</h2>
                 <div class="colored-line"></div><br><br>
                 <p><strong>Caso você queira que os estabelecimentos que você frequenta tenha o Marviin, nos diga qual que nós nos encarregamos disso</strong></p>
-                <form class="form-estabelecimentos">
+                <form class="form-site form-indicacao-usuario" onsubmit="return false;">
                     <div class="wow fadeInRight animated" data-wow-offset="10" data-wow-duration="1.5s">
                         <input type="text" name="nome" required="required" placeholder="Digite aqui o nome do estabelecimento..." /><br>
-                        <input type="text" name="nome" required="required" placeholder="Digite aqui a cidade do estabelecimento..." /><br>
+                        <input type="text" name="cidade" required="required" placeholder="Digite aqui a cidade do estabelecimento..." /><br>
                         <input type="email" required="required" name="email" placeholder="Digite aqui o seu email..." /><br>
                         <input class="telefone-estabelecimento" type="text" name="telefone" placeholder="Digite aqui o telefone do estabelecimento..." /><br>
                     </div>
                     <div>
                         <input id="envia-form" type="submit" value="ENVIAR"/>
-                        <span id="carregando" class="loading-login" style="display: none;">carregando...</span>
+                        <span id="carregando" class="loading-login form-indicacao-loading" style="display: none;">carregando...</span>
                     </div>
                  </form><br><br>
            </div>

@@ -741,7 +741,7 @@ class FormularioInteresseView(views.APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        dados = json.loads(request.data.get('formulario_estabelecimento'))
+        dados = json.loads(request.data.get('formulario_dados'))
         logger.debug('===---=-=--=--=-=-= dados fomrulario::: ' + repr(dados))
         loja = Loja()
         loja.nome = dados['nome']
@@ -772,6 +772,29 @@ class FormularioInteresseView(views.APIView):
 
         msg = EmailMessage(
             u'[Site] Formulário de interesse',
+            body,
+            'contato@marviin.com.br',
+            ['contato@marviin.com.br']
+        )
+        msg.content_subtype = "html"
+        msg.send()
+
+        return Response({'success': True})
+
+
+class FormularioIndicacaoView(views.APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        dados = json.loads(request.data.get('formulario_dados'))
+        logger.debug('===---=-=--=--=-=-= dados fomrulario::: ' + repr(dados))
+        body = u'<h2>Informações fornecidas</h2><br>' \
+               u'<strong>Nome do estabelecimento:</strong> ' + dados['nome'] + u'<br><br>' \
+               u'<strong>Cidade do estabelecimento:</strong> ' + dados['cidade'] + u'<br><br>' \
+               u'<strong>Telefone do estabelecimento:</strong> ' + dados['telefone'] + u'<br><br>' \
+               u'<strong>Email de quem indicou:</strong> ' + dados['email']
+        msg = EmailMessage(
+            u'[Site] Formulário de indicação de estabelecimento',
             body,
             'contato@marviin.com.br',
             ['contato@marviin.com.br']

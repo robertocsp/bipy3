@@ -57,6 +57,8 @@ urlpatterns = [
     url(r'^marviin/api/rest/cardapio[/]?$', views.CardapioView.as_view(), name='cardapio_view'),
     url(r'^marviin/api/rest/pesquisa_estabelecimento[/]?$', views.FormularioInteresseView.as_view(),
         name='pesquisa_estabelecimento_view'),
+    url(r'^marviin/api/rest/indicacao_usuario[/]?$', views.FormularioIndicacaoView.as_view(),
+        name='indicacao_usuario_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^upload/$', upload, name='upload'),
     url(r'^cadastrar-cardapio/$', cadastraCardapio, name='cadastra-cardapio'),
