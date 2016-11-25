@@ -202,7 +202,7 @@
   the JavaScript SDK to present a graphical Login button that triggers
   the FB.login() function when clicked.
 -->
-    <div class="content">
+    <!--<div class="content">
         <img src="img/logo-marviin.png" width="160" height="" />
         <p class="acesso-texto">Para se cadastrar e começar a utilizar o Marviin, acesse nosso sistema com sua conta do Facebook</p>
         <input type="hidden" id="uac" name="uac" value="" />
@@ -217,6 +217,108 @@
         <div id="fb-logout-btn" style="display: none">
             <input type="button" name="sair" value="Sair" id="sair" onclick="logout();" />
         </div>
+    </div>-->
+    <div class="content content-dados">
+        <img src="img/logo-marviin.png" width="160" height="">
+        <div id="status">Olá, Fábio Marques!</div>
+
+        <div id="permissao-pagina">
+            <br><label class="text-into">Complete seus dados abaixo para começar a usar o Marviin</label>
+            <div class="dados-est">
+                <h2><label>Dados do Estabelecimento</label></h2>
+                <label>Nome do estabelecimento: </label>
+                <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+                <label>Telefone do estabelecimento: </label>
+                <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+                <label>CNPJ do Estabelecimento: </label>
+                <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+                <label>Endereco do estabelecimento: </label>
+                <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+                <div class="input-middle">
+                    <label>Complemento: </label>
+                    <input type="text" name="nome_loja" value="" id="nome_loja">
+                </div>
+                <div class="input-middle">
+                    <label>Bairro: </label>
+                    <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+                </div>
+                <div class="input-middle">
+                    <label>Cidade: </label>
+                    <input type="text" name="nome_loja" value="" id="nome_loja">
+                </div>
+                <div class="input-middle">
+                    <label>Estado</label>
+                    <select class="form-control">
+                        <option value="AC">ACRE</option>
+                        <option value="AL">ALAGOAS</option>
+                        <option value="AM">AMAZONAS</option>
+                        <option value="AP">AMAPA</option>
+                        <option value="BA">BAHIA</option>
+                        <option value="CE">CEARA</option>
+                        <option value="DF">DISTRITO FEDERAL</option>
+                        <option value="ES">ESPIRITO SANTO</option>
+                        <option value="GO">GOIAS</option>
+                        <option value="MA">MARANHAO</option>
+                        <option value="MG">MINAS GERAIS</option>
+                        <option value="MS">MATO GROSSO DO SUL</option>
+                        <option value="MT">MATO GROSSO</option>
+                        <option value="PA">PARA</option>
+                        <option value="PB">PARAIBA</option>
+                        <option value="PE">PERNAMBUCO</option>
+                        <option value="PI">PIAUI</option>
+                        <option value="PR">PARANA</option>
+                        <option value="RJ">RIO DE JANEIRO</option>
+                        <option value="RN">RIO GRANDE DO NORTE</option>
+                        <option value="RO">RONDONIA</option>
+                        <option value="RR">RORAIMA</option>
+                        <option value="RS">RIO GRANDE DO SUL</option>
+                        <option value="SC">SANTA CATARINA</option>
+                        <option value="SP">SAO PAULO</option>
+                        <option value="SE">SERGIPE</option>
+                        <option value="TO">TOCANTINS</option>
+                    </select>
+                </div>
+                <div class="input-middle ma">
+                    <label>CEP: </label>
+                    <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+                </div>
+             </div>
+             <div class="dados-resp">
+                <h2><label>Dados do Representante do Estabelecimento</label></h2>
+                <label>Nome: </label>
+                <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+                <label>Email: </label>
+                <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+                <label>Telefone: </label>
+                <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+            </div>
+            <div class="dados-bot">
+                <h2><label>Dados de utilização do Marviin</label></h2>
+                <label>Nome da loja no dashboard: </label>
+                <input type="text" name="nome_loja" value="" id="nome_loja"><br>
+                <label>Selecione sua página no Facebook que utilizará o Marviin:</label>
+                <select id="pid">
+                    <option value="-1">Selecione</option>
+                    <option value="1661594034169333">Teste bot 3</option>
+                    <option value="164053847380345">Teste bot 2</option>
+                    <option value="650564131760855">Teste BOT</option>
+                </select>
+                <label>Indique o módulo que a página selecionada irá utilizar:</label>
+                <select id="pid">
+                    <option value="-1">Selecione</option>
+                    <option value="1661594034169333">Atendimento</option>
+                    <option value="164053847380345">Delivery</option>
+                </select>
+            </div>
+            <br><div class="button">
+                <input type="button" name="selecionar" id="ok" value="ENVIAR SOLICITAÇÃO PARA ANÁLISE" onclick="sendPage();">
+            </div>
+        </div>
+
+        <div id="fb-logout-btn" style="display: block;">
+            <input type="button" name="sair" value="SAIR" id="sair" onclick="logout();">
+        </div>
     </div>
+
 </body>
 </html>

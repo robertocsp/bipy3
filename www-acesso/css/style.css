@@ -30,8 +30,9 @@ p, a, div, span, label, input, select, button{
 }
 
 .content img {
-    margin: 30px 0 30px 124px;
-    width: 160px;
+    margin: 25px auto;
+    width: 106px;
+    display: block;
 }
 
 .acesso-texto{
@@ -80,7 +81,7 @@ p, a, div, span, label, input, select, button{
 }
 
 select{
-    height: 30px;
+    height: 33px;
     padding: 6px 12px;
     font-size: 14px;
     line-height: 1.42857143;
@@ -146,9 +147,55 @@ select{
 #permissao-pagina label.text-into{
     width: 94%;
     float: left;
-    margin: 10px 0 26px 2px;
+    margin: 0 0 20px 2px;
     text-align: center;
     border-bottom: 1px solid #ccc;
-    padding-bottom: 20px;
+    padding-bottom: 5px;
 }
 
+.content-dados{
+    height: auto;
+    position: inherit;
+    border: 0;
+    width: 768px;
+}
+
+h2{
+    float: left;
+    width: 100%;
+    margin: 0 0 20px 0;
+}
+
+.dados-est h2{
+    margin-bottom: 45px;
+}
+
+h2 label{
+    font-size: 20px;
+}
+
+.dados-est, .dados-resp, .dados-bot{
+    float: left;
+    width: 49%;
+}
+
+.content-dados #permissao-pagina input[type="text"] {
+    width: 92%;
+}
+
+.input-middle{
+    float: left;
+    width: 49%;
+}
+
+.input-middle.ma{
+    width: 67%;
+}
+
+.input-middle.me{
+    width: 29%;
+}
+
+.input-middle select{
+    width: 176px;
+}
