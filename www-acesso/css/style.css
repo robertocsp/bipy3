@@ -199,3 +199,110 @@ h2 label{
 .input-middle select{
     width: 176px;
 }
+
+.logo{
+    float: left;
+    display: block;
+    margin: 12px 450px 12px 15px;
+}
+
+ul li{
+    list-style: none;
+}
+
+.header-acesso ul{
+    float: right;
+    margin: 34px 100px 0 0;
+}
+
+.header-acesso a{
+    color: #999;
+}
+
+.header-acesso a:hover{
+    text-decoration: underline;
+    color: #000;
+}
+
+.header-acesso{
+    float: left;
+    width: 100%;
+    -webkit-box-shadow: -1px 2px 5px -2px rgba(6, 6, 6,.5);
+    -moz-box-shadow: -1px 2px 5px -2px rgba(6, 6, 6,.5);
+    box-shadow: -1px 6px 2px -2px rgba(6, 6, 6,.5);
+    margin: 0 0 30px 0;
+}
+
+footer, .contato{
+    float: left;
+    width: 100%;
+}
+
+.contato{
+    background: #F7F8FA;
+    padding-bottom: 42px;
+    margin-top: 40px;
+}
+
+.contato h2 {
+    font-size: 40px;
+    line-height: 50px;
+    margin-top: 0;
+    margin-bottom: 5px;
+    text-align: center;
+    font-weight: normal;
+}
+
+.colored-line {
+    margin: auto;
+    z-index: 1;
+    width: 165px;
+    height: 1px;
+    background: red;
+    margin-top: 52px;
+}
+
+.container {
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 600px;
+}
+
+.container .coluna-fale {
+    width: 190px;
+    float: left;
+    text-align: center;
+}
+
+.container .coluna-fale ul{
+    margin-top: 30px;
+}
+
+
+.coluna-fale ul a{
+    color: #428bca;
+    text-decoration: none;
+}
+
+.coluna-fale:last-child ul a {
+    color: #3b5998;
+    font-weight: bold;
+}
+
+.coluna-fale ul a strong {
+    font-weight: 700;
+}
+
+footer .copyright {
+    color: #808080;
+    padding: 20px 0;
+    width: 850px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+footer .copyright a {
+    color: #428bca;
+}
