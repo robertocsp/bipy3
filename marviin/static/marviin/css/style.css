@@ -1817,6 +1817,43 @@ p.descri{
     float:right;
 }
 
+.tela-pedido-delivery .coluna .conteudo-pedido {
+    height: 76px;
+}
+
+.tela-pedido-delivery .coluna .droptrue > li {
+    height: 166px;
+}
+
+.tela-pedido-delivery .endereco-detalhe span {
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+    float: left;
+    margin: 2px 0 0 3px;
+}
+
+.tela-pedido-delivery .pagamento-detalhe span {
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+    float: left;
+    margin: 10px 0 0 20px;
+    width: 93%;
+}
+
+.tela-pedido-delivery .coluna .detalhe-pedido-icon .lista-pedidos .pagamento-detalhe span strong{
+    margin: 0;
+}
+
+.container.tela-pedido-delivery .list-group-item{
+    width: 500px;
+}
+
+.container.tela-pedido-delivery .detalhe-pedido-icon .lista-pedidos{
+    width: 500px;
+}
+
 @media only screen and (max-width: 1024px){
     .around{
         overflow-y: hidden;

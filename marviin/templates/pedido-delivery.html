@@ -1,14 +1,14 @@
 {% extends "includes/layout.html" %}
 
-{% block  pedidos %}active{% endblock %}
+{% block  delivery %}active{% endblock %}
 
 {% block conteudo %}
 
 {% load pedido_tags %}
 
-<div class="container">
+<div class="container tela-pedido-delivery">
   <div class="page-header">
-    <h1><i class="fa fa-list"></i> Pedidos</h1>
+    <h1><i class="fa fa-list"></i> Pedidos Delivery</h1>
   </div>
     <form action="/pedidos/" method="post" id="form-filtros-pedido">
     {% csrf_token %}
@@ -63,7 +63,152 @@
           <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
         </h3>
         <ul id="solicitado" class="droptrue">
-            {% include "includes/snippets/cards_pedido.html" with pedidos=solicitado %}
+          <li class="ui-state-default">
+            <div class="header-pedido" data-uid="{{ card_uid }}">
+              <div class="cabecalho">
+                <img class="media-object img-circle" src="../../static/marviin/img/default_user.png" width="40" height="40" alt="" >
+                <p>Fabio Marques<br> <span class="ultimo">Pedido feito há <span class="" data-minutes-passed="">55 minutos</span></span></p>
+              </div>
+            </div>
+            <div class="conteudo-pedido lista-pedidos-tela">
+              <div class="detalhe-conteudo">
+
+                <div><label class="status-label"><strong><i class="fa fa-barcode"></i> Pedido:</strong> 201611234</label></div>
+                <div class="messeger detalhe-pedido-icon">
+                  <label class="interacao status-label">
+                    <strong><i class="fa fa-desktop"></i> Interação:</strong>
+                    <i class="logo open-dialogo" data-uid=""></i>
+                    <i class="fa fa-wpforms open-lista-pedidos"></i>
+                  </label>
+
+                  <!-- Lista de pedidos-->
+                  <div class="lista-pedidos">
+                    <a href="javascript:void(0);" class="close">X</a>
+                    <div class="bs-example">
+                        <div class="list-group">
+                            <a href="javascript:void(0);" class="list-group-item">
+                               <div class="cabecalho">
+                                    <img class="media-object img-circle" src="../../static/marviin/img/default_user.png" width="40" height="40" alt="" >
+                                    <p class="tempo-minuto">Fabio Marques<br> <span class="ultimo">Pedido feito há <span class="" data-minutes-passed="">55 minutos</span></span></p>
+                               </div>
+                            </a>
+                            <a href="javascript:void(0);" class="list-group-item mesa-item">
+                                <div>
+                                    <label class="status-label mesa-detalhe">
+                                        <strong><i class="fa fa-barcode"></i> Pedido:</strong>
+                                        <span class="">201611234</span>
+                                    </label>
+                                </div>
+                            </a>
+                            <a href="javascript:void(0);" class="list-group-item mesa-item">
+                                <div>
+                                    <label class="status-label endereco-detalhe">
+                                        <strong><i class="fa fa-street-view"></i> Endereço:</strong>
+                                        <span class="">Rua salvador allende, 931, bloco II, apartamento 303, Recreio dos bandeirantes, Rio de janeiro</span>
+                                    </label>
+                                </div>
+                            </a>
+                            <a href="javascript:void(0);" class="list-group-item mesa-item">
+                                <div>
+                                    <label class="status-label pagamento-detalhe">
+                                        <strong><i class="fa fa-credit-card"></i> Forma de pagamento:</strong>
+                                        <!--Opcao debito/credito-->
+                                        <span class=""><strong><i class="fa fa-credit-card-alt"></i> Debito</strong>, Bandeira Elo</span>
+                                        <br>
+
+                                        <!--Opcao dinheiro-->
+                                        <span class=""><strong><i class="fa fa-money"></i> Dinheiro</strong>, Troco para R$50,00</span><br>
+                                    </label>
+                                </div>
+                            </a>
+                            <a href="javascript:void(0);" class="list-group-item border-4 detalhes-itens mesa-item">
+                                <label class="status-label">
+                                    <strong><i class="fa fa-desktop"></i> Interação:</strong>
+                                    <i class="logo open-dialogo" data-uid=""></i>
+                                    <i class="fa fa-wpforms open-lista-pedidos"></i>
+                                </label>
+                                <span class="border">border</span>
+                            </a>
+
+                            <a href="javascript:void(0);" class="list-group-item">
+                                3 pizzas
+                            </a>
+
+                            <a href="javascript:void(0);" class="list-group-item">
+                               <div class="status-list status-list-detalhe">
+                                <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid=""/>
+                                    <i class="fa fa-hand-paper-o"></i> <span class="status-mini">Solicitado</span>
+                                </label>
+                                <label class="em-processo"><input type="radio" name="em-processo" data-uid=""/>
+                                    <i class="fa fa-hand-grab-o"></i><span class="status-mini">Em processo</span>
+                                </label>
+                                <label class="concluido"><input type="radio" name="concluido" data-uid=""/>
+                                    <i class="fa fa-hand-pointer-o"></i><span class="status-mini">Concluido</span>
+                                </label>
+                                <label class="entregue"><input type="radio" name="entregue" data-uid=""/>
+                                    <i class="fa fa-thumbs-o-up"></i><span class="status-mini">Entregue</span>
+                                </label>
+                                <label class="cancelado"><input type="radio" name="cancelado" data-uid=""/>
+                                    <i class="fa fa-thumbs-o-down"></i><span class="status-mini">Cancelado</span>
+                                </label>
+                              </div>
+                            </a>
+                        </div>
+                    </div>
+                  </div>
+                  <!-- inicio dialogo bot -->
+                 <div class="content-dialog">
+                  <div class="dialogo messeger">
+                    <a href="javascript:void(0);" class="close">X</a>
+                    <div class="cabecalho-chat">
+                      <p>Fabio Marques<br> <span class="ultimo">Pedido feito há <span id="" class="" data-minutes-passed="">55 minutos</span></span></p>
+                    </div>
+                    <ul id="{{ card_uid }}_messages">
+                      <li class="cons">
+                          <img class="media-object img-circle" src="../../static/marviin/img/default_user.png" width="40" height="40" alt="">
+                          <div class="balao">
+                            <h4 class="media-heading"> Fabio Marques</h4>
+                            <p>uitexjcbpx xzkjchpzkxjc</p>
+                          </div>
+                      </li>
+                      <li class="est">
+                          <div class="balao">
+                            <h4 class="media-heading"> Nome estabeleciemnto</h4>
+                            <p>vkcjvhlxckjvhlkv</p>
+                          </div>
+                      </li>
+                    </ul>
+                    <div class="box-teclado">
+                      <label>
+                        <input type="text" placeholder="Mensagem..." name="texto">
+                      </label>
+                      <i class="btn-send" id="" data-uid="">Enviar</i>
+                    </div>
+                  </div>
+                 </div>
+                </div>
+              </div>
+            </div>
+            <div class="footer-pedido">
+              <div class="status-list status-list-detalhe-del">
+                <label class="solicitado" class="ativo"><input type="radio" name="solicitado" data-uid=""/>
+                    <i class="fa fa-hand-paper-o"></i>
+                </label>
+                <label class="em-processo"><input type="radio" name="em-processo" data-uid=""/>
+                    <i class="fa fa-hand-grab-o"></i>
+                </label>
+                <label class="concluido"><input type="radio" name="concluido" data-uid=""/>
+                    <i class="fa fa-hand-pointer-o"></i>
+                </label>
+                <label class="entregue"><input type="radio" name="entregue" data-uid=""/>
+                    <i class="fa fa-thumbs-o-up"></i>
+                </label>
+                <label class="cancelado"><input type="radio" name="cancelado" data-uid=""/>
+                    <i class="fa fa-thumbs-o-down"></i>
+                </label>
+              </div>
+            </div>
+          </li>
         </ul>
       </div>
       <div class="coluna">

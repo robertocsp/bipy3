@@ -37,3 +37,7 @@ def termos(request):
 @login_required
 def cadastraCardapio(request):
     return render(request, 'cad-cardapio.html')
+
+@login_required
+def pedidos_delivery(request):
+    return render(request, 'pedido-delivery.html')
