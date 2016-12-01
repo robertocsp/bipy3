@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marviin - Acesso</title>
+         <meta charset="utf-8">
+         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+         <meta id="viewport" name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/style.css">
+
+    </head>
+    <body>
+        <section class="header-acesso">
+            <a href="" class="logo"><img src="img/logo-marviin.png" width="106" /></a>
+            <ul>
+                <li><a href="http://marviin.com.br">Voltar para o site institucional</a></li>
+            </ul>
+        </section>
+        <section class="senha">
+            <div class="container-form">
+                <p class="bullet-senha"><i class="fa fa-unlock-alt fa-2x" aria-hidden="true"></i></p>
+                <p>Para finalizar seu cadastro, insira abaixo uma senha.</p>
+                <form action="">
+                    <label>Senha:</label><br>
+                    <input type="password" name="" value="" /><br>
+                    <label>Confirmar senha:</label><br>
+                    <input type="password" name="" value="" /><br>
+                    <input type="button" class="btn-confirma" name="" value="ENVIAR" />
+                </form>
+            </div>
+        </section>
+        <div class="contem-footer">
+            <footer>
+                <p class="copyright">
+                    ©2016 Bipy3, todos os direitos reservados. <a href="http://marviin.com.br/termos.html" title="Termos e condições de uso"> Termos de Uso.</i></a>
+                </p>
+            </footer>
+        </div>
+
+        <!--Alerta-->
+        <div id="aviso" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Aviso</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Mensagem para o usu'ario</p>
+                        <p class="text-warning"><small>Lorem ipsum</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-primary">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+
+
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $('.btn-confirma').click(functions(){
+                    $("#aviso").modal('show');
+                });
+            });
+        </script>
+
+    </body>
+</html>
