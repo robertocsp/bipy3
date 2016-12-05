@@ -155,9 +155,9 @@ select{
 
 .content-dados{
     height: auto;
-    position: inherit;
     border: 0;
     width: 768px;
+    margin: 0 auto;
 }
 
 h2{
@@ -373,4 +373,22 @@ footer .copyright a {
    height: 57px;
    z-index: 1;
    border-top: 1px solid #eee;
+}
+
+.loading-marviin{
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    background: rgba(0, 0, 0, .5) url('../img/loading-acesso5.gif')no-repeat center center;
+    background-size: 150px 150px;
+    display: none;
+}
+
+html, body{
+    height: 100%;
 }
