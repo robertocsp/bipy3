@@ -1081,9 +1081,6 @@ class AcessoBotView(views.APIView):
 
 def fb_subscribe(page_id, page_access_token, app_scoped_user_id=None, modulo='548897018630774'):
     config_problem = None
-    return Response({"success": True, "message": u'Tudo pronto, fácil assim, você já pode começar a utilizar seu '
-                                                 u'novo produto. Acesse sua caixa postal eletrônica, pois enviamos '
-                                                 u'um e-mail com informações importantes.'}), config_problem
     fb_service_subscribe_app_to_page = Template('https://graph.facebook.com/$arg1/subscribed_apps?'
                                                 'access_token=$arg2')
     url_subscribe_app_to_page = fb_service_subscribe_app_to_page.substitute(arg1=page_id, arg2=page_access_token)
