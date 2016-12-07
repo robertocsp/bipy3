@@ -35,7 +35,7 @@ import logging
 import requests
 import re
 import os
-import io
+import codecs
 import string
 import random
 
@@ -750,9 +750,10 @@ class AcessoBotV2Passo2View(views.APIView):
                 loja.telefone2 = user.profile.telefone
                 loja.save()
                 # envio de email para o cliente sobre sua nova aquisicao, FALTOU FALAR DA COBRANCA
-                with io.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
-                                                                    'templates'),
-                                                       'acesso'), 'email-inscricao.html'), 'rt') as email_inscricao:
+                with codecs.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
+                                                                        'templates'),
+                                                           'acesso'), 'email-inscricao.html'),
+                                 encoding='utf-8') as email_inscricao:
                     body_incompleto = email_inscricao.read().replace('\n', '')
                 body_template = Template(body_incompleto)
                 body_inscricao = body_template.substitute(arg1=user.first_name)
@@ -786,9 +787,9 @@ class AcessoBotV2Passo2View(views.APIView):
                     u'<strong>Email:</strong> ' + loja.email + u'<br><br>' \
                     u'<strong>Telefone:</strong> ' + loja.telefone2
             # envio de email para cliente poder cadastrar sua senha.
-            with io.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
-                                                                'templates'),
-                                                   'acesso'), 'email-senha.html'), 'rt') as email_senha:
+            with codecs.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
+                                                                    'templates'),
+                                                       'acesso'), 'email-senha.html'), encoding='utf-8') as email_senha:
                 body_incompleto = email_senha.read().replace('\n', '')
             body_template = Template(body_incompleto)
             body_senha = body_template.substitute(arg1=dados_acesso['nome_usuario'],
@@ -931,9 +932,10 @@ class CriaSenhaView(views.APIView):
             else:
                 modulo_contratado = u'Inválido, código: ' + loja.app_id
             # envio de email para o cliente sobre sua nova aquisicao, FALTOU FALAR DA COBRANCA
-            with io.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
-                                                                'templates'),
-                                                   'acesso'), 'email-inscricao.html'), 'rt') as email_inscricao:
+            with codecs.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
+                                                                    'templates'),
+                                                       'acesso'), 'email-inscricao.html'),
+                             encoding='utf-8') as email_inscricao:
                 body_incompleto = email_inscricao.read().replace('\n', '')
             body_template = Template(body_incompleto)
             body_inscricao = body_template.substitute(arg1=user.first_name)
@@ -1000,9 +1002,9 @@ class EsqueciSenhaView(views.APIView):
         response = Response({"success": True, "message": u'Siga as instruções, no e-mail que enviamos à você, para '
                                                          u'cadastrar uma nova senha.'})
         # envio de email para cliente poder cadastrar sua senha.
-        with io.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
-                                                            'templates'),
-                                               'acesso'), 'email-senha2.html'), 'rt') as email_senha:
+        with codecs.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
+                                                                'templates'),
+                                                   'acesso'), 'email-senha2.html'), encoding='utf-8') as email_senha:
             body_incompleto = email_senha.read().replace('\n', '')
         body_template = Template(body_incompleto)
         body_senha = body_template.substitute(arg1=user.first_name,
