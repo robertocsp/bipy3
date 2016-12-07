@@ -181,11 +181,12 @@ def touch_cliente(self, sender_id):
 
 
 @celery_app.task(bind=True, soft_time_limit=10)
-def salva_se_nao_existir(self, sender_id, user):
+def salva_se_nao_existir(self, sender_id, loja_id, user):
     data = {}
     pass
     data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
     data['id_cliente'] = sender_id
+    data['id_loja'] = loja_id
     data['nome_cliente'] = user['first_name'] + ' ' + user['last_name']
     data['foto_cliente'] = user['profile_pic']
     data['genero'] = user['gender']

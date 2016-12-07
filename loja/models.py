@@ -11,6 +11,8 @@ class Loja(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
     id_loja_facebook = models.CharField('id_loja_facebook', max_length=128, unique=True, null=True, blank=True)
     nome = models.CharField('nome', max_length=100)
+    nome_estabelecimento = models.CharField('nome_estabelecimento', max_length=100, null=True, blank=True)
+    cnpj = models.CharField('cnpj', max_length=14, null=True, blank=True)
     endereco = models.CharField('endereco', max_length=200, null=True, blank=True)
     complemento = models.CharField('complemento', max_length=100, null=True, blank=True)
     bairro = models.CharField('bairro', max_length=100, null=True, blank=True)
@@ -32,6 +34,8 @@ class Loja(models.Model):
     )
     tipo_loja = models.CharField(max_length=20, choices=TIPOS_ESTABELECIMENTO, blank=True, null=True)
     outro_tipo_loja = models.CharField('outro_tipo_loja', max_length=100, null=True, blank=True)
+    token_login = models.CharField('token_login', max_length=200, null=True, blank=True)
+    app_id = models.CharField('app_id', max_length=128, null=True, blank=True)
 
     def __unicode__(self):
         return self.nome

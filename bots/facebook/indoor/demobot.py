@@ -811,7 +811,7 @@ def pega_usuario(sender_id, loja_id):
         try:
             app_log.debug('pega_usuario 1:: ')
             user = get_object.delay(sender_id, loja_id).get()
-            salva_se_nao_existir.delay(sender_id, user)
+            salva_se_nao_existir.delay(sender_id, loja_id, user)
             app_log.debug('pega_usuario 2:: ')
             break
         except SoftTimeLimitExceeded:

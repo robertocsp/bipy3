@@ -1,0 +1,14 @@
+<div class="container-form">
+    <p class="bullet-senha"><i class="fa fa-unlock-alt fa-2x" aria-hidden="true"></i></p>
+    <p>{{title}}</p>
+    <form id="form_cadastro_senha" onsubmit="return false;">
+        <label>Senha:</label><br>
+        <input type="password" name="senha" required><br>
+        <label>Confirmar senha:</label><br>
+        <input type="password" name="confirma_senha" required><br>
+        <input type="checkbox" name="ver_caracteres" id="ver_caracteres">ver caracteres<br>
+        <input type="submit" class="btn-confirma" value="ENVIAR" />
+        <input type="hidden" name="token" value="{{token}}">
+        <input type="hidden" name="metodo" id="metodo" value="{{method}}">
+    </form>
+</div>

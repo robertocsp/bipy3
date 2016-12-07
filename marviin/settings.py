@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -23,10 +24,8 @@ with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marviin_conf'), 
             SECRET_KEY = key_value_pair[1]
         elif key_value_pair[0] == 'api-secret':
             CHAVE_BOT_API_INTERNA = key_value_pair[1]
-        elif key_value_pair[0] == 'app-id':
-            FB_APP_ID = key_value_pair[1]
-        elif key_value_pair[0] == 'app-secret':
-            FB_APP_SECRET = key_value_pair[1]
+        elif key_value_pair[0] == 'apps':
+            FB_APPS = json.loads(key_value_pair[1])
         elif key_value_pair[0] == 'email-user':
             EMAIL_USER = key_value_pair[1]
         elif key_value_pair[0] == 'email-password':
@@ -69,6 +68,9 @@ INSTALLED_APPS = (
     'fb_acesso',
     'upload_cardapio',
     'relacionamento',
+    'estados',
+    'cidades',
+    'marviin.user_profile'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -88,7 +90,7 @@ ROOT_URLCONF = 'marviin.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(os.path.join(os.path.join(BASE_DIR, 'marviin'), 'templates'), 'acesso')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -120,9 +122,9 @@ DATABASES = {
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',
-    # 'PAGE_SIZE': 10,
-    )
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAdminUser',
+    ),
 }
 
 # Internationalization
@@ -148,9 +150,9 @@ WEBSOCKET_URL = '/ws/'
 
 WS4REDIS_HEARTBEAT = '--heartbeat--'
 
-#configuracao para nao persistir as mensagens enviadas via websocket
-#quando o valor eh positivo a cada reconexao no canal a ultima mensagem eh sempre enviada novamente para o cliente
-#a principio nao vejo necessidade de precisar receber a ultima mensagem enviada pelo canal novamente em um reload de pagina
+# configuracao para nao persistir as mensagens enviadas via websocket
+# quando o valor eh positivo a cada reconexao no canal a ultima mensagem eh sempre enviada novamente para o cliente
+# a principio nao vejo necessidade de precisar receber a ultima mensagem enviada pelo canal em um reload de pagina
 WS4REDIS_EXPIRE = -1
 
 CORS_ORIGIN_ALLOW_ALL = True

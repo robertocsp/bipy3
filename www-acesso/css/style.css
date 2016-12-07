@@ -65,7 +65,20 @@ p, a, div, span, label, input, select, button{
     margin-bottom: 5px;
 }
 
-#permissao-pagina input[type="text"]{
+#permissao-pagina button.invalid-field{
+    color: #f02626;
+}
+
+#permissao-pagina input[type="text"].invalid-field,
+#permissao-pagina input[type="password"].invalid-field,
+#permissao-pagina input[type="email"].invalid-field,
+#permissao-pagina select.invalid-field{
+    border: 1px solid #f02626;
+}
+
+#permissao-pagina input[type="text"],
+#permissao-pagina input[type="password"],
+#permissao-pagina input[type="email"]{
     float: left;
     width: 265px;
     font-size: 14px;
@@ -97,7 +110,7 @@ select{
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 
-#pid{
+#pid, #modulo{
     margin: 0 0 20px 0;
     float: left;
     width: 200px
@@ -153,11 +166,17 @@ select{
     padding-bottom: 5px;
 }
 
+#permissao-pagina label.text-into-cad-usuario{
+    border-top: 1px solid #ccc;
+    padding-top: 5px;
+    margin-top: 10px;
+}
+
 .content-dados{
     height: auto;
+    position: inherit;
     border: 0;
     width: 768px;
-    margin: 0 auto;
 }
 
 h2{
@@ -179,7 +198,9 @@ h2 label{
     width: 49%;
 }
 
-.content-dados #permissao-pagina input[type="text"] {
+.content-dados #permissao-pagina input[type="text"],
+.content-dados #permissao-pagina input[type="password"],
+.content-dados #permissao-pagina input[type="email"]{
     width: 92%;
 }
 
@@ -338,7 +359,7 @@ footer .copyright a {
     margin-bottom: 0;
 }
 
-.senha input[type="password"] {
+.senha input[type="password"], .senha input[type="text"] {
     float: left;
     width: 80%;
     font-size: 14px;
@@ -346,6 +367,12 @@ footer .copyright a {
     margin: 0 0 15px 25px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.senha input[type="checkbox"]{
+    margin-left: -173px;
+    margin-top: 20px;
+    margin-bottom: 12px;
 }
 
 .senha .btn-confirma{

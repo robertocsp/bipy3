@@ -45,7 +45,7 @@ saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
 POSTBACK_MAP = {
     'menu_novo_pedido': u'Novo pedido',
-    'pedir_cardapio': u'Pedir cardápio',
+    'pedir_cardapio': u'Visualizar cardápio',
     'menu_trocar_mesa': u'Definir endereço',
     'finalizar_pedido': u'Enviar pedido',
     'pedir_mais': u'+ itens ao pedido',
@@ -120,13 +120,13 @@ def get_elements_menu(conversa):
         })
     menu.append(
         {
-            'title': u'Peça o cardápio',
+            'title': u'Visualize o cardápio',
             'image_url': 'https://sistema.marviin.com.br/static/marviin/img/pedir-cardapio.jpg',
-            'subtitle': u'Peça nosso cardápio para auxiliá-lo(a) na montagem de seu pedido.',
+            'subtitle': u'Visualize nosso cardápio para auxiliá-lo(a) na montagem de seu pedido.',
             'buttons': [
                 {
                     'type': 'postback',
-                    'title': u'Pedir cardápio',
+                    'title': u'Visualizar cardápio',
                     'payload': 'pedir_cardapio'
                 }
             ]
@@ -763,7 +763,7 @@ def pega_usuario(sender_id, loja_id):
         try:
             app_log.debug('pega_usuario 1:: ')
             user = get_object.delay(sender_id, loja_id).get()
-            salva_se_nao_existir.delay(sender_id, user)
+            salva_se_nao_existir.delay(sender_id, loja_id, user)
             app_log.debug('pega_usuario 2:: ')
             break
         except SoftTimeLimitExceeded:

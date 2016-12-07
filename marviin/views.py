@@ -4,6 +4,7 @@ from marviin.forms import *
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
 
 from loja.models import Loja
 
@@ -24,7 +25,16 @@ def login_geral(request):
                                "message": u'Loja não encontrada. Entre em contato com o administrador do sistema.'})
             username = request.POST['username']
             senha = request.POST['senha']
-            user = authenticate(username=username, password=senha)
+            try:
+                user_login = User.objects.get(email=username)
+                if user_login.is_active:
+                    user = authenticate(username=user_login.username, password=senha)
+                else:
+                    return render(request, 'login.html',
+                                  {"form": form, "success": False, "type": 403,
+                                   "message": u'Usuário desabilitado.'})
+            except User.DoesNotExist:
+                user = None
             if user is not None:
                 login(request, user)
                 request.session['id_loja'] = loja.id

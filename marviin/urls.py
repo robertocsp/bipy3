@@ -51,7 +51,13 @@ urlpatterns = [
     url(r'^marviin/api/rest/pede_garcom[/]?$', views.ChamarGarcomView.as_view(), name='chamar_garcom_view'),
     url(r'^marviin/api/rest/pede_conta[/]?$', views.PedirContaView.as_view(), name='pedir_conta_view'),
     url(r'^marviin/api/rest/notificacao_lida[/]?$', views.NotificacaoLidaView.as_view(), name='notificacao_lida_view'),
-    url(r'^marviin/api/rest/acesso_bot[/]?$', views.AcessoBotView.as_view(), name='acesso_bot_view'),
+    url(r'^marviin/api/rest/acesso_bot_v2[/]?$', views.AcessoBotV2View.as_view(), name='acesso_bot_v2_view'),
+    url(r'^marviin/api/rest/acesso_bot_v2_passo2[/]?$', views.AcessoBotV2Passo2View.as_view(),
+        name='acesso_bot_v2_passo2_view'),
+    url(r'^marviin/api/rest/valida_token[/]?$', views.ValidaTokenView.as_view(), name='valida_token_view'),
+    url(r'^marviin/api/rest/cria_senha[/]?$', views.CriaSenhaView.as_view(), name='cria_senha_view'),
+    url(r'^marviin/api/rest/esqueci_senha[/]?$', views.EsqueciSenhaView.as_view(), name='esqueci_senha_view'),
+    url(r'^marviin/api/rest/cria_senha2[/]?$', views.CriaSenha2View.as_view(), name='cria_senha2_view'),
     url(r'^marviin/api/rest/page_access_token[/]?$', views.PageAccessTokenView.as_view(),
         name='page_access_token_view'),
     url(r'^marviin/api/rest/cardapio[/]?$', views.CardapioView.as_view(), name='cardapio_view'),
@@ -66,4 +72,7 @@ urlpatterns = [
     url(r'^upload-cardapio/$', FileFieldView.as_view(), name='upload-cardapio'),
     url(r'^download-cardapio/$', download_cardapio, name='download-cardapio'),
     url(r'^termos-e-condicoes-de-uso/$', termos, name='termos'),
-    url(r'^relacionamento/$', relacionamento, name='relacionamento')]
+    url(r'^relacionamento/$', relacionamento, name='relacionamento'),
+    url(r'^marviin/api/rest/estados[/]?$', views.EstadosView.as_view(), name='estados_view'),
+    url(r'^marviin/api/rest/cidades[/]?$', views.CidadesView.as_view(), name='cidades_view'),
+]
