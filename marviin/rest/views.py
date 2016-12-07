@@ -668,7 +668,8 @@ class AcessoBotV2View(views.APIView):
         remove_not_eligible_pages(user_id)
         pages = FbContasUsuario.objects.filter(app_scoped_user_id=user_id).order_by('page_name')
         if len(pages) == 0:
-            return fail_response(400, '{"type": "acc", "object": "'+user_info['name']+'"}')
+            return fail_response(400, u'{"type": "acc", "object": "'+user_info['name']+u', todas suas páginas já '
+                                      u'utilizam algum módulo nosso. Qualquer dúvida entre em contato conosco."}')
         return Response({"success": True, "client_id": app_id, "user_name": user_info['name'],
                          "pages": [{"id": page.page_id, "name": page.page_name} for page in pages]},
                         template_name='campos-solicitacao.html')
