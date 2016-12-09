@@ -75,6 +75,7 @@ def send_image_url_message(self, sender_id, loja_id, url, icon=ROBOT_ICON):
     return fb.post(loja_id, json=payload)
 
 
+@celery_app.task(bind=True, soft_time_limit=7)
 def send_button_message(sender_id, loja_id, text, buttons):
     payload = {
         'recipient': {
