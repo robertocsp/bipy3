@@ -81,6 +81,8 @@ def fb_authorize(request):
         account_linking_token = request.GET['account_linking_token']
     else:
         return render(request, 'fb_authorize_fail.html')
+    if account_linking_token not in redirect_uri:
+        redirect(redirect_uri)
     logger.info('-=-=-=- redirect_uri -=-=-=-' + redirect_uri)
     logger.info('-=-=-=- account_linking_token -=-=-=-' + account_linking_token)
     if request.method == 'POST':
@@ -103,12 +105,11 @@ def fb_authorize(request):
                     ClienteMarviin.objects.create(user=user)
                 user.cliente_marviin.authorization_code = signing.dumps('autorizado', compress=True)
                 user.cliente_marviin.authorization_code.save()
-                redirect('{0}?account_linking_token={1}&authorization_code={2}'.format(
-                    redirect_uri, account_linking_token, user.cliente_marviin.authorization_code))
+                redirect('{0}&authorization_code={1}'.format(redirect_uri, user.cliente_marviin.authorization_code))
             else:
-                redirect('{0}?account_linking_token={1}'.format(redirect_uri, account_linking_token))
+                redirect(redirect_uri)
         else:
-            redirect('{0}?account_linking_token={1}'.format(redirect_uri, account_linking_token))
+            redirect(redirect_uri)
     else:
         form = LoginForm()
         return render(request, 'fb_authorize.html', {'form': form, 'redirect_uri': redirect_uri,
