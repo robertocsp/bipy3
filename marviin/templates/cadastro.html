@@ -1,73 +1,100 @@
-{% extends "includes/layout.html" %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marviin - Cadastro</title>
+         <meta charset="utf-8">
+         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+         <meta id="viewport" name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../static/marviin/css/font-awesome.min.css">
+        <link href="../static/marviin/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../static/marviin/css/style.css" rel="stylesheet">
+    </head>
+    <body>
 
-{% block conteudo %}
-    <div class="container">
-      <div class="page-header">
-        <h1><i class="fa fa-user"></i> Suas informações</h1>
-      </div>
-      <form class="form-user">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-6">
-        <div class="col-md-12">
-          <label>Nome estabelecimento:</label>
-            <input type="text" placeholder="Nome estabelecimento..." class="form-control">
-          </label><br>
-       </div>
-        <div class="col-md-12">
-          <label>Endereço:</label>
-          <input type="text" placeholder="Logradouro..." class="form-control"><br>
-        </div>
-        <div class="col-md-6">
-          <input type="text" placeholder="Complemento..." class="form-control">
-        </div>
-        <div class="col-md-6">
-          <input type="text" placeholder="Bairro..." class="form-control"><br>
-        </div>
-        <div class="col-md-6">
-          <input type="text" placeholder="Cidade..." class="form-control">
-        </div>
-        <div class="col-md-6">
-          <input type="text" placeholder="Estado..." class="form-control"><br>
-        </div>
-        <div class="col-md-7">
-          <input type="text" placeholder="CEP..." class="form-control"><br>
-        </div>
-        <div class="col-md-12">
-          <label>Tipo de serviço:</label>
-            <select class="form-control" id="sel1">
-            <option>Selecione tipo</option>
-            <option>Restaurante / Bar</option>
-            <option>Pizzaria</option>
-          </select><br>
-          </label>
-        </div>
+        <form class="form-horizontal tela-cadastro">
+            <img src="../static/marviin/img/login-g-branco.png" width="106" />
+            <label class="titulo-label">Preencha os campos abaixo</label><br>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="text" class="form-control" id="nome" placeholder="Nome...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="email" placeholder="Digite seu email..." class="form-control" id="Email">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="text" class="form-control" id="cep" placeholder="CEP...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="text" class="form-control" id="endereco" placeholder="Endereço...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="text" class="form-control" id="complemento" placeholder="Complemento...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="text" class="form-control" id="bairro" placeholder="Bairro...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="text" class="form-control" id="cidade" placeholder="Cidade...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="text" class="form-control" id="estado" placeholder="Estado...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="text" class="form-control" id="telefone" placeholder="Telefone...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="password" class="form-control" id="Senha" placeholder="Senha...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <input type="password" class="form-control" id="confirmasenha" placeholder="Confirmar Senha...">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" value="agree">  Concordo com os <a href="#">Termos e condições de uso</a>.
+                    </label>
+                </div>
+            </div>
 
-        <div class="col-md-12">
-            <label>Logo:</label>
-              <input id="logo" name="file-pt-BR[]" type="file" multiple>
-            </label><br>
-        </div><br><br>
-        <button type="submit" class="btn btn-primary">
-          <span class="glyphicon glyphicon-okr" aria-hidden="true"></span> Salvar
-        </button><br /><br />
-      </form>
-      </div>
-      </div>
-      <div class="col-md-3">
-      </div>
-    </div>
-
-{% endblock %}
-
-{% block scripts %}
-
-    <script type="text/javascript">
-       $('#logo').fileinput({
-          language: 'pt-BR',
-          uploadUrl: '#',
-          allowedFileExtensions : ['jpg', 'png','gif'],
-       });
-    </script>
-
-{% endblock %}
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" value="agree">  Aceito receber novidades sobre o Marviin.
+                    </label>
+                </div>
+            </div>
+            <br>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <button id="" type="button" class="btn btn-primary save-card">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Enviar
+                    </button>
+                    <button id="" type="button" class="btn btn-default save-card">
+                        <span class="fa fa-times" aria-hidden="true"></span> Cancelar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </body>
+</html>

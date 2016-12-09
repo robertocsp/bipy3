@@ -1862,6 +1862,93 @@ p.descri{
     display: none;
 }
 
+.conteiner-login{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    margin: auto;
+    width: 300px;
+    height: 280px;
+    background: #fff;
+    -webkit-box-shadow: 2px 4px 10px 8px rgba(6, 6, 6,.5);
+    -moz-box-shadow: 2px 4px 10px 8px rgba(6, 6, 6,.5);
+    box-shadow: 2px 4px 10px 8px rgba(6, 6, 6,.5);
+    z-index: 100;
+    padding: 20px;
+}
+
+.tela-erro{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    margin: auto;
+    width: 50%;
+    height: 400px;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #aaa;
+}
+
+.tela-erro img{
+    width: 106px;
+    display: block;
+    margin: 0 auto;
+}
+
+.tela-erro h5{
+    color: #aaa;
+    font-size: 25px;
+    width: 100%;
+    text-align: center;
+}
+
+.tela-erro .voltar a{
+    font-size: 16px;
+    text-decoration: uderline;
+    width: 100%;
+    text-align: center;
+}
+
+.conteiner-login img{
+    width: 106px;
+    margin: 20px auto 20px auto;
+    display: block;
+}
+
+.conteiner-login .text-center{
+    width: 100%;
+    text-align: center;
+    display: block;
+    font-size: 20px;
+}
+
+.tela-cadastro{
+    padding: 20px;
+}
+
+.tela-cadastro label{
+    color: #333;
+    width: 100%;
+    display: block;
+    text-align: center;
+    font-size: 13px;
+}
+
+.tela-cadastro label.titulo-label{
+    font-size: 18px;
+}
+
+.tela-cadastro img{
+    margin: 15px auto;
+    display: block;
+    width: 106px;
+}
+
+
 @media only screen and (max-width: 1024px){
     .around{
         overflow-y: hidden;
