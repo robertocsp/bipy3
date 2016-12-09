@@ -73,8 +73,14 @@ def logout_geral(request):
 
 
 def fb_authorize(request):
-    redirect_uri = request.data.get('redirect_uri', None)
-    account_linking_token = request.data.get('account_linking_token', None)
+    if 'redirect_uri' in request.POST and 'account_linking_token' in request.POST:
+        redirect_uri = request.POST['redirect_uri']
+        account_linking_token = request.POST['account_linking_token']
+    elif 'redirect_uri' in request.GET and 'account_linking_token' in request.GET:
+        redirect_uri = request.GET['redirect_uri']
+        account_linking_token = request.GET['account_linking_token']
+    else:
+        return render(request, 'fb_authorize_fail.html')
     logger.info('-=-=-=- redirect_uri -=-=-=-' + redirect_uri)
     logger.info('-=-=-=- account_linking_token -=-=-=-' + account_linking_token)
     if request.method == 'POST':
