@@ -174,8 +174,8 @@ $(function() {
             {
                 $('div.loading-marviin').show();
                 $('#modulo').prop('disabled', true);
-                if (history.pushState)
-                    history.pushState('marviin login acesso', "Marviin Acesso", "/");
+                if (history && history.replaceState)
+                    history.replaceState('marviin login acesso', "Marviin Acesso", "/");
                 $.post('https://sistema.marviin.com.br/marviin/api/rest/acesso_bot_v2',
                      {code: code, client_id: state.split('|')[1]},
                      function(data) {

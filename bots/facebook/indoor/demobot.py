@@ -25,22 +25,9 @@ from demobotlog import app_log
 
 my_cache.cache_entry_prefix = 'indoor'
 flask_app = Flask(__name__)
-# celery_app = make_celery(flask_app, 'rabbitbotvhost')
+
 app_log.debug('celery_app:::' + send_generic_message.name)
-'''
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-with open(os.path.join(os.path.join(BASE_DIR, 'marviin_conf'), 'keys.txt')) as keys_file:
-    for line in keys_file:
-        key_value_pair = line.strip().split('=')
-        if key_value_pair[0] == 'super_user_user':
-            SUPER_USER_USER = key_value_pair[1]
-        if key_value_pair[0] == 'super_user_password':
-            SUPER_USER_PASSWORD = key_value_pair[1]
-        if key_value_pair[0] == 'api-secret':
-            CHAVE_BOT_API_INTERNA = key_value_pair[1]
-        if key_value_pair[0] == 'webhook-secret':
-            CHAVE_BOT_WEBHOOK = key_value_pair[1]
-'''
+
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
 POSTBACK_MAP = {

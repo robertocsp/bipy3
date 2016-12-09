@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marviin - Autorização</title>
+         <meta charset="utf-8">
+         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+         <meta id="viewport" name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    </head>
+    <body>
+            <form action="" method="post" id="form-login">
+                {% csrf_token %}
+                <input type="hidden" name="redirect_uri" value="{{redirect_uri}}"/>
+                <input type="hidden" name="account_linking_token" value="{{account_linking_token}}"/>
+                <div class="input-group">
+                  <span class="input-group-addon" id="basic-addon1"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
+                  <input type="text" id="id_username" name="username" class="form-control" placeholder="Usuário..." aria-describedby="basic-addon1">
+                </div><br />
+                <div class="input-group">
+                  <span class="input-group-addon" id="basic-addon2"><span class="fa fa-unlock" aria-hidden="true"></span></span>
+                  <input type="password" id="id_senha" name="senha" class="form-control" placeholder="Senha..." aria-describedby="basic-addon2">
+                </div><br />
+                <button type="submit" id="btn-login-entrar" class="btn btn-primary btn-verde btn-border-white">
+                  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Entrar
+                </button>
+            </form>
+    </body>
+</html>
