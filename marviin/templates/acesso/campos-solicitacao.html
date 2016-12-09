@@ -1,9 +1,7 @@
     <div class="content content-dados" id="conteudo-principal">
-        <div id="cumprimento">Olá, {{user_name}}!</div>
-
         <div id="permissao-pagina">
             <form id="form_solicitacao_acesso" onsubmit="return false;">
-                <br/><label class="text-into">Indique o módulo que deseja utilizar</label>
+                <br/><label class="text-into">Olá, {{user_name}}! Indique o módulo que deseja utilizar</label>
                 <select id="modulo" name="modulo" onchange="carregaInfosUsuario($(this).val());">
                     <option value="" disabled="disabled">Selecione</option>
                     <option value="548897018630774"{% if client_id == '548897018630774' %} selected{% endif %}>Atendimento</option>
@@ -18,7 +16,7 @@
                     <input type="text" name="tel_estabelecimento" value="" id="tel_estabelecimento" required><br>
                     <label>CNPJ do Estabelecimento: </label>
                     <input type="text" name="cnpj_estabelecimento" value="" id="cnpj_estabelecimento" required><br>
-                    <div class="input-middle ma">
+                    <div class="input-middle">
                         <label>CEP: </label>
                         <input type="text" name="cep_estabelecimento" value="" id="cep_estabelecimento" required><br>
                     </div>
@@ -46,10 +44,8 @@
                  <div class="dados-resp" id="cadastro_usuario">
                     <h2><label>Dados do usuário para o Dashboard Marviin</label></h2>
                     <div>
-                        <button type="button" id="btn_tenho_login" title="Já tenho login">Já tenho login</button>
-                    </div>
-                    <div>
-                        <button type="button" id="btn_nao_tenho_login" title="Não tenho login">Não tenho login</button>
+                        <button type="button" class="btn-tenho" id="btn_tenho_login" title="Já tenho login"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> Já tenho login</button>
+                        <button type="button" class="btn-tenho" id="btn_nao_tenho_login" title="Não tenho login"><i class="fa fa-thumbs-o-down" aria-hidden="true"></i> Não tenho login</button>
                     </div>
                     <input type="hidden" name="tipo_cadastro_usuario" value="" id="tipo_cadastro_usuario">
                     <div id="nao_tenho_login" style="display: none">

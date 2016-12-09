@@ -52,7 +52,7 @@ body .navbar-default ul.navbar-nav > li > a:focus, .navbar-default .navbar-nav>.
 }
 
 label{
-	color: #aaa;
+	color: #665c53;
 	font-weight: normal;
 }
 
@@ -1852,6 +1852,14 @@ p.descri{
 
 .container.tela-pedido-delivery .detalhe-pedido-icon .lista-pedidos{
     width: 500px;
+}
+
+.pag label.checkbox-inline{
+    color: #665c53;
+}
+
+.form-group.bandeiras-lista{
+    display: none;
 }
 
 @media only screen and (max-width: 1024px){

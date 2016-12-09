@@ -41,3 +41,7 @@ def cadastraCardapio(request):
 @login_required
 def pedidos_delivery(request):
     return render(request, 'pedido-delivery.html')
+
+@login_required
+def pagamento(request):
+    return render(request, 'pagamento.html')

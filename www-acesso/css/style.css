@@ -419,3 +419,15 @@ footer .copyright a {
 html, body{
     height: 100%;
 }
+
+.btn-tenho{
+    background: #fff;
+    border: 1px solid #665c53;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin: 0 20px 40px 10px;
+}
+
+#envia_cadastro_marviin{
+    margin-top: 30px;
+}

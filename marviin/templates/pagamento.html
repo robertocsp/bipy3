@@ -1,0 +1,139 @@
+{% extends "includes/layout.html" %}
+
+{% block  delivery %}active{% endblock %}
+
+{% block  pagamento %}active{% endblock %}
+
+{% block conteudo %}
+{% load pedido_tags %}
+
+<div class="container hist">
+    <div class="page-header">
+      <h1><i class="fa fa-money"></i> Configurar meios de pagamento</h1>
+    </div>
+    <div class="container pag">
+      <form class="form-user">
+        <h4><label class="col-xs-12">Meios de pagamento aceitos:</label></h4><br><br>
+        <div class="form-group btns">
+            <div class="col-xs-2">
+                <label class="btn-debito">
+                    <input type="checkbox" value="agree"> Débito
+                </label>
+            </div>
+            <div class="col-xs-2">
+                <label class="btn-cartao">
+                    <input type="checkbox" value="agree"> Crédito
+                </label>
+            </div>
+            <div class="col-xs-2">
+                <label class="btn-dinheiro">
+                    <input type="checkbox" value="agree"> Dinheiro
+                </label>
+            </div>
+            <div class="col-xs-2">
+                <label class="btn-vale">
+                    <input type="checkbox" value="agree"> Vale Refeição
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group bandeiras-lista" id="btn-vale"><br><br><br>
+            <h4><label class="col-xs-12"><i class="fa fa-ticket"></i>  Bandeiras (Vale Refeição):</label></h4><br><br>
+            <div class="col-xs-2">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Alelo/Visa Vale
+                </label>
+            </div>
+            <div class="col-xs-2">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Sodexo
+                </label>
+            </div>
+            <div class="col-xs-2">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Ticket Restaurante
+                </label>
+            </div>
+        </div>
+        <div class="form-group bandeiras-lista" id="btn-cartao"><br><br><br>
+            <h4><label class="col-xs-12"><i class="fa fa-credit-card"></i>  Bandeiras (Crédito):</label></h4><br><br>
+            <div class="col-xs-1">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Visa
+                </label>
+            </div>
+            <div class="col-xs-2">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Mastercard
+                </label>
+            </div>
+            <div class="col-xs-2">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> American Express
+                </label>
+            </div>
+            <div class="col-xs-1">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Diners
+                </label>
+            </div>
+            <div class="col-xs-1">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Elo
+                </label>
+            </div>
+        </div>
+        <div class="form-group bandeiras-lista" id="btn-debito"><br><br><br>
+            <h4><label class="col-xs-12"><i class="fa fa-credit-card-alt"></i>  Bandeiras (Débito):</label></h4><br><br>
+            <div class="col-xs-1">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Visa
+                </label>
+            </div>
+            <div class="col-xs-2">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Mastercard
+                </label>
+            </div>
+            <div class="col-xs-1">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="agree"> Elo
+                </label>
+            </div>
+        </div>
+        <br><br>
+        <button type="submit" class="btn btn-primary">
+          <span class="glyphicon glyphicon-okr" aria-hidden="true"></span> Salvar
+        </button><br /><br />
+      </form>
+      </div>
+      </div>
+      <div class="col-md-3">
+      </div>
+    </div>
+</div>
+<!-- inicio dialogo bot -->
+<div id="content-dialog" class="content-dialog"></div>
+<div class="bg"></div>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+    $(".btns input").click(function(){
+
+        thatClass = $(this).parent("label").attr("class");
+
+        if($("#" + thatClass).hasClass("ativo")){
+            $("#" + thatClass).hide();
+            $("#" + thatClass).removeClass("ativo");
+        }else{
+            $("#" + thatClass).show();
+            $("#" + thatClass).addClass("ativo");
+        }
+    });
+
+</script>
+
+{% endblock %}
