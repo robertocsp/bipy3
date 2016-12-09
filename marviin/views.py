@@ -87,9 +87,9 @@ def fb_authorize(request):
     logger.info('-=-=-=- account_linking_token -=-=-=-' + account_linking_token)
     if request.method == 'POST':
         form = LoginForm(request.POST)
-        if form.is_valid() and redirect_uri is not None and account_linking_token is not None:
-            username = form.username
-            senha = form.senha
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            senha = form.cleaned_data['senha']
             try:
                 user_login = User.objects.get(email=username)
                 if user_login.is_active:
