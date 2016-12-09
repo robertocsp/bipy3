@@ -20,34 +20,22 @@ except ImportError:
     from urllib import urlencode
 from my_celery.tasks import get_object, send_quickreply_message, enviar_pedido, envia_resposta, send_generic_message, \
     touch_cliente, send_text_message, salva_se_nao_existir, notificacao_dashboard, get_cardapio, \
-    send_image_url_message, troca_mesa_dashboard, teste_tarefa, error_handler
+    send_image_url_message, troca_mesa_dashboard, teste_tarefa, error_handler, send_button_message
 from deliverylog import app_log
 
 my_cache.cache_entry_prefix = 'delivery'
+my_cache.EXPIRACAO_CACHE_CONVERSA = 60 * 30  # 30 minutos
 flask_app = Flask(__name__)
-# celery_app = make_celery(flask_app, 'rabbitbotdeliveryvhost')
+
 app_log.debug('celery_app:::' + send_generic_message.name)
-'''
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-with open(os.path.join(os.path.join(BASE_DIR, 'marviin_conf'), 'keys.txt')) as keys_file:
-    for line in keys_file:
-        key_value_pair = line.strip().split('=')
-        if key_value_pair[0] == 'super_user_user':
-            SUPER_USER_USER = key_value_pair[1]
-        if key_value_pair[0] == 'super_user_password':
-            SUPER_USER_PASSWORD = key_value_pair[1]
-        if key_value_pair[0] == 'api-secret':
-            CHAVE_BOT_API_INTERNA = key_value_pair[1]
-        if key_value_pair[0] == 'webhook-secret':
-            CHAVE_BOT_WEBHOOK = key_value_pair[1]
-'''
+
 saudacao = ['ola', 'oi', 'bom dia', 'boa tarde', 'boa noite']
 agradecimentos = ['obrigado', 'obrigada', 'valeu', 'vlw', 'flw']
 POSTBACK_MAP = {
     'menu_novo_pedido': u'Novo pedido',
     'pedir_cardapio': u'Visualizar cardápio',
     'menu_trocar_mesa': u'Definir endereço',
-    'finalizar_pedido': u'Enviar pedido',
+    'finalizar_pedido': u'Conferir e Enviar',
     'pedir_mais': u'+ itens ao pedido',
     'menu_rever_pedido': u'Atualizar pedido',
     'menu_get_started': u'Menu principal',
@@ -55,7 +43,7 @@ POSTBACK_MAP = {
     'remover_item_': u'Remover item',
     'vermais_offset_': u'Ver mais itens',
 }
-# ULTIMO PASSO = 31
+# ULTIMO PASSO = 32
 
 
 def get_elements_menu(conversa):
@@ -66,9 +54,9 @@ def get_elements_menu(conversa):
     if possui_itens_pedido and mesa_definida and pedido_andamento:
         menu.append(
             {
-                'title': u'Envie seu pedido',
+                'title': u'Confira e envie seu pedido',
                 'image_url': 'https://sistema.marviin.com.br/static/marviin/img/enviar_pedido.jpg',
-                'subtitle': u'Envie seu pedido para iniciarmos seu preparo.',
+                'subtitle': u'Confira e envie seu pedido para iniciarmos seu preparo.',
                 'buttons': [
                     {
                         'type': 'postback',
@@ -151,7 +139,7 @@ def get_quickreply_cardapio_digital(conversa):
         menu.append(
             {
                 'content_type': 'text',
-                'title': u'Enviar pedido',
+                'title': u'Conferir e Enviar',
                 'payload': 'finalizar_pedido'
             })
     if mesa_definida and pedido_andamento:
@@ -187,7 +175,7 @@ def get_quickreply_pedido():
     return [
         {
             'content_type': 'text',
-            'title': u'Enviar pedido',
+            'title': u'Conferir e Enviar',
             'payload': 'finalizar_pedido'
         },
         {
@@ -222,7 +210,7 @@ def get_quickreply_pedido2():
         },
         {
             'content_type': 'text',
-            'title': u'Enviar pedido',
+            'title': u'Conferir e Enviar',
             'payload': 'finalizar_pedido'
         },
         {
@@ -242,7 +230,7 @@ def get_quickreply_finalizar_pedido():
     return [
         {
             'content_type': 'text',
-            'title': u'Confirmar envio',
+            'title': u'Enviar pedido',
             'payload': 'finalizar_enviar'
         },
         {
@@ -323,6 +311,27 @@ def get_quickreply_sim_nao():
     ]
 
 
+# TODO QUICKREPLY DE PGTO
+def get_quickreply_pgto1():
+    pass
+
+
+def get_button_login():
+    # TODO BOTAO CRIAR CONTA CHAMARA WEBVIEW
+    # VER https://developers.facebook.com/docs/messenger-platform/messenger-extension
+    return [
+        {
+            'type': 'account_link',
+            'url': 'https://sistema.marviin.com.br/fb_authorize'
+        },
+        {
+            'type': 'postback',
+            'title': 'Criar Conta',
+            'payload': 'DEVELOPER_DEFINED_PAYLOAD'
+        }
+    ]
+
+
 def get_mensagem(id_mensagem, **args):
     mensagens = {
         'ola':        Template(u'Olá $arg1, como posso ajudá-lo(a)?'),
@@ -332,7 +341,7 @@ def get_mensagem(id_mensagem, **args):
                                u'Você poderá digitá-la novamente a qualquer momento.'),
         'mesa':       Template(u'Por favor, digite seu endereço.'),
         'pedido':     Template(u'Excelente, digite aqui o que deseja, quanto mais detalhado melhor! ;)'),
-        'pedido1':    Template(u'Exemplo: 1 água com gelo sem limão'),
+        'pedido1':    Template(u'Exemplo: 1 pizza família mozarela e 1 coca 2L'),
         'pedido2':    Template(u'Desculpe, mas não encontrei um pedido sendo montado. Pedirei que comece um novo, por '
                                u'favor. Obrigado.'),
         'anotado':    Template(u'Anotado.\n$arg1, deseja mais alguma coisa ou posso enviar seu pedido?'),
@@ -368,6 +377,8 @@ def get_mensagem(id_mensagem, **args):
         'conta':      Template(u'Ok, já avisei para trazerem sua conta.\nMuito obrigado(a), espero que sua experiência '
                                u'tenha sido a melhor possível.\nVolte sempre!'),
         'conta2':     Template(u'Desculpe, mas não tenho anotado seu endereço. Você poderia me informar, por favor.'),
+        'pgto1':      Template(u'Escolha sua forma de pagamento'),
+        'login':      Template(u'Para sua segurança peço que faça o login na sua conta Marviin.'),
     }
     return mensagens[id_mensagem].substitute(args)
 
@@ -550,6 +561,7 @@ def webhook():
                                 'usuario': user,
                                 'mesa': None,
                                 'aux': None,
+                                'pgto': None,
                                 'itens_pedido': [],
                                 'nao_entendidas': 0,
                                 'datahora_inicio_pedido': None,
@@ -583,7 +595,7 @@ def webhook():
                                     passo_menu(message, sender_id, loja_id, conversa)
                                 elif u'pedido' in unicodedata.normalize('NFKD', message)\
                                         .encode('ASCII', 'ignore').lower():
-                                    # passos 13 e 14 definidos dentro do método
+                                    # passo 14 definido dentro do método
                                     passo_novo_pedido(message, sender_id, loja_id, conversa)
                                 elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() \
                                         in agradecimentos:
@@ -618,7 +630,7 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
     if payload == 'menu_novo_pedido' or payload == 'menu_novo_pedido2':
         if payload == 'menu_novo_pedido2':
             set_variaveis(conversa)
-        # passos 13 e 14 definidos dentro do método
+        # passos 14 definido dentro do método
         passo_novo_pedido(message, sender_id, loja_id, conversa)
     elif payload == 'menu_trocar_mesa':
         define_sim_nao(conversa, 3, define_passo, 15, define_payload, 'menu_trocar_mesa')
@@ -643,7 +655,6 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
         conversa['passo'] = 17
         passo_pedir_mais(message, sender_id, loja_id, conversa)
     elif payload == 'finalizar_pedido':
-        conversa['passo'] = 18
         passo_finalizar_pedido(message, sender_id, loja_id, conversa)
     elif payload == 'finalizar_enviar':
         conversa['passo'] = 0
@@ -751,6 +762,10 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
                           itens_pedido=(False, None),
                           datetime_pedido=(False, None))
             passo_rever_pedido_2(message, sender_id, loja_id, conversa, eh_msg_sucesso=True)
+    elif passo == 32:
+        define_mesa(conversa['aux'], conversa)
+        conversa['aux'] = None
+        passo_finalizar_pedido(message, sender_id, loja_id, conversa)
     else:
         conversa['passo'] = 12
         passo_nao_entendido(message, sender_id, loja_id, conversa)
@@ -960,21 +975,35 @@ def passo_finalizar_enviar(message, sender_id, loja_id, conversa):
 def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         if len(conversa['itens_pedido']) > 0:
-            pedidos = None
-            for i, item in enumerate(conversa['itens_pedido']):
-                if pedidos:
-                    pedidos += '\n'
-                else:
-                    pedidos = ''
-                pedidos += repr(item['quantidade']) + ' ' + item['descricao']
-            bot1 = pedidos
-            bot2 = get_mensagem('finalizar')
-            chain(send_text_message.si(sender_id, loja_id, bot1),
-                  send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_finalizar_pedido(), icon=None))()
+            # TODO VERIFICAR SE NECESSITA DE LOGIN OU SE AUTORIZACAO AINDA EH VALIDA
+            send_button_message.delay(sender_id, loja_id, get_mensagem('login'), get_button_login())
         else:
             bot = get_mensagem('rever2')
             chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
                                                                                          get_elements_menu(conversa)))()
+
+
+def passo_finalizar_pedido_autorizado(message, sender_id, loja_id, conversa):
+    # TODO IMPLEMENTAR FORMA DE PGTO
+    if conversa['mesa'] is None:
+        define_sim_nao(conversa, 3, define_passo, 32, define_payload, 'finalizar_pedido')
+        mensagem_mesa(conversa, loja_id, sender_id)
+    elif conversa['pgto'] is None:
+        send_quickreply_message.delay(sender_id, loja_id, get_mensagem('pgto1'), get_quickreply_pgto1())
+    else:
+        conversa['passo'] = 18
+        pedidos = None
+        for i, item in enumerate(conversa['itens_pedido']):
+            if pedidos:
+                pedidos += '\n'
+            else:
+                pedidos = ''
+            pedidos += repr(item['quantidade']) + ' ' + item['descricao']
+        bot1 = pedidos
+        bot2 = get_mensagem('finalizar')
+        chain(send_text_message.si(sender_id, loja_id, bot1),
+              send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_finalizar_pedido(),
+                                         icon=None))()
 
 
 def passo_pedir_mais(message, sender_id, loja_id, conversa):
@@ -1055,12 +1084,8 @@ def passo_trocar_mesa_2(message, sender_id, loja_id, conversa):
 def passo_novo_pedido(message, sender_id, loja_id, conversa):
     if not existe_pedido_andamento(sender_id, loja_id, conversa):
         set_variaveis(conversa, datetime_pedido=(True, datetime.datetime.utcnow()))
-        if conversa['mesa'] is None:
-            define_sim_nao(conversa, 3, define_passo, 13, define_payload, 'menu_novo_pedido')
-            mensagem_mesa(conversa, loja_id, sender_id)
-        else:
-            conversa['passo'] = 14
-            mensagem_pedido(sender_id, loja_id, conversa)
+        conversa['passo'] = 14
+        mensagem_pedido(sender_id, loja_id, conversa)
 
 
 def mensagem_mesa(conversa, loja_id, sender_id):

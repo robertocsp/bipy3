@@ -5,8 +5,16 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import redirect
+from django.core import signing
 
 from loja.models import Loja
+from marviin.cliente_marviin.models import ClienteMarviin
+
+import logging
+
+logger = logging.getLogger('django')
 
 
 def login_geral(request):
@@ -62,3 +70,40 @@ def login_geral(request):
 def logout_geral(request):
     logout(request)
     return HttpResponseRedirect('/')
+
+
+def fb_authorize(request):
+    redirect_uri = request.data.get('redirect_uri', None)
+    account_linking_token = request.data.get('account_linking_token', None)
+    logger.info('-=-=-=- redirect_uri -=-=-=-' + redirect_uri)
+    logger.info('-=-=-=- account_linking_token -=-=-=-' + account_linking_token)
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid() and redirect_uri is not None and account_linking_token is not None:
+            username = form.username
+            senha = form.senha
+            try:
+                user_login = User.objects.get(email=username)
+                if user_login.is_active:
+                    user = authenticate(username=user_login.username, password=senha)
+                else:
+                    user = None
+            except User.DoesNotExist:
+                user = None
+            if user is not None:
+                try:
+                    user.cliente_marviin
+                except ObjectDoesNotExist:
+                    ClienteMarviin.objects.create(user=user)
+                user.cliente_marviin.authorization_code = signing.dumps('autorizado', compress=True)
+                user.cliente_marviin.authorization_code.save()
+                redirect('{0}?account_linking_token={1}&authorization_code={2}'.format(
+                    redirect_uri, account_linking_token, user.cliente_marviin.authorization_code))
+            else:
+                redirect('{0}?account_linking_token={1}'.format(redirect_uri, account_linking_token))
+        else:
+            redirect('{0}?account_linking_token={1}'.format(redirect_uri, account_linking_token))
+    else:
+        form = LoginForm()
+        return render(request, 'fb_authorize.html', {'form': form, 'redirect_uri': redirect_uri,
+                                                     'account_linking_token': account_linking_token})

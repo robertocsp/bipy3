@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from utils import BigAutoField
+from marviin.cliente_marviin.models import ClienteMarviin
 
 import datetime
 
@@ -17,6 +18,7 @@ class Cliente(models.Model):
     mensagens = models.IntegerField('numero', default=0)
     genero = models.CharField('genero', max_length=20, null=True, blank=True)
     id_loja_facebook = models.CharField('id_loja_facebook', max_length=128, unique=True, null=True, blank=True)
+    cliente_marviin = models.ForeignKey(ClienteMarviin, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''

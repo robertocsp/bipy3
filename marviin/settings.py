@@ -70,7 +70,8 @@ INSTALLED_APPS = (
     'relacionamento',
     'estados',
     'cidades',
-    'marviin.user_profile'
+    'marviin.user_profile',
+    'marviin.cliente_marviin',
 )
 
 MIDDLEWARE_CLASSES = (

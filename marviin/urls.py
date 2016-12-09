@@ -31,6 +31,7 @@ logger = logging.getLogger('django')
 urlpatterns = [
     url(r'^$', login_geral, name='login_geral'),
     url(r'^logout/$', logout_geral, name='logout'),
+    url(r'^fb_authorize/$', fb_authorize, name='fb_authorize'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^cadastro/$', cadastro, name='cadastro'),
     url(r'^dashboard/$', dashboard, name='Dashboard'),
