@@ -76,7 +76,7 @@ def send_image_url_message(self, sender_id, loja_id, url, icon=ROBOT_ICON):
 
 
 @celery_app.task(bind=True, soft_time_limit=7)
-def send_button_message(sender_id, loja_id, text, buttons):
+def send_button_message(self, sender_id, loja_id, text, buttons):
     payload = {
         'recipient': {
             'id': sender_id
