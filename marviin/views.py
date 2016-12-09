@@ -104,12 +104,12 @@ def fb_authorize(request):
                 except ObjectDoesNotExist:
                     ClienteMarviin.objects.create(user=user)
                 user.cliente_marviin.authorization_code = signing.dumps('autorizado', compress=True)
-                user.cliente_marviin.authorization_code.save()
-                redirect('{0}&authorization_code={1}'.format(redirect_uri, user.cliente_marviin.authorization_code))
+                user.cliente_marviin.save()
+                return redirect('{0}&authorization_code={1}'.format(redirect_uri, user.cliente_marviin.authorization_code))
             else:
-                redirect(redirect_uri)
+                return redirect(redirect_uri)
         else:
-            redirect(redirect_uri)
+            return redirect(redirect_uri)
     else:
         form = LoginForm()
         return render(request, 'fb_authorize.html', {'form': form, 'redirect_uri': redirect_uri,
