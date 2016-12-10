@@ -481,7 +481,7 @@ class EnderecoClienteView(views.APIView):
                                       u'e tente novamente novamente.')
         psid = request.GET['psid']
         try:
-            cliente = Cliente.objects.get(chave_facebook=psid).select_related('cliente_marviin')
+            cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
         except Cliente.DoesNotExist:
             logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '

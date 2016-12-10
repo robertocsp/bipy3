@@ -14,7 +14,7 @@
     </head>
     <body>
         <section class="conteiner-login">
-            <img src="../static/marviin/img/login-g-branco.png" width="106" />
+            <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
             <div class="input-group" id="lista-enderecos">
                 <img src="../static/marviin/img/loading-marviin.gif" />
             </div><br />
@@ -39,7 +39,10 @@
                 });
             })
             .fail(function(error) {
-                $('#lista-enderecos').html(error.message);
+                if(error.message)
+                    $('#lista-enderecos').html(error.message);
+                else
+                    $('#lista-enderecos').html('Desculpe, mas não foi possível recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
             });
         }
 
@@ -56,9 +59,10 @@
             if(isSupported)
             {
                 MessengerExtensions.getUserID(function success(uids) {
+                    alert(getParameterByName('psid'));
                     get_endereco(uids.psid);
                 }, function error(err) {
-                    $.post();
+                    //$.post();
                     $('#lista-enderecos').html('Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
                 });
             }
