@@ -14,15 +14,16 @@
     </head>
     <body>
         <section>
-            <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
+            <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" /><br />
             <div class="input-group" id="lista-enderecos">
-                <img src="../static/marviin/img/loading-marviin.gif" width="106" />
             </div><br />
             <button type="button" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white">
               <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher
             </button>
         </section>
+        <div class="loading-marviin"></div>
         <script>
+        $('.loading-marviin').show();
         function get_endereco(psid)
         {
             $.getJSON( 'https://sistema.marviin.com.br/marviin/api/rest/endereco_cliente?psid='+psid, function( data ) {
@@ -44,6 +45,9 @@
                     $('#lista-enderecos').html(error.message);
                 else
                     $('#lista-enderecos').html('Desculpe, mas não foi possível recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
+            })
+            .always(function() {
+                $('div.loading-marviin').hide();
             });
         }
 
