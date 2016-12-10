@@ -2,6 +2,7 @@
 from django.db import models
 from utils import BigAutoField
 from marviin.cliente_marviin.models import ClienteMarviin
+from jsonfield import JSONField
 
 import datetime
 
@@ -11,7 +12,8 @@ class Cliente(models.Model):
     nome = models.CharField('nome', max_length=200, null=True, blank=True)
     telefone = models.CharField('telefone', max_length=20, null=True, blank=True)
     chave_telegram = models.CharField('chave_telegram', max_length=20, unique=True, null=True, blank=True)
-    #cheguei a este tamanho a partir deste post: http://stackoverflow.com/questions/7566672/whats-the-max-length-of-a-facebook-uid
+    # cheguei a este tamanho a partir deste post:
+    # http://stackoverflow.com/questions/7566672/whats-the-max-length-of-a-facebook-uid
     chave_facebook = models.CharField('chave_facebook', max_length=128, unique=True, null=True, blank=True)
     foto = models.CharField('foto', max_length=255, null=True, blank=True)
     data_interacao = models.DateTimeField(null=True)
@@ -19,6 +21,7 @@ class Cliente(models.Model):
     genero = models.CharField('genero', max_length=20, null=True, blank=True)
     id_loja_facebook = models.CharField('id_loja_facebook', max_length=128, unique=True, null=True, blank=True)
     cliente_marviin = models.ForeignKey(ClienteMarviin, null=True, blank=True)
+    pedido_info = JSONField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''

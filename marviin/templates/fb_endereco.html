@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marviin - Escolha de endereço</title>
+         <meta charset="utf-8">
+         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+         <meta id="viewport" name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../static/marviin/css/font-awesome.min.css">
+        <link href="../static/marviin/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../static/marviin/css/style.css" rel="stylesheet">
+
+        <script type="text/javascript" src="../static/marviin/js/jquery.min.js"></script>
+        <script type="text/javascript" src="../static/marviin/js/main.js"></script>
+    </head>
+    <body>
+        <section class="conteiner-login">
+            <img src="../static/marviin/img/login-g-branco.png" width="106" />
+            <div class="input-group" id="lista-enderecos">
+                <img src="../static/marviin/img/loading-marviin.gif" />
+            </div><br />
+            <button type="button" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white">
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher
+            </button>
+        </section>
+        <script>
+        function get_endereco(psid)
+        {
+            $.getJSON( 'https://sistema.marviin.com.br/marviin/api/rest/endereco_cliente?psid='+psid, function( data ) {
+                data.forEach(function (item, index){
+                    $('#lista-enderecos').html('<label>Endereço</label>');
+                    var input = $('<input></input>')
+                        .attr('type', 'radio')
+                        .attr('name', 'endereco_entrega')
+                        .attr('value', item.id);
+                    var endereco = item.endereco + ' ' + item.complemento + ', ' + item.bairro + ', CEP: ' + item.cep + ', ' + item.cidade + ', ' + item.estado;
+                    if(index > 0)
+                        $('#lista-enderecos').append($('<br></br>'));
+                    $('#lista-enderecos').append(input).append(endereco);
+                });
+            })
+            .fail(function(error) {
+                $('#lista-enderecos').html(error.message);
+            });
+        }
+
+        (function(d, s, id){
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) {return;}
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.com/en_US/messenger.Extensions.js";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'Messenger'));
+
+        window.extAsyncInit = function() {
+            var isSupported = MessengerExtensions.isInExtension();
+            if(isSupported)
+            {
+                MessengerExtensions.getUserID(function success(uids) {
+                    get_endereco(uids.psid);
+                }, function error(err) {
+                    $.post();
+                    $('#lista-enderecos').html('Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
+                });
+            }
+            else
+            {
+                var psid = getParameterByName('psid');
+                if(typeof psid === 'undefined')
+                {
+                    $('#lista-enderecos').html('Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
+                }
+                else
+                {
+                    get_endereco(psid);
+                }
+            }
+        };
+        </script>
+    </body>
+</html>

@@ -16,6 +16,7 @@ from pedido.templatetags.pedido_tags import minutos_passados
 from upload_cardapio.models import Cardapio
 from estados.models import Estado
 from cidades.models import Cidade
+from marviin.cliente_marviin.models import Endereco
 from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
 
@@ -424,6 +425,87 @@ class EnviarMensagemBotView(views.APIView):
                     um_pedido.historico.append({ator: mensagem})
                     um_pedido.save()
                     return um_pedido
+
+'''
+class LinkToMarviinView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
+        psid = request.data.get('psid')
+        auth_code = request.data.get('auth_code')
+        try:
+            raw_auth_code = signing.loads(auth_code, max_age=300)  # max ages em segundos (5 minutos)
+        except signing.BadSignature:
+            logger.error('-=-=-=-=-=-=-=- codigo de autorizacao invalido, psid: '+psid+'; auth_code: '+auth_code)
+            raw_auth_code = signing.loads(auth_code)
+            try:
+                cliente_marviin = ClienteMarviin.objects.get(authorization_code=auth_code + '#' + raw_auth_code)
+                cliente_marviin.authorization_code = None
+                cliente_marviin.save()
+                add_cliente_marviin_cliente_fb(psid, cliente_marviin)
+            except ClienteMarviin.DoesNotExist:
+                pass
+            return Response({"success": False})
+        try:
+            cliente_marviin = ClienteMarviin.objects.get(authorization_code=auth_code+'#'+raw_auth_code)
+        except ClienteMarviin.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- codigo de autorizacao nao encontrado, psid: '+psid+'; auth_code: '+auth_code +
+                         '; raw_auth_code: '+raw_auth_code)
+            return Response({"success": False})
+        return add_cliente_marviin_cliente_fb(psid, cliente_marviin)
+
+
+def add_cliente_marviin_cliente_fb(psid, cliente_marviin):
+        try:
+            cliente = Cliente.objects.get(chave_facebook=psid)
+            cliente.cliente_marviin = cliente_marviin
+            cliente.save()
+        except Cliente.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
+            return Response({"success": False})
+        return Response({"success": True})
+'''
+
+
+class EnderecoClienteView(views.APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        if 'psid' not in request.GET:
+            logger.error('-=-=-=-=-=-=-=- parametro psid nao encontrado.')
+            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
+                                      u'e tente novamente novamente.')
+        psid = request.GET['psid']
+        try:
+            cliente = Cliente.objects.get(chave_facebook=psid).select_related('cliente_marviin')
+        except Cliente.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
+            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
+                                      u'e tente novamente novamente.')
+        if cliente.cliente_marviin.authorization_code is None:
+            logger.error('-=-=-=-=-=-=-=- usuario nao logado: ' + psid)
+            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
+                                      u'e tente novamente novamente.')
+        authorization_code = cliente.cliente_marviin.authorization_code.split('#')[0]
+        try:
+            signing.loads(authorization_code, max_age=600)  # max ages em segundos (10 minutos)
+        except signing.BadSignature:
+            logger.error('-=-=-=-=-=-=-=- usuario com login efetuado a mais de 10 minutos: ' + psid)
+            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
+                                      u'e tente novamente novamente.')
+        enderecos = Endereco.objects.filter(user=cliente.cliente_marviin.user, tipo=1).order_by('-padrao', 'endereco')
+        enderecos_resultado = []
+        if enderecos:
+            for endereco in enderecos:
+                enderecos_resultado.append({"id": endereco.id, "endereco": endereco.endereco,
+                                            "complemento": endereco.complemento, "bairro": endereco.bairro,
+                                            "cep": endereco.cep, "estado": endereco.estado, "cidade": endereco.cidade,
+                                            "padrao": endereco.padrao})
+        return Response(enderecos_resultado)
 
 
 class TrocarMesaView(views.APIView):
@@ -1082,11 +1164,9 @@ class AcessoBotView(views.APIView):
 
 def fb_subscribe(page_id, page_access_token, app_scoped_user_id=None, modulo='548897018630774'):
     config_problem = None
-    fb_service_subscribe_app_to_page = Template('https://graph.facebook.com/$arg1/subscribed_apps?'
-                                                'access_token=$arg2')
-    url_subscribe_app_to_page = fb_service_subscribe_app_to_page.substitute(arg1=page_id, arg2=page_access_token)
-    response = fb_request(method='POST', fb_url=url_subscribe_app_to_page)
+    response = fb_subscribe_page(page_id, page_access_token)
     if response is None:
+        logger.error(page_id + u' :: Cód. SUBS1: Não foi possível completar a solicitação.')
         return fail_response(500, u'{"type": "subs", "object": "Cód. SUBS1: Não foi possível completar a solicitação. '
                                   u'Por favor, tente em instantes."}'), None
     subscribe = response.json()
@@ -1094,18 +1174,49 @@ def fb_subscribe(page_id, page_access_token, app_scoped_user_id=None, modulo='54
         response = fb_persistent_menu(page_access_token, modulo=modulo)
         if response is None:
             config_problem = u'Cód. SUBS2: Não foi possível criar o menu hamburguer.'
+            logger.error(page_id + u' :: Cód. SUBS2: Não foi possível criar o menu hamburguer.')
         else:
             persistent_menu = response.json()
             if 'Success' not in persistent_menu['result']:
                 config_problem = u'Cód. SUBS3: Não foi possível criar o menu hamburguer.'
+                logger.error(page_id + u' :: Cód. SUBS3: Não foi possível criar o menu hamburguer.')
         fb_greeting_text(page_access_token, modulo=modulo)
         response = fb_get_started(page_access_token)
         if response is None:
             config_problem = u'Cód. SUBS4: Não foi possível adicionar o botão iniciar.'
+            logger.error(page_id + u' :: Cód. SUBS4: Não foi possível adicionar o botão iniciar.')
         else:
             get_started = response.json()
             if 'Success' not in get_started['result']:
                 config_problem = u'Cód. SUBS5: Não foi possível adicionar o botão iniciar.'
+                logger.error(page_id + u' :: Cód. SUBS5: Não foi possível adicionar o botão iniciar.')
+        response = fb_whitelist_domain(page_access_token)
+        if response is None:
+            response = fb_subscribe_page(page_id, page_access_token, method='DELETE')
+            if response is None:
+                logger.error(page_id + u' :: Cód. SUBS6: Não foi possível remover associação com app.')
+            else:
+                unsubscribe = response.json()
+                if 'success' not in unsubscribe or unsubscribe['success'] == False:
+                    logger.error(page_id + u' :: Cód. SUBS7: Não foi possível remover associação com app.')
+            logger.error(page_id + u' :: Cód. SUBS8: Não foi possível adicionar whitelist domain.')
+            return fail_response(500,
+                                 u'{"type": "subs", "object": "Cód. SUBS8: Não foi possível completar a solicitação. '
+                                 u'Por favor, tente em instantes."}'), None
+        else:
+            whitelist_domain = response.json()
+            if 'Success' not in whitelist_domain['result']:
+                response = fb_subscribe_page(page_id, page_access_token, method='DELETE')
+                if response is None:
+                    logger.error(page_id + u' :: Cód. SUBS9: Não foi possível remover associação com app.')
+                else:
+                    unsubscribe = response.json()
+                    if 'success' not in unsubscribe or unsubscribe['success'] == False:
+                        logger.error(page_id + u' :: Cód. SUBS10: Não foi possível remover associação com app.')
+                logger.error(page_id + u' :: Cód. SUBS11: Não foi possível adicionar whitelist domain.')
+                return fail_response(500,
+                                     u'{"type": "subs", "object": "Cód. SUBS11: Não foi possível completar a '
+                                     u'solicitação. Por favor, tente em instantes."}'), None
         fb_acesso = Fb_acesso()
         fb_acesso.page_id = page_id
         fb_acesso.page_access_token = page_access_token
@@ -1127,6 +1238,13 @@ def fb_request(method=None, fb_url=None, json=None):
         response = json.loads(e.read())
         logger.error('!!!ERROR!!! ' + repr(response))
         return None
+
+
+def fb_subscribe_page(pid, pac, method='POST'):
+    fb_service_subscribe_app_to_page = Template('https://graph.facebook.com/$arg1/subscribed_apps?'
+                                                'access_token=$arg2')
+    url_subscribe_app_to_page = fb_service_subscribe_app_to_page.substitute(arg1=pid, arg2=pac)
+    return fb_request(method=method, fb_url=url_subscribe_app_to_page)
 
 
 def fb_persistent_menu(pac, modulo='548897018630774'):
@@ -1198,6 +1316,16 @@ def fb_get_started(pac):
     }
     url_get_started = 'https://graph.facebook.com/v2.7/me/thread_settings?access_token=' + pac
     return fb_request(method='POST', fb_url=url_get_started, json=get_started)
+
+
+def fb_whitelist_domain(pac):
+    whitelist_domain = {
+      "setting_type": "domain_whitelisting",
+      "whitelisted_domains": ["https://sistema.marviin.com.br"],
+      "domain_action_type": "add"
+    }
+    url_whitelist_domain = 'https://graph.facebook.com/v2.7/me/thread_settings?access_token=' + pac
+    return fb_request(method='POST', fb_url=url_whitelist_domain, json=whitelist_domain)
 
 
 class PageAccessTokenView(views.APIView):

@@ -38,6 +38,7 @@ class Endereco(models.Model):
     estado = models.CharField('estado', max_length=2)
     cidade = models.CharField('cidade', max_length=100)
     tipo = models.SmallIntegerField('tipo')  # 1: entrega / 2: cobranca / 3: 1 e 2
+    padrao = models.BooleanField()
 
 
 class Cartao(models.Model):
