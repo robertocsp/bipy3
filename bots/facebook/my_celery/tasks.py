@@ -4,6 +4,7 @@ import requests
 import base64
 import json
 import time
+import os
 import keys.keys as my_keys
 import facebook.facebook as fb
 from celery import Celery  # usar shared_task em caso do celery app nao ficar no arquivo de tarefas
@@ -15,6 +16,7 @@ from cliente.models import Cliente
 
 logger = get_task_logger(__name__)
 fb.logger.parent = logger
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marviin.settings')
 celery_app = Celery(__name__, broker='amqp://rabbitbot:rabbitbot@localhost/rabbitbotvhost', backend='rpc://')
 ROBOT_ICON = u'\U0001f4bb'
 
