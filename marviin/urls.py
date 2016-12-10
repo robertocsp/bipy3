@@ -60,6 +60,7 @@ urlpatterns = [
     url(r'^marviin/api/rest/cria_senha2[/]?$', views.CriaSenha2View.as_view(), name='cria_senha2_view'),
     url(r'^marviin/api/rest/page_access_token[/]?$', views.PageAccessTokenView.as_view(),
         name='page_access_token_view'),
+    url(r'^marviin/api/rest/link_to_marviin[/]?$', views.LinkToMarviinView.as_view(), name='link_to_marviin_view'),
     url(r'^marviin/api/rest/cardapio[/]?$', views.CardapioView.as_view(), name='cardapio_view'),
     url(r'^marviin/api/rest/pesquisa_estabelecimento[/]?$', views.FormularioInteresseView.as_view(),
         name='pesquisa_estabelecimento_view'),

@@ -9,9 +9,6 @@ import facebook.facebook as fb
 from celery import Celery  # usar shared_task em caso do celery app nao ficar no arquivo de tarefas
 from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
-from django.core import signing
-from marviin.cliente_marviin.models import ClienteMarviin
-from cliente.models import Cliente
 
 logger = get_task_logger(__name__)
 fb.logger.parent = logger
@@ -158,39 +155,16 @@ def send_generic_message(self, sender_id, loja_id, elements):
 
 @celery_app.task(bind=True, soft_time_limit=10)
 def link_psid_marviin(self, user_id, auth_code):
-    psid = user_id
-    try:
-        raw_auth_code = signing.loads(auth_code, max_age=300)  # max ages em segundos (5 minutos)
-    except signing.BadSignature:
-        logger.error('-=-=-=-=-=-=-=- codigo de autorizacao invalido, psid: ' + psid + '; auth_code: ' + auth_code)
-        raw_auth_code = signing.loads(auth_code)
-        try:
-            cliente_marviin = ClienteMarviin.objects.get(authorization_code=auth_code + '#' + raw_auth_code)
-            cliente_marviin.authorization_code = None
-            cliente_marviin.save()
-            add_cliente_marviin_cliente_fb(psid, cliente_marviin)
-        except ClienteMarviin.DoesNotExist:
-            pass
-        return False
-    try:
-        cliente_marviin = ClienteMarviin.objects.get(authorization_code=auth_code + '#' + raw_auth_code)
-    except ClienteMarviin.DoesNotExist:
-        logger.error(
-            '-=-=-=-=-=-=-=- codigo de autorizacao nao encontrado, psid: ' + psid + '; auth_code: ' + auth_code +
-            '; raw_auth_code: ' + raw_auth_code)
-        return False
-    return add_cliente_marviin_cliente_fb(psid, cliente_marviin)
-
-
-def add_cliente_marviin_cliente_fb(psid, cliente_marviin):
-    try:
-        cliente = Cliente.objects.get(chave_facebook=psid)
-        cliente.cliente_marviin = cliente_marviin
-        cliente.save()
-    except Cliente.DoesNotExist:
-        logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
-        return False
-    return True
+    data = {}
+    pass
+    data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
+    data['psid'] = user_id
+    data['auth_code'] = auth_code
+    url = 'http://localhost:8888/marviin/api/rest/link_to_marviin'
+    headers = {'content-type': 'application/json',
+               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    logger.info(repr(response))
 
 
 @celery_app.task(bind=True, soft_time_limit=10)
