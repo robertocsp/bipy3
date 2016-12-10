@@ -13,15 +13,13 @@
         <script type="text/javascript" src="../static/marviin/js/main.js"></script>
     </head>
     <body>
-        <section class="conteiner-login">
-            <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
-            <div class="input-group" id="lista-enderecos">
-                <img src="../static/marviin/img/loading-marviin.gif" />
-            </div><br />
-            <button type="button" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white">
-              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher
-            </button>
-        </section>
+        <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
+        <div class="input-group" id="lista-enderecos">
+            <img src="../static/marviin/img/loading-marviin.gif" />
+        </div><br />
+        <button type="button" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher
+        </button>
         <script>
         function get_endereco(psid)
         {
@@ -33,6 +31,7 @@
                         .attr('name', 'endereco_entrega')
                         .attr('value', item.id);
                     var endereco = item.endereco + ' ' + item.complemento + ', ' + item.bairro + ', CEP: ' + item.cep + ', ' + item.cidade + ', ' + item.estado;
+                    alert(endereco);
                     if(index > 0)
                         $('#lista-enderecos').append($('<br></br>'));
                     $('#lista-enderecos').append(input).append(endereco);
@@ -59,7 +58,6 @@
             if(isSupported)
             {
                 MessengerExtensions.getUserID(function success(uids) {
-                    alert(getParameterByName('psid'));
                     get_endereco(uids.psid);
                 }, function error(err) {
                     //$.post();

@@ -501,6 +501,7 @@ class EnderecoClienteView(views.APIView):
         enderecos_resultado = []
         if enderecos:
             for endereco in enderecos:
+                logger.info('-=-=-=- endereco::' + endereco.endereco)
                 enderecos_resultado.append({"id": endereco.id, "endereco": endereco.endereco,
                                             "complemento": endereco.complemento, "bairro": endereco.bairro,
                                             "cep": endereco.cep, "estado": endereco.estado, "cidade": endereco.cidade,
