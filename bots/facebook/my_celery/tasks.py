@@ -164,7 +164,9 @@ def link_psid_marviin(self, user_id, auth_code):
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
+    json_response = response.json()
     logger.info(repr(response))
+    return json_response['success']
 
 
 @celery_app.task(bind=True, soft_time_limit=10)

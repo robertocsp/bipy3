@@ -19,7 +19,7 @@ class Cliente(models.Model):
     data_interacao = models.DateTimeField(null=True)
     mensagens = models.IntegerField('numero', default=0)
     genero = models.CharField('genero', max_length=20, null=True, blank=True)
-    id_loja_facebook = models.CharField('id_loja_facebook', max_length=128, unique=True, null=True, blank=True)
+    id_loja_facebook = models.CharField('id_loja_facebook', max_length=128, null=True, blank=True)
     cliente_marviin = models.ForeignKey(ClienteMarviin, null=True, blank=True)
     pedido_info = JSONField(null=True, blank=True)
 
