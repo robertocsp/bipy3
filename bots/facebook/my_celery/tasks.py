@@ -4,8 +4,8 @@ import requests
 import base64
 import json
 import time
-import keys.keys as my_keys
-import facebook.facebook as fb
+import bots.facebook.keys.keys as my_keys
+import bots.facebook.facebook.facebook as fb
 from celery import Celery  # usar shared_task em caso do celery app nao ficar no arquivo de tarefas
 from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
