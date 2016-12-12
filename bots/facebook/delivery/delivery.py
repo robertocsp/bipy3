@@ -44,15 +44,14 @@ POSTBACK_MAP = {
     'remover_item_': u'Remover item',
     'vermais_offset_': u'Ver mais itens',
 }
-# ULTIMO PASSO = 32
+# ULTIMO PASSO = 34
 
 
 def get_elements_menu(conversa):
     menu = []
     possui_itens_pedido = (len(conversa['itens_pedido']) > 0)
-    mesa_definida = (conversa['mesa'] is not None)
     pedido_andamento = (conversa['datahora_inicio_pedido'] is not None)
-    if possui_itens_pedido and mesa_definida and pedido_andamento:
+    if possui_itens_pedido and pedido_andamento:
         menu.append(
             {
                 'title': u'Confira e envie seu pedido',
@@ -61,12 +60,12 @@ def get_elements_menu(conversa):
                 'buttons': [
                     {
                         'type': 'postback',
-                        'title': u'Enviar pedido',
+                        'title': u'Conferir e Enviar',
                         'payload': 'finalizar_pedido'
                     }
                 ]
             })
-    if mesa_definida and pedido_andamento:
+    if pedido_andamento:
         menu.append(
             {
                 'title': u'Adicione itens ao pedido',
@@ -75,12 +74,12 @@ def get_elements_menu(conversa):
                 'buttons': [
                     {
                         'type': 'postback',
-                        'title': u'+ itens ao pedido',
+                        'title': u'Pedir mais coisas',
                         'payload': 'pedir_mais'
                     }
                 ]
             })
-    if possui_itens_pedido and mesa_definida and pedido_andamento:
+    if possui_itens_pedido and pedido_andamento:
         menu.append(
             {
                 'title': u'Atualize seu pedido',
@@ -134,23 +133,22 @@ def get_elements_menu(conversa):
 def get_quickreply_cardapio_digital(conversa):
     menu = []
     possui_itens_pedido = (len(conversa['itens_pedido']) > 0)
-    mesa_definida = (conversa['mesa'] is not None)
     pedido_andamento = (conversa['datahora_inicio_pedido'] is not None)
-    if possui_itens_pedido and mesa_definida and pedido_andamento:
+    if possui_itens_pedido and pedido_andamento:
         menu.append(
             {
                 'content_type': 'text',
                 'title': u'Conferir e Enviar',
                 'payload': 'finalizar_pedido'
             })
-    if mesa_definida and pedido_andamento:
+    if pedido_andamento:
         menu.append(
             {
                 'content_type': 'text',
                 'title': u'Pedir mais coisas',
                 'payload': 'pedir_mais'
             })
-    if possui_itens_pedido and mesa_definida and pedido_andamento:
+    if possui_itens_pedido and pedido_andamento:
         menu.append(
             {
                 'content_type': 'text',
