@@ -21,11 +21,11 @@ except ImportError:
 from my_celery.tasks import get_object, send_quickreply_message, enviar_pedido, envia_resposta, send_generic_message, \
     touch_cliente, send_text_message, salva_se_nao_existir, notificacao_dashboard, get_cardapio, \
     send_image_url_message, troca_mesa_dashboard, teste_tarefa, error_handler, send_button_message, \
-    link_psid_marviin
+    link_psid_marviin, check_login_valid
 from deliverylog import app_log
 
 my_cache.cache_entry_prefix = 'delivery'
-my_cache.EXPIRACAO_CACHE_CONVERSA = 60 * 30  # 30 minutos
+my_cache.EXPIRACAO_CACHE_CONVERSA = 60 * 20  # 30 minutos
 flask_app = Flask(__name__)
 
 app_log.debug('celery_app:::' + send_generic_message.name)
@@ -147,7 +147,7 @@ def get_quickreply_cardapio_digital(conversa):
         menu.append(
             {
                 'content_type': 'text',
-                'title': u'+ itens ao pedido',
+                'title': u'Pedir mais coisas',
                 'payload': 'pedir_mais'
             })
     if possui_itens_pedido and mesa_definida and pedido_andamento:
@@ -213,6 +213,36 @@ def get_quickreply_pedido2():
             'content_type': 'text',
             'title': u'Conferir e Enviar',
             'payload': 'finalizar_pedido'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Começar novo pedido',
+            'payload': 'menu_novo_pedido2'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
+        }
+    ]
+
+
+def get_quickreply_endereco():
+    return [
+        {
+            'content_type': 'text',
+            'title': u'Pedir mais coisas',
+            'payload': 'pedir_mais'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Atualizar pedido',
+            'payload': 'menu_rever_pedido'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Visualizar cardápio',
+            'payload': 'pedir_cardapio'
         },
         {
             'content_type': 'text',
@@ -396,7 +426,8 @@ def get_mensagem(id_mensagem, **args):
                                u'tenha sido a melhor possível.\nVolte sempre!'),
         'conta2':     Template(u'Desculpe, mas não tenho anotado seu endereço. Você poderia me informar, por favor.'),
         'pgto1':      Template(u'Escolha sua forma de pagamento'),
-        'login':      Template(u'Para sua segurança peço que faça o login na sua conta Marviin.'),
+        'login':      Template(u'Para sua segurança, peço que faça o login na sua conta Marviin.'),
+        'login2':     Template(u'Não foi possível efetuar o login, por favor, tente novamente.'),
         'endereco':   Template(u'Por favor, me informe seu endereço de entrega.'),
     }
     return mensagens[id_mensagem].substitute(args)
@@ -634,14 +665,16 @@ def webhook():
                                 app_log.debug(payload)
                                 conversa['suspensa'] = 0
                                 define_payload(message, sender_id, loja_id, conversa, payload)
-                            elif x.get('account_linking') and x['account_linking'].get('authorization_code'):
-                                link = link_psid_marviin.delay(sender_id,
-                                                               x['account_linking'].get('authorization_code')).get()
-                                if link:
-                                    conversa['passo'] = 34
-                                    passo_finalizar_pedido_autorizado(None, sender_id, loja_id, conversa)
-                                else:
-                                    retomar_passo(sender_id, loja_id, conversa)
+                            elif x.get('account_linking'):
+                                link = False
+                                if x['account_linking'].get('authorization_code'):
+                                    link = link_psid_marviin.delay(sender_id,
+                                                                   x['account_linking'].get('authorization_code')).get()
+                                    if link:
+                                        conversa['passo'] = 34
+                                        passo_finalizar_pedido_autorizado(None, sender_id, loja_id, conversa)
+                                if link is False:
+                                    send_text_message.delay(sender_id, loja_id, get_mensagem('login2'))
                         elif x.get('dashboard'):
                             conversa['suspensa'] += 1
                             conversa['uid'] = x['dashboard']['uid']
@@ -1005,8 +1038,13 @@ def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         if len(conversa['itens_pedido']) > 0:
             # TODO VERIFICAR SE NECESSITA DE LOGIN OU SE AUTORIZACAO AINDA EH VALIDA
-            conversa['passo'] = 33
-            send_button_message.delay(sender_id, loja_id, get_mensagem('login'), get_button_login())
+            login_valid = check_login_valid.delay(sender_id).get()
+            if login_valid is False:
+                conversa['passo'] = 33
+                send_button_message.delay(sender_id, loja_id, get_mensagem('login'), get_button_login())
+            else:
+                conversa['passo'] = 34
+                passo_finalizar_pedido_autorizado(message, sender_id, loja_id, conversa)
         else:
             bot = get_mensagem('rever2')
             chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
@@ -1017,8 +1055,9 @@ def passo_finalizar_pedido_autorizado(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         if len(conversa['itens_pedido']) > 0:
             # TODO PEGAR ENDERECO VIA WEBVIEW
-            send_button_message.delay(sender_id, loja_id, get_mensagem('endereco'),
-                                      get_button_webview_endereco(sender_id))
+            chain(send_button_message.si(sender_id, loja_id, get_mensagem('endereco'),
+                                         get_button_webview_endereco(sender_id)),
+                  send_quickreply_message.si(sender_id, loja_id, 'Ou, se preferir:', get_quickreply_endereco()))()
             '''
             passo_endereco(message, sender_id, loja_id, conversa)
             if conversa['mesa'] is None:

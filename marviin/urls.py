@@ -78,6 +78,8 @@ urlpatterns = [
     url(r'^marviin/api/rest/estados[/]?$', views.EstadosView.as_view(), name='estados_view'),
     url(r'^marviin/api/rest/cidades[/]?$', views.CidadesView.as_view(), name='cidades_view'),
     url(r'^marviin/api/rest/endereco_cliente[/]?$', views.EnderecoClienteView.as_view(), name='endereco_cliente_view'),
+    url(r'^marviin/api/rest/check_login_valid[/]?$', views.CheckLoginValidView.as_view(),
+        name='check_login_valid_view'),
     url(r'^fb_authorize/$', fb_authorize, name='fb_authorize'),
     url(r'^fb_endereco/$', fb_endereco, name='fb_endereco'),
 ]

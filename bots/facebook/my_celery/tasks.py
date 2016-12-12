@@ -170,6 +170,21 @@ def link_psid_marviin(self, user_id, auth_code):
 
 
 @celery_app.task(bind=True, soft_time_limit=10)
+def check_login_valid(self, user_id):
+    data = {}
+    pass
+    data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
+    data['psid'] = user_id
+    url = 'http://localhost:8888/marviin/api/rest/check_login_valid'
+    headers = {'content-type': 'application/json',
+               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    json_response = response.json()
+    logger.info(repr(response))
+    return json_response['success']
+
+
+@celery_app.task(bind=True, soft_time_limit=10)
 def get_cardapio(self, loja_id):
     data = {}
     pass

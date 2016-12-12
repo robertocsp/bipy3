@@ -471,6 +471,32 @@ def add_cliente_marviin_cliente_fb(psid, cliente_marviin):
     return Response({"success": True})
 
 
+class CheckLoginValidView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
+        psid = request.data.get('psid')
+        try:
+            cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
+        except Cliente.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
+            return Response({"success": False})
+        if cliente.cliente_marviin is None or cliente.cliente_marviin.authorization_code is None:
+            logger.error('-=-=-=-=-=-=-=- usuario nao logado: ' + psid)
+            return Response({"success": False})
+        authorization_code = cliente.cliente_marviin.authorization_code.split('#')[0]
+        try:
+            signing.loads(authorization_code, max_age=600)  # max ages em segundos (10 minutos)
+            return Response({"success": True})
+        except signing.BadSignature:
+            logger.error('-=-=-=-=-=-=-=- usuario com login efetuado a mais de 10 minutos: ' + psid)
+            return Response({"success": False})
+
+
 class EnderecoClienteView(views.APIView):
     permission_classes = (AllowAny,)
 
@@ -486,7 +512,7 @@ class EnderecoClienteView(views.APIView):
             logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
                                       u'e tente novamente novamente.')
-        if cliente.cliente_marviin.authorization_code is None:
+        if cliente.cliente_marviin is None or cliente.cliente_marviin.authorization_code is None:
             logger.error('-=-=-=-=-=-=-=- usuario nao logado: ' + psid)
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
                                       u'e tente novamente novamente.')
