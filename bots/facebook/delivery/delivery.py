@@ -1041,7 +1041,7 @@ def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
             login_valid = check_login_valid.delay(sender_id).get()
             if login_valid is False:
                 conversa['passo'] = 33
-                send_button_message.delay(sender_id, loja_id, get_mensagem('login'), get_button_login())
+                send_button_message.delay(sender_id, loja_id, get_mensagem('login'), get_button_login(sender_id))
             else:
                 conversa['passo'] = 34
                 passo_finalizar_pedido_autorizado(message, sender_id, loja_id, conversa)
