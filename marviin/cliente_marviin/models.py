@@ -12,6 +12,7 @@ class ClienteMarviin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='cliente_marviin')
     cpf = models.CharField('cpf', max_length=11, null=True, blank=True)
     authorization_code = models.CharField('authorization_code', max_length=200, null=True, blank=True)
+    mail_mkt = models.BooleanField()
 
 
 @receiver(post_save, sender=User)

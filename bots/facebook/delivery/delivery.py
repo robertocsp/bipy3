@@ -345,7 +345,7 @@ def get_quickreply_pgto1():
     pass
 
 
-def get_button_login():
+def get_button_login(psid):
     # TODO BOTAO CRIAR CONTA CHAMARA WEBVIEW
     # VER https://developers.facebook.com/docs/messenger-platform/messenger-extension
     return [
@@ -354,9 +354,11 @@ def get_button_login():
             'url': 'https://sistema.marviin.com.br/fb_authorize'
         },
         {
-            'type': 'postback',
-            'title': 'Criar Conta',
-            'payload': 'DEVELOPER_DEFINED_PAYLOAD'
+            'type': 'web_url',
+            'url': 'https://sistema.marviin.com.br/fb_criarconta?psid='+psid,
+            'title': 'Criar conta',
+            'webview_height_ratio': 'tall',
+            'messenger_extensions': True
         }
     ]
 

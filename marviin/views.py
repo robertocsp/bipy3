@@ -122,3 +122,8 @@ def fb_authorize(request):
 def fb_endereco(request):
     if request.method == 'GET':
         return render(request, 'fb_endereco.html')
+
+
+def fb_criarconta(request):
+    if request.method == 'GET':
+        return render(request, 'fb_criarconta.html')
