@@ -1,0 +1,16 @@
+label.error {
+    text-align: left;
+    color: red;
+}
+
+label.checkbox-inline > label.error {
+    display: none !important;
+}
+
+input.error {
+    border-color: red;
+}
+
+label.checkbox-inline > label.error + span {
+    color: red;
+}

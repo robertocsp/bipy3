@@ -127,3 +127,11 @@ def fb_endereco(request):
 def fb_criarconta(request):
     if request.method == 'GET':
         return render(request, 'fb_criarconta.html')
+    elif request.method == 'POST':
+        psid = request.POST['psid']
+        nome = request.POST['nome']
+        cpf = request.POST['cpf']
+        telefone = request.POST['telefone']
+        email = request.POST['email']
+        termos = request.POST['termos']
+        mailmkt = request.POST['mailmkt']
