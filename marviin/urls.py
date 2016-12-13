@@ -31,7 +31,6 @@ logger = logging.getLogger('django')
 urlpatterns = [
     url(r'^$', login_geral, name='login_geral'),
     url(r'^logout/$', logout_geral, name='logout'),
-    url(r'^fb_authorize/$', fb_authorize, name='fb_authorize'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^cadastro/$', cadastro, name='cadastro'),
     url(r'^dashboard/$', dashboard, name='Dashboard'),
@@ -61,6 +60,7 @@ urlpatterns = [
     url(r'^marviin/api/rest/cria_senha2[/]?$', views.CriaSenha2View.as_view(), name='cria_senha2_view'),
     url(r'^marviin/api/rest/page_access_token[/]?$', views.PageAccessTokenView.as_view(),
         name='page_access_token_view'),
+    url(r'^marviin/api/rest/link_to_marviin[/]?$', views.LinkToMarviinView.as_view(), name='link_to_marviin_view'),
     url(r'^marviin/api/rest/cardapio[/]?$', views.CardapioView.as_view(), name='cardapio_view'),
     url(r'^marviin/api/rest/pesquisa_estabelecimento[/]?$', views.FormularioInteresseView.as_view(),
         name='pesquisa_estabelecimento_view'),
@@ -77,4 +77,10 @@ urlpatterns = [
     url(r'^relacionamento/$', relacionamento, name='relacionamento'),
     url(r'^marviin/api/rest/estados[/]?$', views.EstadosView.as_view(), name='estados_view'),
     url(r'^marviin/api/rest/cidades[/]?$', views.CidadesView.as_view(), name='cidades_view'),
+    url(r'^marviin/api/rest/endereco_cliente[/]?$', views.EnderecoClienteView.as_view(), name='endereco_cliente_view'),
+    url(r'^marviin/api/rest/check_login_valid[/]?$', views.CheckLoginValidView.as_view(),
+        name='check_login_valid_view'),
+    url(r'^fb_authorize/$', fb_authorize, name='fb_authorize'),
+    url(r'^fb_endereco/$', fb_endereco, name='fb_endereco'),
+    url(r'^fb_criarconta/$', fb_criarconta, name='fb_criarconta'),
 ]

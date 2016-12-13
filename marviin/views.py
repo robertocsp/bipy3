@@ -13,6 +13,7 @@ from loja.models import Loja
 from marviin.cliente_marviin.models import ClienteMarviin
 
 import logging
+import uuid
 
 logger = logging.getLogger('django')
 
@@ -103,9 +104,11 @@ def fb_authorize(request):
                     user.cliente_marviin
                 except ObjectDoesNotExist:
                     ClienteMarviin.objects.create(user=user)
-                user.cliente_marviin.authorization_code = signing.dumps('autorizado', compress=True)
+                raw_auth_code = str(uuid.uuid4())
+                user.cliente_marviin.authorization_code = signing.dumps(raw_auth_code, compress=True)+'#'+raw_auth_code
                 user.cliente_marviin.save()
-                return redirect('{0}&authorization_code={1}'.format(redirect_uri, user.cliente_marviin.authorization_code))
+                return redirect('{0}&authorization_code={1}'.format(redirect_uri,
+                                                                    user.cliente_marviin.authorization_code))
             else:
                 return redirect(redirect_uri)
         else:
@@ -114,3 +117,21 @@ def fb_authorize(request):
         form = LoginForm()
         return render(request, 'fb_authorize.html', {'form': form, 'redirect_uri': redirect_uri,
                                                      'account_linking_token': account_linking_token})
+
+
+def fb_endereco(request):
+    if request.method == 'GET':
+        return render(request, 'fb_endereco.html')
+
+
+def fb_criarconta(request):
+    if request.method == 'GET':
+        return render(request, 'fb_criarconta.html')
+    elif request.method == 'POST':
+        psid = request.POST['psid']
+        nome = request.POST['nome']
+        cpf = request.POST['cpf']
+        telefone = request.POST['telefone']
+        email = request.POST['email']
+        termos = request.POST['termos']
+        mailmkt = request.POST['mailmkt']

@@ -8,23 +8,32 @@
         <link rel="stylesheet" href="../static/marviin/css/font-awesome.min.css">
         <link href="../static/marviin/css/bootstrap.min.css" rel="stylesheet">
         <link href="../static/marviin/css/style.css" rel="stylesheet">
+        <link href="../static/marviin/css/style_criarconta.css" rel="stylesheet">
+
+        <script type="text/javascript" src="../static/marviin/js/jquery.min.js"></script>
+        <script type="text/javascript" src="../static/marviin/js/jquery.mask.min.js"></script>
+        <script type="text/javascript" src="../static/marviin/js/jquery.validate.min.js"></script>
+        <script type="text/javascript" src="../static/marviin/js/main.js"></script>
+        <script type="text/javascript" src="../static/marviin/js/messenger_extensions.js"></script>
+        <script type="text/javascript" src="../static/marviin/js/custom_criarconta.js"></script>
     </head>
     <body>
 
-        <form class="form-horizontal tela-cadastro">
-            <img src="../static/marviin/img/login-g-branco.png" width="106" />
+        <form action="" method="post" class="form-horizontal tela-cadastro" id="form-criarconta">
+            <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
             <label class="titulo-label">Preencha os campos abaixo</label><br>
+            <input type="hidden" id="psid" name="psid" value="">
             <div class="form-group">
                 <div class="col-xs-12">
-                    <input type="text" class="form-control" id="nome" placeholder="Nome...">
+                    <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome...">
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-xs-12">
-                    <input type="email" placeholder="Digite seu email..." class="form-control" id="Email">
+                    <input type="text" class="form-control" id="cpf" name="cpf" placeholder="CPF...">
                 </div>
             </div>
-            <div class="form-group">
+            <!--div class="form-group">
                 <div class="col-xs-12">
                     <input type="text" class="form-control" id="cep" placeholder="CEP...">
                 </div>
@@ -53,26 +62,43 @@
                 <div class="col-xs-12">
                     <input type="text" class="form-control" id="estado" placeholder="Estado...">
                 </div>
-            </div>
+            </div-->
             <div class="form-group">
                 <div class="col-xs-12">
-                    <input type="text" class="form-control" id="telefone" placeholder="Telefone...">
+                    <input type="text" class="form-control" id="telefone" name="telefone" placeholder="Telefone...">
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-xs-12">
-                    <input type="password" class="form-control" id="Senha" placeholder="Senha...">
+                    <input type="email" placeholder="Digite seu email..." name="email" class="form-control" id="email">
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-xs-12">
-                    <input type="password" class="form-control" id="confirmasenha" placeholder="Confirmar Senha...">
+                    <label>
+                        Ao clicar em Enviar, você receberá um e-mail com um código de confirmação que você irá digitar na próxima tela, junto com o cadastro da senha da sua conta Marviin.
+                    </label>
                 </div>
             </div>
+            <!--<div class="form-group">-->
+                <!--<div class="col-xs-12">-->
+                    <!--<input type="text" placeholder="Código de confirmação..." name="codigo" class="form-control" id="codigo">-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<div class="col-xs-12">-->
+                    <!--<input type="password" class="form-control" id="Senha" placeholder="Senha...">-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+                <!--<div class="col-xs-12">-->
+                    <!--<input type="password" class="form-control" id="confirmasenha" placeholder="Confirmar Senha...">-->
+                <!--</div>-->
+            <!--</div>-->
             <div class="form-group">
                 <div class="col-xs-12">
                     <label class="checkbox-inline">
-                        <input type="checkbox" value="agree">  Concordo com os <a href="#">Termos e condições de uso</a>.
+                        <input type="checkbox" name="termos" value="agree">  <span>Concordo com os <a href="#">Termos e condições de uso</a>.</span>
                     </label>
                 </div>
             </div>
@@ -80,17 +106,17 @@
             <div class="form-group">
                 <div class="col-xs-12">
                     <label class="checkbox-inline">
-                        <input type="checkbox" value="agree">  Aceito receber novidades sobre o Marviin.
+                        <input type="checkbox" name="mailmkt" value="agree">  Aceito receber novidades sobre o Marviin.
                     </label>
                 </div>
             </div>
             <br>
             <div class="form-group">
                 <div class="col-xs-12">
-                    <button id="" type="button" class="btn btn-primary save-card">
+                    <button id="btn-enviar" type="submit" class="btn btn-primary save-card">
                         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Enviar
                     </button>
-                    <button id="" type="button" class="btn btn-default save-card">
+                    <button id="btn-cancelar" type="button" class="btn btn-default save-card">
                         <span class="fa fa-times" aria-hidden="true"></span> Cancelar
                     </button>
                 </div>

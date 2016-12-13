@@ -12,6 +12,7 @@ class ClienteMarviin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='cliente_marviin')
     cpf = models.CharField('cpf', max_length=11, null=True, blank=True)
     authorization_code = models.CharField('authorization_code', max_length=200, null=True, blank=True)
+    mail_mkt = models.BooleanField()
 
 
 @receiver(post_save, sender=User)
@@ -38,6 +39,7 @@ class Endereco(models.Model):
     estado = models.CharField('estado', max_length=2)
     cidade = models.CharField('cidade', max_length=100)
     tipo = models.SmallIntegerField('tipo')  # 1: entrega / 2: cobranca / 3: 1 e 2
+    padrao = models.BooleanField()
 
 
 class Cartao(models.Model):

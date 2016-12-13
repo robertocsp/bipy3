@@ -1,7 +1,7 @@
     <div class="content content-dados" id="conteudo-principal">
         <div id="permissao-pagina">
             <form id="form_solicitacao_acesso" onsubmit="return false;">
-                <br/><label class="text-into">Olá, {{user_name}}! Indique o módulo que deseja utilizar</label>
+                <br/><label for="modulo" class="text-into">Olá, {{user_name}}! Indique o módulo que deseja utilizar</label>
                 <select id="modulo" name="modulo" onchange="carregaInfosUsuario($(this).val());">
                     <option value="" disabled="disabled">Selecione</option>
                     <option value="548897018630774"{% if client_id == '548897018630774' %} selected{% endif %}>Atendimento</option>
@@ -10,33 +10,33 @@
                 <br><label class="text-into" id="info_cadastro">Complete os dados abaixo e logo logo poderá começar a usar o Marviin</label>
                 <div class="dados-est" id="cadastro_estabelecimento">
                     <h2><label>Dados do Estabelecimento</label></h2>
-                    <label>Nome do estabelecimento: </label>
+                    <label for="nome_estabelecimento">Nome do estabelecimento: </label>
                     <input type="text" name="nome_estabelecimento" value="" id="nome_estabelecimento" required maxlength="100"><br>
-                    <label>Telefone do estabelecimento: </label>
+                    <label for="tel_estabelecimento">Telefone do estabelecimento: </label>
                     <input type="text" name="tel_estabelecimento" value="" id="tel_estabelecimento" required><br>
-                    <label>CNPJ do Estabelecimento: </label>
+                    <label for="cnpj_estabelecimento">CNPJ do Estabelecimento: </label>
                     <input type="text" name="cnpj_estabelecimento" value="" id="cnpj_estabelecimento" required><br>
                     <div class="input-middle">
-                        <label>CEP: </label>
+                        <label for="cep_estabelecimento">CEP: </label>
                         <input type="text" name="cep_estabelecimento" value="" id="cep_estabelecimento" required><br>
                     </div>
-                    <label>Endereco do estabelecimento: </label>
+                    <label for="endereco_estabelecimento">Endereco do estabelecimento: </label>
                     <input type="text" name="endereco_estabelecimento" value="" id="endereco_estabelecimento" required maxlength="200"><br>
                     <div class="input-middle">
-                        <label>Complemento: </label>
+                        <label for="complemento_estabelecimento">Complemento: </label>
                         <input type="text" name="complemento_estabelecimento" value="" id="complemento_estabelecimento" maxlength="100">
                     </div>
                     <div class="input-middle">
-                        <label>Bairro: </label>
+                        <label for="bairro_estabelecimento">Bairro: </label>
                         <input type="text" name="bairro_estabelecimento" value="" id="bairro_estabelecimento" required maxlength="100"><br>
                     </div>
                     <div class="input-middle">
-                        <label>Estado</label>
+                        <label for="estado_estabelecimento">Estado</label>
                         <select class="form-control" name="estado_estabelecimento" id="estado_estabelecimento" required>
                         </select>
                     </div>
                     <div class="input-middle">
-                        <label>Cidade: </label>
+                        <label for="cidade_estabelecimento">Cidade: </label>
                         <select class="form-control" name="cidade_estabelecimento" id="cidade_estabelecimento" required>
                         </select>
                     </div>
@@ -50,21 +50,21 @@
                     <input type="hidden" name="tipo_cadastro_usuario" value="" id="tipo_cadastro_usuario">
                     <div id="nao_tenho_login" style="display: none">
                         <label class="text-into text-into-cad-usuario">Após o envio do formulário, um email será enviado, para o email abaixo, para que você possa criar seu login e senha de acesso ao Dashboard Marviin</label>
-                        <label>Nome: </label>
+                        <label for="nome_usuario">Nome: </label>
                         <input type="text" name="nome_usuario" value="" id="nome_usuario" maxlength="30"><br>
-                        <label>Sobrenome: </label>
+                        <label for="sobrenome_usuario">Sobrenome: </label>
                         <input type="text" name="sobrenome_usuario" value="" id="sobrenome_usuario" maxlength="30"><br>
-                        <label>Email (será o seu login no Dashboard do Marviin): </label>
+                        <label for="email_usuario">Email (será o seu login no Dashboard do Marviin): </label>
                         <input type="email" name="email_usuario" value="" id="email_usuario" maxlength="100"><br>
                         <span><a href="#" class="esqueci-senha">Esqueci minha senha</a></span><br><br>
-                        <label>Telefone: </label>
+                        <label for="tel_usuario">Telefone: </label>
                         <input type="text" name="tel_usuario" value="" id="tel_usuario"><br>
                     </div>
                     <div id="tenho_login" style="display: none">
                         <label class="text-into text-into-cad-usuario">Insira seu login e senha e já tenha acesso ao seu estabelecimento no Dashboard Marviin</label>
-                        <label>Login: </label>
+                        <label for="login_usuario">Login: </label>
                         <input type="email" name="login_usuario" value="" id="login_usuario" maxlength="100"><br>
-                        <label>Senha: </label>
+                        <label for="senha_usuario">Senha: </label>
                         <input type="password" name="senha_usuario" value="" id="senha_usuario"><br>
                         <span><a href="#" class="esqueci-senha">Esqueci minha senha</a></span>
                     </div>
@@ -72,9 +72,9 @@
                 <br>
                 <div class="dados-bot" id="cadastro_pagina_dashboard">
                     <h2><label>Dados de utilização do Marviin</label></h2>
-                    <label>Nome do estabelecimento no dashboard: </label>
+                    <label for="nome_dashboard">Nome do estabelecimento no dashboard: </label>
                     <input type="text" name="nome_dashboard" value="" id="nome_dashboard" required maxlength="80"><br>
-                    <label>Selecione sua página no Facebook que utilizará o Marviin:</label>
+                    <label for="pid">Selecione sua página no Facebook que utilizará o Marviin:</label>
                     <select id="pid" name="pid" required>
                         <option value="" disabled selected>Selecione</option>
                         {% for page in pages %}
