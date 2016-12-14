@@ -29,6 +29,18 @@ def save_cliente_marviin(sender, instance, **kwargs):
         ClienteMarviin.objects.create(user=instance)
 
 
+class FacebookTemp(models.Model):
+    id = models.CharField(primary_key=True, max_length=36)
+    redirect_uri = models.CharField(max_length=700, blank=True, null=True)
+    account_linking_token = models.CharField(max_length=500, blank=True, null=True)
+
+
+class Facebook(models.Model):
+    id = models.CharField(primary_key=True, max_length=36)
+    user_id = models.CharField(max_length=128)
+    authorization_code = models.CharField(max_length=200)
+
+
 class Endereco(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

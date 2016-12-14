@@ -11,20 +11,11 @@
     </head>
     <body>
         <div>
-            <center>
-                <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
-            </center>
+            <center><img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" /></center>
         </div>
         <div>
             <center>
-                <label class="text-center"><i class="fa fa-thumbs-down fa-2x"></i> {{ message }}.</label>
-            </center>
-        </div>
-        <div>
-            <center>
-                <a href="javascript:void(0)" onclick="window.location.href='/fb_login?redirect_uri={{redirect_uri}}&account_linking_token={{account_linking_token}}{% if perm %}&perm={{ perm|join:',' }}{% endif %}'">
-                    <img src="../static/marviin/img/fb-login-btn.png" />
-                </a>
+                <label class="text-center"><i class="fa fa-thumbs-down fa-2x"></i> {{ message }}</label>
             </center>
         </div>
     </body>

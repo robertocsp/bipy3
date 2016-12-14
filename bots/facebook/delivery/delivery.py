@@ -351,7 +351,7 @@ def get_button_login(psid):
     return [
         {
             'type': 'account_link',
-            'url': 'https://sistema.marviin.com.br/fb_authorize'
+            'url': 'https://sistema.marviin.com.br/fb_login'
         },
         {
             'type': 'web_url',
