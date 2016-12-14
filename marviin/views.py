@@ -165,7 +165,7 @@ def fb_login(request):
                                      'state=$arg1&'
                                      'scope=public_profile,email,user_birthday&'
                                      'auth_type=reauthenticate&'
-                                     'response_type=code%20token')
+                                     'response_type=code token')
         logger.info('-=-=-=-1 redirect_uri -=-=-=-' + redirect_uri)
         logger.info('-=-=-=-1 account_linking_token -=-=-=-' + account_linking_token)
         logger.info('-=-=-=-1 state -=-=-=-' + state)
