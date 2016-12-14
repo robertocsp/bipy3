@@ -170,7 +170,11 @@ def fb_login(request):
         logger.info('-=-=-=-1 account_linking_token -=-=-=-' + account_linking_token)
         logger.info('-=-=-=-1 state -=-=-=-' + state)
         return redirect(fb_login_redirect.substitute(arg1=state))
-    elif 'code' in request.GET and 'state' in request.GET and 'token' in request.GET:
+    logger.info('-=-=-=-::: request.method -=-=-=-' + repr(request.method))
+    logger.info('-=-=-=-::: request.META -=-=-=-' + repr(request.META))
+    logger.info('-=-=-=-::: request.GET -=-=-=-' + repr(request.GET))
+    logger.info('-=-=-=-::: request.POST -=-=-=-' + repr(request.POST))
+    if 'code' in request.GET and 'state' in request.GET and 'token' in request.GET:
         user_code = request.GET['code']
         user_state = request.GET['state']
         user_token = request.GET['token']
