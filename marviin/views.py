@@ -179,6 +179,7 @@ def fb_login(request):
         logger.info('-=-=-=-2 token -=-=-=-' + user_token)
         try:
             user_temp = FacebookTemp.objects.get(id=state)
+            FacebookTemp.objects.filter(id=state).delete()
         except FacebookTemp.DoesNotExist:
             return fail_response(400, u'{"type": "msg", "object": "Cód. 1: Estado inválido."}')
         fb_code_to_token = Template('https://graph.facebook.com/v2.8/oauth/access_token?'
