@@ -164,26 +164,25 @@ def fb_login(request):
                                      'redirect_uri=https://sistema.marviin.com.br/fb_login/&'
                                      'state=$arg1&'
                                      'scope=public_profile,email,user_birthday&'
-                                     'auth_type=reauthenticate&'
+                                     'auth_type=$arg2&'
                                      'response_type=code')
-        logger.info('-=-=-=-1 redirect_uri -=-=-=-' + redirect_uri)
-        logger.info('-=-=-=-1 account_linking_token -=-=-=-' + account_linking_token)
-        logger.info('-=-=-=-1 state -=-=-=-' + state)
-        return redirect(fb_login_redirect.substitute(arg1=state))
-    logger.info('-=-=-=-::: request.META -=-=-=-' + repr(request.META))
-    logger.info('-=-=-=-::: request.GET -=-=-=-' + repr(request.GET))
+        if 'status' not in request.GET:
+            arg2 = 'reauthenticate'
+        else:
+            arg2 = 'rerequest'
+        return redirect(fb_login_redirect.substitute(arg1=state, arg2=arg2))
     if 'code' in request.GET and 'state' in request.GET:
         user_code = request.GET['code']
         user_state = request.GET['state']
-        # user_token = request.GET['token']
-        logger.info('-=-=-=-2 code -=-=-=-' + user_code)
-        logger.info('-=-=-=-2 state -=-=-=-' + user_state)
-        # logger.info('-=-=-=-2 token -=-=-=-' + user_token)
         try:
             user_temp = FacebookTemp.objects.get(id=user_state)
             FacebookTemp.objects.filter(id=user_state).delete()
         except FacebookTemp.DoesNotExist:
-            return fail_response(400, u'{"type": "msg", "object": "Cód. 1: Estado inválido."}')
+            logger.error('-=-=-=- FacebookTemp.DoesNotExist -=-=-=-')
+            return render(request, 'fb_login_fail.html',
+                          {'message': u'Não é possível prosseguir com seu login, pois foi detectada uma falha de '
+                                      u'segurança. Certifique-se que você esteja em uma rede segura e tente seu login '
+                                      u'novamente. Obrigado.'})
         fb_code_to_token = Template('https://graph.facebook.com/v2.8/oauth/access_token?'
                                     'client_id=1147337505373379&'
                                     'client_secret=$arg1&'
@@ -193,11 +192,21 @@ def fb_login(request):
                                                         arg2=user_code)
         response = fb_request(fb_url=url_code_to_token)
         if response is None:
-            return fail_response(500, u'{"type": "msg", "object": "Cód. 1: Falha na verificação do código FB."}')
+            logger.error('-=-=-=- Nao houve resposta a chamada url_code_to_token -=-=-=-')
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
+                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token})
         code_to_token = response.json()
-        logger.info('-=-=-=-2 code_to_token json ' + repr(code_to_token))
         if 'access_token' not in code_to_token:
-            return fail_response(500, u'{"type": "msg", "object": "Cód. 2: Falha na verificação do código FB."}')
+            logger.error('-=-=-=- access_token nao encontrado na resposta de url_code_to_token -=-=-=- ' +
+                         repr(code_to_token))
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
+                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token})
         access_token = code_to_token['access_token']
         fb_check_token = Template('https://graph.facebook.com/debug_token?input_token=$arg1&'
                                   'access_token=1147337505373379|$arg2')
@@ -205,48 +214,99 @@ def fb_login(request):
                                                     arg2=settings.FB_APPS['1147337505373379'])
         response = fb_request(fb_url=url_check_token)
         if response is None:
-            return fail_response(500, u'{"type": "msg", "object": "Cód. 3: Falha na verificação do token FB."}')
+            logger.error('-=-=-=- Nao houve resposta a chamada url_check_token -=-=-=-')
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
+                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token})
         token_info = response.json()
-        logger.info('-=-=-=-2 check_token json ' + repr(token_info))
         if 'data' not in token_info:
-            return fail_response(500, u'{"type": "msg", "object": "Cód. 4: Falha na verificação do token FB."}')
+            logger.error('-=-=-=- data nao encontrado na resposta de url_check_token -=-=-=- ' + repr(token_info))
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
+                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token})
         if token_info['data']['app_id'] != '1147337505373379':
-            return fail_response(500, u'{"type": "msg", "object": "Cód. 5: Falha na verificação do token FB."}')
+            logger.error('-=-=-=- app_id nao confere -=-=-=- ' + repr(token_info))
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
+                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token})
         user_id = token_info['data']['user_id']
         fb_user_info = Template('https://graph.facebook.com/v2.8/$arg1?access_token=$arg2')
         url_user_info = fb_user_info.substitute(arg1=user_id,
                                                 arg2=access_token)
         response = fb_request(fb_url=url_user_info)
         if response is None:
-            return fail_response(500, u'{"type": "msg", "object": "Cód. 6: Falha ao validar usuário FB."}')
+            logger.error('-=-=-=- Nao houve resposta a chamada url_user_info -=-=-=-')
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
+                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token})
         user_info = response.json()
-        logger.info('-=-=-=- user_info json ' + repr(user_info))
         if 'name' not in user_info:
-            return fail_response(500, u'{"type": "msg", "object": "Cód. 7: Falha ao validar usuário FB."}')
+            logger.error('-=-=-=- name nao encontrado para user_id:: ' + user_id + ' -=-=-=- ' + repr(user_info))
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
+                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token})
         fb_user_permissions = Template('https://graph.facebook.com/v2.8/$arg1/permissions?access_token=$arg2')
         url_user_permissions = fb_user_permissions.substitute(arg1=user_id,
                                                               arg2=access_token)
         response = fb_request(fb_url=url_user_permissions)
         if response is None:
-            return fail_response(500, u'{"type": "msg", "object": "Cód. 8: Falha ao validar permissões FB."}')
+            logger.error('-=-=-=- Nao houve resposta a chamada url_user_permissions -=-=-=-')
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
+                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token})
         user_permissions = response.json()
-        logger.info('-=-=-=- user_permissions json ' + repr(user_permissions))
         if 'data' not in user_permissions:
-            return fail_response(500, u'{"type": "msg", "object": "Cód. 9: Falha ao validar permissões FB."}')
+            logger.error('-=-=-=- data nao encontrado na resposta de url_user_permissions -=-=-=- ' +
+                         repr(user_permissions))
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
+                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token})
         not_granted = []
         for user_permission in user_permissions['data']:
             if user_permission['status'] != 'granted':
                 not_granted.append(user_permission['permission'])
         if len(not_granted) > 0:
-            pass
+            logger.error('-=-=-=- permissoes nao dadas -=-=-=- ' + repr(not_granted))
+            return render(request, 'fb_authorize_fail.html',
+                          {'type': 400, 'message': u'Olá {0}, notei que você não gostaria de compartilhar algumas das '
+                                                   u'informações que lhe pedi permissão. Saiba que elas não serão '
+                                                   u'compartilhadas com ninguém e servem somente para uma melhor '
+                                                   u'experiência conosco.'.format(user_info['name']),
+                           'redirect_uri': user_temp.redirect_uri,
+                           'account_linking_token': user_temp.account_linking_token, 'status': 2})
         else:
-            # TODO tratamento de erros e salvar usuario
-            user = Facebook()
+            try:
+                user = Facebook.objects.get(user_id=user_id)
+            except Facebook.DoesNotExist:
+                while True:
+                    user, created = Facebook.objects.get_or_create(id=str(uuid.uuid4()))
+                    if created:
+                        break
+            user.user_id = user_id
             raw_auth_code = str(uuid.uuid4())
             user.authorization_code = signing.dumps(raw_auth_code, compress=True) + '#' + raw_auth_code
-            logger.info('-=-=-=- user logged in ' + repr(user.authorization_code))
+            user.save()
             return redirect('{0}&authorization_code={1}'.format(user_temp.redirect_uri,
                                                                 user.authorization_code))
+    else:
+        logger.error('-=-=-=- Acesso inválido ao login -=-=-=-')
+        return render(request, 'fb_login_fail.html',
+                      {'message': u'Não é possível prosseguir com seu login. Este acesso só pode ser feito a partir '
+                                  u'do Messenger. Obrigado.'})
 
 
 def fb_request(method=None, fb_url=None, json=None):
