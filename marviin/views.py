@@ -165,27 +165,20 @@ def fb_login(request):
                                      'state=$arg1&'
                                      'scope=public_profile,email,user_birthday&'
                                      'auth_type=reauthenticate&'
-                                     'response_type=code token')
+                                     'response_type=code')
         logger.info('-=-=-=-1 redirect_uri -=-=-=-' + redirect_uri)
         logger.info('-=-=-=-1 account_linking_token -=-=-=-' + account_linking_token)
         logger.info('-=-=-=-1 state -=-=-=-' + state)
         return redirect(fb_login_redirect.substitute(arg1=state))
-    logger.info('-=-=-=-::: request.method -=-=-=-' + repr(request.method))
     logger.info('-=-=-=-::: request.META -=-=-=-' + repr(request.META))
     logger.info('-=-=-=-::: request.GET -=-=-=-' + repr(request.GET))
-    logger.info('-=-=-=-::: request.POST -=-=-=-' + repr(request.POST))
-    if 'code' in request.GET and 'state' in request.GET and 'token' in request.GET:
+    if 'code' in request.GET and 'state' in request.GET:
         user_code = request.GET['code']
         user_state = request.GET['state']
-        user_token = request.GET['token']
-    else:
-        user_code = request.POST.get('code', None)
-        user_state = request.POST.get('state', None)
-        user_token = request.POST.get('token', None)
-    if user_code is not None and user_state is not None and user_token is not None:
+        # user_token = request.GET['token']
         logger.info('-=-=-=-2 code -=-=-=-' + user_code)
         logger.info('-=-=-=-2 state -=-=-=-' + user_state)
-        logger.info('-=-=-=-2 token -=-=-=-' + user_token)
+        # logger.info('-=-=-=-2 token -=-=-=-' + user_token)
         try:
             user_temp = FacebookTemp.objects.get(id=state)
             FacebookTemp.objects.filter(id=state).delete()
