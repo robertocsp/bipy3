@@ -180,15 +180,15 @@ def fb_login(request):
         logger.info('-=-=-=-2 state -=-=-=-' + user_state)
         # logger.info('-=-=-=-2 token -=-=-=-' + user_token)
         try:
-            user_temp = FacebookTemp.objects.get(id=state)
-            FacebookTemp.objects.filter(id=state).delete()
+            user_temp = FacebookTemp.objects.get(id=user_state)
+            FacebookTemp.objects.filter(id=user_state).delete()
         except FacebookTemp.DoesNotExist:
             return fail_response(400, u'{"type": "msg", "object": "Cód. 1: Estado inválido."}')
         fb_code_to_token = Template('https://graph.facebook.com/v2.8/oauth/access_token?'
                                     'client_id=1147337505373379&'
                                     'client_secret=$arg1&'
                                     'code=$arg2&'
-                                    'redirect_uri=https://acesso.marviin.com.br/')
+                                    'redirect_uri=https://sistema.marviin.com.br/fb_login/')
         url_code_to_token = fb_code_to_token.substitute(arg1=settings.FB_APPS['1147337505373379'],
                                                         arg2=user_code)
         response = fb_request(fb_url=url_code_to_token)
