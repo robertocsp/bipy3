@@ -161,7 +161,7 @@ def fb_login(request):
     if state is not None and 'code' not in request.GET and 'state' not in request.GET and 'token' not in request.GET:
         fb_login_redirect = Template('https://www.facebook.com/v2.8/dialog/oauth?'
                                      'client_id=1147337505373379&'
-                                     'redirect_uri=https://sistema.marviin.com.br/fb_login&'
+                                     'redirect_uri=https://sistema.marviin.com.br/fb_login/&'
                                      'state=$arg1&'
                                      'scope=public_profile,email,user_birthday&'
                                      'auth_type=reauthenticate&'
