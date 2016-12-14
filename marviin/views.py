@@ -174,6 +174,11 @@ def fb_login(request):
         user_code = request.GET['code']
         user_state = request.GET['state']
         user_token = request.GET['token']
+    else:
+        user_code = request.POST['code']
+        user_state = request.POST['state']
+        user_token = request.POST['token']
+    if user_code is not None and user_state is not None and user_token is not None:
         logger.info('-=-=-=-2 code -=-=-=-' + user_code)
         logger.info('-=-=-=-2 state -=-=-=-' + user_state)
         logger.info('-=-=-=-2 token -=-=-=-' + user_token)
