@@ -163,14 +163,16 @@ def fb_login(request):
                                      'client_id=1147337505373379&'
                                      'redirect_uri=https://sistema.marviin.com.br/fb_login/&'
                                      'state=$arg1&'
-                                     'scope=public_profile,email,user_birthday&'
-                                     'auth_type=$arg2&'
+                                     'scope=$arg2&'
+                                     'auth_type=$arg3&'
                                      'response_type=code')
-        if 'status' not in request.GET:
-            arg2 = 'reauthenticate'
+        if 'perm' not in request.GET:
+            arg2 = 'public_profile,email,user_birthday'
+            arg3 = 'reauthenticate'
         else:
-            arg2 = 'rerequest'
-        return redirect(fb_login_redirect.substitute(arg1=state, arg2=arg2))
+            arg2 = request.GET['perm']
+            arg3 = 'rerequest'
+        return redirect(fb_login_redirect.substitute(arg1=state, arg2=arg2, arg3=arg3))
     if 'code' in request.GET and 'state' in request.GET:
         user_code = request.GET['code']
         user_state = request.GET['state']
@@ -287,7 +289,7 @@ def fb_login(request):
                                                    u'compartilhadas com ninguém e servem somente para uma melhor '
                                                    u'experiência conosco.'.format(user_info['name']),
                            'redirect_uri': user_temp.redirect_uri,
-                           'account_linking_token': user_temp.account_linking_token, 'status': 2})
+                           'account_linking_token': user_temp.account_linking_token, 'perm': not_granted})
         else:
             try:
                 user = Facebook.objects.get(user_id=user_id)
