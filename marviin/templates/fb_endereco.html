@@ -15,13 +15,36 @@
         <script type="text/javascript" src="../static/marviin/js/custom_endereco.js"></script>
     </head>
     <body>
-        <section>
-            <div class="input-group" id="lista-enderecos">
-                <img src="../static/marviin/img/loading-marviin.gif" width="106" />
-            </div><br />
+        <section id="endereco-page"> <!--
+            <div id="lista-enderecos">
+                <img src="../static/marviin/img/loading-marviin.gif" width="50" />
+            </div><br />-->
+            <label>Escolha abaixo o endereço de entrega</label>
+            <!--Lista enderecos-->
+                <div class="lista-enderecos">
+
+                    <label class="endereco">
+                        <input type="radio" /> Rua Voluntarios da Patria, 64
+                    </label>
+                    <label class="endereco">
+                        <input type="radio" /> Rua Sao clemente, 6422
+                    </label>
+                    <label class="endereco">
+                        <input type="radio" /> Rua Afonso pena, 323
+                    </label>
+                    <label class="endereco">
+                        <input type="radio" /> Rua Salvador Allende, 931
+                    </label>
+
+                </div>
+            <!--Final lista-->
+            <button type="button" class="btn btn-default adicionar-endereco">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Adicionar Endereço
+            </button>
             <button type="button" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white">
               <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher
             </button>
         </section>
+        <div class="loading-marviin"></div>
     </body>
 </html>
