@@ -25,6 +25,11 @@
                 <a href="javascript:void(0)" onclick="window.location.href='/fb_login?redirect_uri={{redirect_uri}}&account_linking_token={{account_linking_token}}{% if perm %}&perm={{ perm|join:',' }}{% endif %}'">
                     <img src="../static/marviin/img/fb-login-btn.png" />
                 </a>
+                {% if perm %}
+                <button type="button" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white" onclick="window.location.href='/fb_login?redirect_uri={{redirect_uri}}&account_linking_token={{account_linking_token}}'">
+                  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Continuar
+                </button>
+                {% endif %}
             </center>
         </div>
     </body>

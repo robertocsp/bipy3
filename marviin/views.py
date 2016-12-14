@@ -285,9 +285,10 @@ def fb_login(request):
             logger.error('-=-=-=- permissoes nao dadas -=-=-=- ' + repr(not_granted))
             return render(request, 'fb_authorize_fail.html',
                           {'type': 400, 'message': u'Olá {0}, notei que você não gostaria de compartilhar algumas das '
-                                                   u'informações que lhe pedi permissão. Saiba que elas não serão '
-                                                   u'compartilhadas com ninguém e servem somente para uma melhor '
-                                                   u'experiência conosco.'.format(user_info['name']),
+                                                   u'informações que lhe pedi permissão. Estas informações servem '
+                                                   u'somente para uma melhor experiência conosco. Caso mude de idéia, '
+                                                   u'clique no botão do Facebook abaixo, ou clique em continuar para '
+                                                   u'finalizar o processo de login.'.format(user_info['name']),
                            'redirect_uri': user_temp.redirect_uri,
                            'account_linking_token': user_temp.account_linking_token, 'perm': not_granted})
         else:
