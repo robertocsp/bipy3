@@ -321,13 +321,14 @@ def fb_login(request):
                     try:
                         with transaction.atomic():
                             user = Facebook.objects.create(id=str(uuid.uuid4()))
-                        user.skip_perm = request.session.get('skip_perm', False)
                         break
                     except IntegrityError:
                         continue
             user.user_id = user_id
             if len(not_granted) > 0:
                 user.perm_not_granted = ','.join(not_granted)
+            if request.session.get('skip_perm', False):
+                user.skip_perm = request.session.get('skip_perm', False)
             raw_auth_code = str(uuid.uuid4())
             user.authorization_code = signing.dumps(raw_auth_code, compress=True) + '#' + raw_auth_code
             user.save()
