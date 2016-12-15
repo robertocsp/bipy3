@@ -7,13 +7,13 @@
 
     <title>Marviin - Inovacao em atendimento</title>
 
-    <link href="../../static/marviin/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../static/marviin/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../static/marviin/css/jquery.fancybox.css" media="screen" />
-    <link rel="stylesheet" href="../../static/marviin/css/jquery-ui.css">
-    <link href="../../static/marviin/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/marviin/css/jquery-ui.css" />
+    <link href="../../static/marviin/css/style.css" rel="stylesheet" />
     <link href="../../static/marviin/css/fileinput.css" media="all" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="../../static/marviin/css/font-awesome.min.css">
-    <link rel="stylesheet" href="../../static/marviin/js/dist/styles/marviin/notify-marviin.css">
+    <link rel="stylesheet" href="../../static/marviin/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../../static/marviin/js/dist/styles/marviin/notify-marviin.css" />
 
 
     <!--[if lt IE 9]>
@@ -78,12 +78,9 @@
             <li class="dropdown user">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                  <img src="../static/marviin/img/default_user.png" class="img-circle" alt="Cinque Terre" width="30" height="30">
-                Olá, {% if request.user.is_authenticated %}{{ request.user.first_name }}{% endif %} <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="/cadastro"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Editar informações</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/logout"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Sair</a></li>
-              </ul>
+                Olá, {% if request.user.is_authenticated %}{{ request.user.first_name }}{% endif %}  | </a>
+                 <a href="/logout"> <strong>Sair</strong></a>
+
             </li>
           </ul>
         </div>
@@ -101,4 +98,4 @@
     {% block scripts %} Scripst inline {% endblock %}
 
   </body>
-</html>
+</html>w

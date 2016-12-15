@@ -257,6 +257,8 @@ footer p{
 
 .navbar-nav li.user a.dropdown-toggle{
     padding-bottom: 5px;
+    float: left;
+    padding-right: 4px;
 }
 
 /*Upload*/
@@ -1992,6 +1994,15 @@ p.descri{
     -moz-box-shadow: 2px 4px 10px 0px rgba(6, 6, 6,.5);
     box-shadow: 2px 4px 10px 0px rgba(6, 6, 6,.5);
     margin-bottom: 15px;
+}
+
+.notifyjs-corner{
+    top: 50px !important;
+}
+
+.dropdown a:last-child{
+    float: left;
+    padding: 19px 0 0 0px;
 }
 
 @media only screen and (max-width: 1024px){
