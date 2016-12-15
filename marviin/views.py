@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 from django.core import signing
 from django.conf import settings
-from django.db import transaction
+from django.db import IntegrityError, transaction
 
 from loja.models import Loja
 from marviin.cliente_marviin.models import ClienteMarviin, Facebook, FacebookTemp
@@ -159,13 +159,23 @@ def fb_login(request):
         user_temp.account_linking_token = account_linking_token
         user_temp.save()
     if state is not None and 'code' not in request.GET and 'state' not in request.GET and 'token' not in request.GET:
-        fb_login_redirect = Template('https://www.facebook.com/v2.8/dialog/oauth?'
-                                     'client_id=1147337505373379&'
-                                     'redirect_uri=https://sistema.marviin.com.br/fb_login/&'
-                                     'state=$arg1&'
-                                     'scope=$arg2&'
-                                     'auth_type=$arg3&'
-                                     'response_type=code')
+        if 'perm' not in request.GET and request.session.get('not_granted_step', False):
+            fb_login_redirect = Template('https://www.facebook.com/v2.8/dialog/oauth?'
+                                         'client_id=1147337505373379&'
+                                         'redirect_uri=https://sistema.marviin.com.br/fb_login/&'
+                                         'state=$arg1&'
+                                         'response_type=code')
+            del request.session['not_granted_step']
+            request.session['skip_perm'] = True
+            return redirect(fb_login_redirect.substitute(arg1=state))
+        else:
+            fb_login_redirect = Template('https://www.facebook.com/v2.8/dialog/oauth?'
+                                         'client_id=1147337505373379&'
+                                         'redirect_uri=https://sistema.marviin.com.br/fb_login/&'
+                                         'state=$arg1&'
+                                         'scope=$arg2&'
+                                         'auth_type=$arg3&'
+                                         'response_type=code')
         if 'perm' not in request.GET:
             arg2 = 'public_profile,email,user_birthday'
             arg3 = 'reauthenticate'
@@ -265,7 +275,8 @@ def fb_login(request):
             logger.error('-=-=-=- Nao houve resposta a chamada url_user_permissions -=-=-=-')
             return render(request, 'fb_authorize_fail.html',
                           {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
-                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                                                   u'Por favor, tente novamente clicando no botão abaixo. '
+                                                   u'Obrigado.',
                            'redirect_uri': user_temp.redirect_uri,
                            'account_linking_token': user_temp.account_linking_token})
         user_permissions = response.json()
@@ -274,31 +285,50 @@ def fb_login(request):
                          repr(user_permissions))
             return render(request, 'fb_authorize_fail.html',
                           {'type': 500, 'message': u'Foi detectada uma falha no seu processo de Login. '
-                                                   u'Por favor, tente novamente clicando no botão abaixo. Obrigado.',
+                                                   u'Por favor, tente novamente clicando no botão abaixo. '
+                                                   u'Obrigado.',
                            'redirect_uri': user_temp.redirect_uri,
                            'account_linking_token': user_temp.account_linking_token})
         not_granted = []
         for user_permission in user_permissions['data']:
             if user_permission['status'] != 'granted':
                 not_granted.append(user_permission['permission'])
-        if len(not_granted) > 0:
-            logger.error('-=-=-=- permissoes nao dadas -=-=-=- ' + repr(not_granted))
-            return render(request, 'fb_authorize_fail.html',
-                          {'type': 400, 'message': u'Olá {0}, notei que você não gostaria de compartilhar algumas das '
-                                                   u'informações que lhe pedi permissão. Saiba que elas não serão '
-                                                   u'compartilhadas com ninguém e servem somente para uma melhor '
-                                                   u'experiência conosco.'.format(user_info['name']),
-                           'redirect_uri': user_temp.redirect_uri,
-                           'account_linking_token': user_temp.account_linking_token, 'perm': not_granted})
+        try:
+            user = Facebook.objects.get(user_id=user_id)
+        except Facebook.DoesNotExist:
+            pass
+        if not request.session.get('skip_perm', False) and (user is None or not user.skip_perm):
+            if len(not_granted) > 0:
+                logger.error('-=-=-=- permissoes nao dadas -=-=-=- ' + repr(not_granted))
+                if not request.session.session_key:
+                    request.session.create()
+                    request.session.set_expiry(300)  # 5 minutos
+                request.session['not_granted_step'] = True
+                return render(request, 'fb_authorize_fail.html',
+                              {'type': 400, 'message': u'Olá {0}, notei que você não gostaria de compartilhar algumas '
+                                                       u'das informações que lhe pedi permissão. Estas informações '
+                                                       u'servem somente para uma melhor experiência conosco. Caso mude '
+                                                       u'de idéia, clique no botão do Facebook abaixo, ou clique em '
+                                                       u'continuar para finalizar o processo de login. Você também '
+                                                       u'poderá dar estas permissões mais tarde, acessando sua área '
+                                                       u'privada através do nosso site '
+                                                       u'<A DEFINIR>'.format(user_info['name']),
+                               'redirect_uri': user_temp.redirect_uri,
+                               'account_linking_token': user_temp.account_linking_token, 'perm': not_granted})
         else:
-            try:
-                user = Facebook.objects.get(user_id=user_id)
-            except Facebook.DoesNotExist:
+            if user is None:
                 while True:
-                    user, created = Facebook.objects.get_or_create(id=str(uuid.uuid4()))
-                    if created:
+                    try:
+                        with transaction.atomic():
+                            user = Facebook.objects.create(id=str(uuid.uuid4()))
                         break
+                    except IntegrityError:
+                        continue
             user.user_id = user_id
+            if len(not_granted) > 0:
+                user.perm_not_granted = ','.join(not_granted)
+            if request.session.get('skip_perm', False):
+                user.skip_perm = request.session.get('skip_perm', False)
             raw_auth_code = str(uuid.uuid4())
             user.authorization_code = signing.dumps(raw_auth_code, compress=True) + '#' + raw_auth_code
             user.save()
