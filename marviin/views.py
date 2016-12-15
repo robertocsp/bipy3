@@ -158,10 +158,10 @@ def fb_login(request):
         user_temp.redirect_uri = redirect_uri
         user_temp.account_linking_token = account_linking_token
         user_temp.save()
-        # if 'session_key' not in request.session:
-        #     logger.info('-=-=-=- creating request.session -=-=-=- ')
-        #     request.session.create()
-        logger.info('-=-=-=- request.session.session_key -=-=-=- ' + repr(request.session._get_session_key()))
+        if not request.session.session_key:
+            logger.info('-=-=-=- creating request.session -=-=-=- ')
+            request.session.create()
+        logger.info('-=-=-=- request.session.session_key -=-=-=- ' + repr(request.session.session_key))
     if state is not None and 'code' not in request.GET and 'state' not in request.GET and 'token' not in request.GET:
         fb_login_redirect = Template('https://www.facebook.com/v2.8/dialog/oauth?'
                                      'client_id=1147337505373379&'
