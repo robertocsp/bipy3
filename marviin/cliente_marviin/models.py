@@ -39,6 +39,8 @@ class Facebook(models.Model):
     id = models.CharField(primary_key=True, max_length=36)
     user_id = models.CharField(max_length=128)
     authorization_code = models.CharField(max_length=200)
+    perm_not_granted = models.CharField(max_length=200, blank=True, null=True)
+    skip_perm = models.BooleanField(default=False)
 
 
 class Endereco(models.Model):
