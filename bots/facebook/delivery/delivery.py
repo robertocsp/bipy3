@@ -352,13 +352,6 @@ def get_button_login(psid):
         {
             'type': 'account_link',
             'url': 'https://sistema.marviin.com.br/fb_login'
-        },
-        {
-            'type': 'web_url',
-            'url': 'https://sistema.marviin.com.br/fb_criarconta?psid='+psid,
-            'title': 'Criar conta',
-            'webview_height_ratio': 'tall',
-            'messenger_extensions': True
         }
     ]
 
