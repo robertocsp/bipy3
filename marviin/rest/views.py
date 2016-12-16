@@ -16,7 +16,7 @@ from pedido.templatetags.pedido_tags import minutos_passados
 from upload_cardapio.models import Cardapio
 from estados.models import Estado
 from cidades.models import Cidade
-from marviin.cliente_marviin.models import Endereco, ClienteMarviin
+from marviin.cliente_marviin.models import Endereco, Facebook
 from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
 
@@ -443,16 +443,16 @@ class LinkToMarviinView(views.APIView):
             logger.error('-=-=-=-=-=-=-=- codigo de autorizacao invalido, psid: ' + psid + '; auth_code: ' + auth_code)
             raw_auth_code = signing.loads(auth_code)
             try:
-                cliente_marviin = ClienteMarviin.objects.get(authorization_code=auth_code + '#' + raw_auth_code)
+                cliente_marviin = Facebook.objects.get(authorization_code=auth_code + '#' + raw_auth_code)
                 cliente_marviin.authorization_code = None
                 cliente_marviin.save()
                 add_cliente_marviin_cliente_fb(psid, cliente_marviin)
-            except ClienteMarviin.DoesNotExist:
+            except Facebook.DoesNotExist:
                 pass
             return Response({"success": False})
         try:
-            cliente_marviin = ClienteMarviin.objects.get(authorization_code=auth_code + '#' + raw_auth_code)
-        except ClienteMarviin.DoesNotExist:
+            cliente_marviin = Facebook.objects.get(authorization_code=auth_code + '#' + raw_auth_code)
+        except Facebook.DoesNotExist:
             logger.error(
                 '-=-=-=-=-=-=-=- codigo de autorizacao nao encontrado, psid: ' + psid + '; auth_code: ' + auth_code +
                 '; raw_auth_code: ' + raw_auth_code)
@@ -523,7 +523,7 @@ class EnderecoClienteView(views.APIView):
             logger.error('-=-=-=-=-=-=-=- usuario com login efetuado a mais de 10 minutos: ' + psid)
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
                                       u'e tente novamente novamente.')
-        enderecos = Endereco.objects.filter(user=cliente.cliente_marviin.user, tipo=1).order_by('-padrao', 'endereco')
+        enderecos = Endereco.objects.filter(user=cliente.cliente_marviin.id, tipo=1).order_by('-padrao', 'endereco')
         enderecos_resultado = []
         if enderecos:
             for endereco in enderecos:

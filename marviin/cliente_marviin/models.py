@@ -15,20 +15,6 @@ class ClienteMarviin(models.Model):
     mail_mkt = models.BooleanField()
 
 
-@receiver(post_save, sender=User)
-def create_cliente_marviin(sender, instance, created, **kwargs):
-    if created:
-        ClienteMarviin.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_cliente_marviin(sender, instance, **kwargs):
-    try:
-        instance.cliente_marviin.save()
-    except ObjectDoesNotExist:
-        ClienteMarviin.objects.create(user=instance)
-
-
 class FacebookTemp(models.Model):
     id = models.CharField(primary_key=True, max_length=36)
     redirect_uri = models.CharField(max_length=700, blank=True, null=True)
@@ -41,11 +27,12 @@ class Facebook(models.Model):
     authorization_code = models.CharField(max_length=200)
     perm_not_granted = models.CharField(max_length=200, blank=True, null=True)
     skip_perm = models.BooleanField(default=False)
+    cpf = models.CharField('cpf', max_length=11, null=True, blank=True)
 
 
 class Endereco(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Facebook, on_delete=models.CASCADE)
     endereco = models.CharField('endereco', max_length=200)
     complemento = models.CharField('complemento', max_length=100)
     bairro = models.CharField('bairro', max_length=100)
@@ -58,6 +45,6 @@ class Endereco(models.Model):
 
 class Cartao(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Facebook, on_delete=models.CASCADE)
     nome_cartao = models.CharField('nome_cartao', max_length=100)
     bandeira = models.SmallIntegerField('bandeira')  # 1: visa / 2: master
