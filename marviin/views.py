@@ -126,9 +126,9 @@ def fb_authorize(request):
 
 def fb_endereco(request):
     if request.method == 'GET':
-        return render(request, 'fb_endereco.html')
+        return render(request, 'fb_endereco.html', {'close': False})
     elif request.method == 'POST':
-        return render(request, 'fb_endereco.html', {'success': True})
+        return render(request, 'fb_endereco.html', {'close': True})
 
 
 def fb_cad_endereco(request):
