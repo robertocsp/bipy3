@@ -35,11 +35,12 @@ function get_endereco(psid)
 
 function process_action(psid)
 {
+    alert('1');
     if(!!$('div.close-window')[0])
     {
         alert('TODO: fechar janela.');
     }
-
+    alert('2');
     $('form#form-endereco').validate({
         rules: {
             endereco_entrega: { required: true },
@@ -52,13 +53,15 @@ function process_action(psid)
             form.submit();
         }
     });
+    alert('3');
     $.extend(
         $.validator.messages, {
             required: 'Campo obrigatório.',
-            email: 'E-mail inválido.'
         }
     );
+    alert('4');
     get_endereco(psid);
+    alert('5');
 }
 
 function error_handler(err)
