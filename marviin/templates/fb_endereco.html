@@ -21,28 +21,15 @@
             </div><br />-->
             <label>Escolha abaixo o endereço de entrega</label>
             <!--Lista enderecos-->
-                <div class="lista-enderecos">
-
-                    <label class="endereco">
-                        <input type="radio" /> Rua Voluntarios da Patria, 64
-                    </label>
-                    <label class="endereco">
-                        <input type="radio" /> Rua Sao clemente, 6422
-                    </label>
-                    <label class="endereco">
-                        <input type="radio" /> Rua Afonso pena, 323
-                    </label>
-                    <label class="endereco">
-                        <input type="radio" /> Rua Salvador Allende, 931
-                    </label>
-
-
-                </div>
+                <form action="" method="post" id="form-endereco">
+                    <div class="lista-enderecos {% if success %}close-window{% endif %}">
+                    </div>
+                </form>
             <!--Final lista-->
-            <button type="button" class="btn btn-default adicionar-endereco">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Adicionar Endereço
-            </button>
-            <button type="button" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white">
+            <a href="/fb_cad_endereco" class="btn btn-default adicionar-endereco">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Adicionar Endereço
+            </a>
+            <button type="submit" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white" style="display: none;">
               <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher
             </button>
         </section>

@@ -127,19 +127,15 @@ def fb_authorize(request):
 def fb_endereco(request):
     if request.method == 'GET':
         return render(request, 'fb_endereco.html')
-
-
-def fb_criarconta(request):
-    if request.method == 'GET':
-        return render(request, 'fb_criarconta.html')
     elif request.method == 'POST':
-        psid = request.POST['psid']
-        nome = request.POST['nome']
-        cpf = request.POST['cpf']
-        telefone = request.POST['telefone']
-        email = request.POST['email']
-        termos = request.POST['termos']
-        mailmkt = request.POST['mailmkt']
+        return render(request, 'fb_endereco.html', {'success': True})
+
+
+def fb_cad_endereco(request):
+    if request.method == 'GET':
+        return render(request, 'fb_cad_endereco.html')
+    elif request.method == 'POST':
+        pass
 
 
 def fb_login(request):
