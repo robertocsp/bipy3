@@ -261,6 +261,7 @@ footer p{
     padding-right: 4px;
 }
 
+
 /*Upload*/
 
 .upload h2.fb{
@@ -2003,6 +2004,25 @@ p.descri{
 .dropdown a:last-child{
     float: left;
     padding: 19px 0 0 0px;
+}
+
+
+.bloco-endereco{
+    float: left;
+    width: 100%;
+    padding: 20px 10px 0 10px;
+    -webkit-box-shadow: 2px 4px 10px 0px rgba(6, 6, 6,.5);
+    -moz-box-shadow: 2px 4px 10px 0px rgba(6, 6, 6,.5);
+    box-shadow: 2px 4px 10px 0px rgba(6, 6, 6,.5);
+    margin-bottom: 15px;
+}
+
+#endereco-page-cad .tela-cadastro {
+    padding: 10px;
+}
+
+.bloco-endereco .btn-danger{
+    margin-bottom: 15px;
 }
 
 @media only screen and (max-width: 1024px){
