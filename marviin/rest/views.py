@@ -523,7 +523,7 @@ class EnderecoClienteView(views.APIView):
             logger.error('-=-=-=-=-=-=-=- usuario com login efetuado a mais de 10 minutos: ' + psid)
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
                                       u'e tente novamente novamente.')
-        enderecos = Endereco.objects.filter(user=cliente.cliente_marviin.user, tipo=1).order_by('-padrao', 'endereco')
+        enderecos = Endereco.objects.filter(user=cliente.cliente_marviin.id, tipo=1).order_by('-padrao', 'endereco')
         enderecos_resultado = []
         if enderecos:
             for endereco in enderecos:

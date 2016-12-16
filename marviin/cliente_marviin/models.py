@@ -32,7 +32,7 @@ class Facebook(models.Model):
 
 class Endereco(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # user = models.ForeignKey(Facebook, on_delete=models.CASCADE)
     endereco = models.CharField('endereco', max_length=200)
     complemento = models.CharField('complemento', max_length=100)
     bairro = models.CharField('bairro', max_length=100)
@@ -45,6 +45,6 @@ class Endereco(models.Model):
 
 class Cartao(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # user = models.ForeignKey(Facebook, on_delete=models.CASCADE)
     nome_cartao = models.CharField('nome_cartao', max_length=100)
     bandeira = models.SmallIntegerField('bandeira')  # 1: visa / 2: master
