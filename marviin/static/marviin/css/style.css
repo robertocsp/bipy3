@@ -2034,10 +2034,10 @@ p.descri{
 }
 
 label.endereco>label.error{
-    display: none;
+    display: none !important;
 }
 
-label.endereco>.error{
+label.endereco>.error + span{
     color: red;
 }
 

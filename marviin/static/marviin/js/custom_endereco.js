@@ -13,7 +13,7 @@ function get_endereco(psid)
                 if(item.padrao == true)
                     input.prop('checked', true);
                 var endereco = ' ' + item.endereco + ' ' + item.complemento + ', ' + item.bairro + ', CEP: ' + item.cep + ', ' + item.cidade + ', ' + item.estado;
-                label.append(input).append(endereco);
+                label.append(input).append($('<label></label>').append(endereco));
                 $('#lista-enderecos').append(label);
             });
             $('form#form-endereco').validate({
