@@ -20,6 +20,9 @@ function get_endereco(psid)
                 rules: {
                     endereco_entrega: { required: true },
                 },
+                submitHandler: function(form) {
+                    alert('submit');
+                },
                 onfocusout: false,
                 onkeyup: false,
                 onclick: false
