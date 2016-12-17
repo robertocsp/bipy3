@@ -2025,6 +2025,14 @@ p.descri{
     margin-bottom: 15px;
 }
 
+.block{
+    display: block !important;
+}
+
+.none{
+    display: none !important;
+}
+
 @media only screen and (max-width: 1024px){
     .around{
         overflow-y: hidden;
