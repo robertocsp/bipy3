@@ -13,22 +13,22 @@
         <script type="text/javascript" src="../static/marviin/js/jquery.validate.min.js"></script>
         <script type="text/javascript" src="../static/marviin/js/main.js"></script>
         <script type="text/javascript" src="../static/marviin/js/messenger_extensions.js"></script>
-        <script type="text/javascript" src="../static/marviin/js/custom_endereco.js?v=0.3"></script>
+        <script type="text/javascript" src="../static/marviin/js/custom_endereco.js?v=0.4"></script>
     </head>
     <body>
         <section id="endereco-page">
             <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
             <label>Escolha abaixo o endereço de entrega</label>
-                <form action="" method="post" id="form-endereco">
-                    <div id="lista-enderecos" class="lista-enderecos{% if close %} close-window{% endif %}">
-                    </div>
-                </form>
-            <a href="/fb_cad_endereco" id="btn-adicionar-endereco" class="btn btn-default adicionar-endereco none">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Adicionar Endereço
-            </a>
-            <button type="submit" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white none">
-              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher
-            </button>
+            <form action="" method="post" id="form-endereco">
+                <div id="lista-enderecos" class="lista-enderecos{% if close %} close-window{% endif %}">
+                </div>
+                <a href="/fb_cad_endereco" id="btn-adicionar-endereco" class="btn btn-default adicionar-endereco none">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Adicionar Endereço
+                </a>
+                <button type="submit" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white none">
+                  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher
+                </button>
+            </form>
         </section>
         <div class="loading-marviin block"></div>
     </body>
