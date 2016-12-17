@@ -51,10 +51,13 @@ function process_action(psid)
         alert('TODO: fechar janela.');
     }
     $('button#btn-escolher-endereco').on('click', function (e){
+        if($(this).hasClass('nosubmit') && !!$('[type=radio]:checked')[0])
+        {
+            $(this).removeClass('nosubmit');
+        }
         if($(this).hasClass('nosubmit'))
         {
             e.preventDefault();
-            $(this).removeClass('nosubmit');
             return false;
         }
         $(this).addClass('nosubmit');
