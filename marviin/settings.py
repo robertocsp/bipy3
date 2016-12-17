@@ -32,7 +32,7 @@ with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marviin_conf'), 
             EMAIL_PASSWORD = key_value_pair[1]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '.marviin.com.br']
 
