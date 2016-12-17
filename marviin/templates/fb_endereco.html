@@ -18,12 +18,10 @@
     <body>
         <section id="endereco-page">
             <label>Escolha abaixo o endereço de entrega</label>
-            <!--Lista enderecos-->
                 <form action="" method="post" id="form-endereco">
-                    <div class="lista-enderecos {% if close %}close-window{% endif %}">
+                    <div class="lista-enderecos{% if close %} close-window{% endif %}">
                     </div>
                 </form>
-            <!--Final lista-->
             <a href="/fb_cad_endereco" class="btn btn-default adicionar-endereco">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Adicionar Endereço
             </a>

@@ -1,5 +1,5 @@
 function get_endereco(psid)
-{
+{alert('vai tentar carregar os enderecos');
     $.getJSON( '/marviin/api/rest/endereco_cliente?psid='+psid, function( data ) {
         if(data && data.length)
         {
