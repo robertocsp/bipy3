@@ -40,7 +40,6 @@ function process_action(psid)
         alert('TODO: fechar janela.');
     }
     $('button#btn-escolher-endereco').on('click', function (e){
-        e.preventDefault();
         if($(this).hasClass('nosubmit'))
             return false;
         $(this).addClass('nosubmit');
