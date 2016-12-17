@@ -16,10 +16,11 @@ function get_endereco(psid)
                 label.append(input).append(endereco);
                 $('#lista-enderecos').append(label);
             });
-            $('button#btn-escolher-endereco').show();
+            $('button#btn-escolher-endereco').removeClass('none');
         }
         else
             $('#lista-enderecos').html('Nenhum endereço encontrado. Utilize o botão abaixo para cadastrar seu endereço de entrega. Obrigado.');
+        $('a#btn-adicionar-endereco').removeClass('none');
     })
     .fail(function(error) {
         if(error.message)
