@@ -1,5 +1,5 @@
 function get_endereco(psid)
-{alert('vai tentar carregar os enderecos');
+{
     $.getJSON( '/marviin/api/rest/endereco_cliente?psid='+psid, function( data ) {
         if(data && data.length)
         {
@@ -22,14 +22,13 @@ function get_endereco(psid)
             $('#lista-enderecos').html('Nenhum endereço encontrado. Utilize o botão abaixo para cadastrar seu endereço de entrega. Obrigado.');
     })
     .fail(function(error) {
-        alert(error);
         if(error.message)
             $('#lista-enderecos').html(error.message);
         else
             $('#lista-enderecos').html('Desculpe, mas não foi possível recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
     })
     .always(function() {
-        $('div.loading-marviin').hide();
+        $('div.loading-marviin').removeClass('block');
     });
 }
 
