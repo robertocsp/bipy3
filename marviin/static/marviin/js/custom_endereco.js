@@ -40,15 +40,12 @@ function process_action(psid)
         alert('TODO: fechar janela.');
     }
     $('button#btn-escolher-endereco').on('click', function (e){
+        if($('button#btn-escolher-endereco').hasClass('nosubmit'))
+            return false;
+        $('button#btn-escolher-endereco').addClass('nosubmit');
         $('form#form-endereco').validate({
             rules: {
                 endereco_entrega: { required: true },
-            },
-            submitHandler: function(form, e) {
-                if($('button#btn-escolher-endereco').hasClass('nosubmit'))
-                    return false;
-                $('button#btn-escolher-endereco').addClass('nosubmit');
-                form.submit();
             }
         });
     });
