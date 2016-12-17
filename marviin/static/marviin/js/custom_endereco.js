@@ -44,7 +44,6 @@ function process_action(psid)
             endereco_entrega: { required: true },
         },
         submitHandler: function(form, e) {
-            e.preventDefault();
             if($('button#btn-escolher-endereco').hasClass('nosubmit'))
                 return false;
             $('button#btn-escolher-endereco').addClass('nosubmit');
