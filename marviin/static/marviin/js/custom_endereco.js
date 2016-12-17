@@ -54,6 +54,7 @@ function process_action(psid)
         if($(this).hasClass('nosubmit'))
         {
             e.preventDefault();
+            $(this).removeClass('nosubmit');
             return false;
         }
         $(this).addClass('nosubmit');
