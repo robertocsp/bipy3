@@ -16,6 +16,14 @@ function get_endereco(psid)
                 label.append(input).append(endereco);
                 $('#lista-enderecos').append(label);
             });
+            $('form#form-endereco').validate({
+                rules: {
+                    endereco_entrega: { required: true },
+                }
+                onfocusout: false,
+                onkeyup: false,
+                onclick: false
+            });
             $('button#btn-escolher-endereco').removeClass('none');
         }
         else
@@ -41,19 +49,11 @@ function process_action(psid)
     }
     $('button#btn-escolher-endereco').on('click', function (e){
         if($(this).hasClass('nosubmit'))
+        {
+            e.preventDefault();
             return false;
+        }
         $(this).addClass('nosubmit');
-    });
-    $('form#form-endereco').validate({
-        rules: {
-            endereco_entrega: { required: true },
-        },
-        submitHandler: function(form) {
-            form.submit();
-        },
-        onfocusout: false,
-        onkeyup: false,
-        onclick: false
     });
     $.extend(
         $.validator.messages, {
