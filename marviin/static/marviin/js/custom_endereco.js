@@ -57,6 +57,7 @@ function process_action(psid)
             return false;
         }
         $(this).addClass('nosubmit');
+        $('form#form-endereco').submit();
     });
     $.extend(
         $.validator.messages, {
