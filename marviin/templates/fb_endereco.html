@@ -20,6 +20,7 @@
             <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
             <label>Escolha abaixo o endereço de entrega</label>
             <form action="" method="post" id="form-endereco">
+                {% csrf_token %}
                 <div id="lista-enderecos" class="lista-enderecos{% if close %} close-window{% endif %}">
                 </div>
                 <a href="/fb_cad_endereco" id="btn-adicionar-endereco" class="btn btn-default adicionar-endereco none">
