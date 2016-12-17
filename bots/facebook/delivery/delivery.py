@@ -4,6 +4,7 @@ This bot listens to port 5003 for incoming connections from Facebook.
 """
 import unicodedata
 import datetime
+import random
 import keys.keys as my_keys
 import my_cache.cache as my_cache
 from string import Template
@@ -365,7 +366,8 @@ def get_button_webview_endereco(psid):
         },
         {
             'type': 'web_url',
-            'url': 'https://sistema.marviin.com.br/fb_endereco?psid='+psid,
+            'url': 'https://sistema.marviin.com.br/fb_endereco?psid='+psid+'&r='+''.join(random.choice('0123456789')
+                                                                                         for x in range(3)),
             'title': 'Escolher outro',
             'webview_height_ratio': 'tall',
             'messenger_extensions': True
