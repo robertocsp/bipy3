@@ -19,7 +19,7 @@ function get_endereco(psid)
             $('form#form-endereco').validate({
                 rules: {
                     endereco_entrega: { required: true },
-                }
+                },
                 onfocusout: false,
                 onkeyup: false,
                 onclick: false
