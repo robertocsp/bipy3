@@ -82,6 +82,6 @@ urlpatterns = [
         name='check_login_valid_view'),
     url(r'^fb_authorize/$', fb_authorize, name='fb_authorize'),
     url(r'^fb_login/$', fb_login, name='fb_login'),
-    url(r'^fb_endereco/$', fb_endereco, name='fb_endereco'),
+    url(r'^fb_endereco[/]$', fb_endereco, name='fb_endereco'),
     url(r'^fb_cad_endereco/$', fb_cad_endereco, name='fb_cad_endereco'),
 ]
