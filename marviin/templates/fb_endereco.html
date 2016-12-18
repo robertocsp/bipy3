@@ -13,7 +13,7 @@
         <script type="text/javascript" src="../static/marviin/js/jquery.validate.min.js"></script>
         <script type="text/javascript" src="../static/marviin/js/main.js"></script>
         <script type="text/javascript" src="../static/marviin/js/messenger_extensions.js"></script>
-        <script type="text/javascript" src="../static/marviin/js/custom_endereco.js?v=0.9"></script>
+        <script type="text/javascript" src="../static/marviin/js/custom_endereco.js?v=1.0"></script>
     </head>
     <body>
         <section id="endereco-page">
@@ -21,6 +21,8 @@
             <label>Escolha abaixo o endereço de entrega</label>
             <form action="" method="post" id="form-endereco">
                 {% csrf_token %}
+                <input type="hidden" name="psid" id="psid" value=""/>
+                <input type="hidden" name="mes" id="mes" value=""/>
                 <div id="lista-enderecos" class="lista-enderecos{% if close %} close-window{% endif %}">
                 </div>
                 <a href="/fb_cad_endereco" id="btn-adicionar-endereco" class="btn btn-default adicionar-endereco none">

@@ -12,7 +12,7 @@ $(function() {
         if(isSupported)
         {
             MessengerExtensions.getUserID(function success(uids) {
-                process_action(uids.psid);
+                process_action(uids.psid, true);
             }, function error(err) {
                 //TODO post error to log
                 error_handler(err);
@@ -27,7 +27,7 @@ $(function() {
             }
             else
             {
-                process_action(psid);
+                process_action(psid, false);
             }
         }
     };

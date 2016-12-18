@@ -1,6 +1,6 @@
-function get_endereco(psid)
+function get_endereco(psid, messengerExtensionSupported)
 {
-    $.getJSON( '/marviin/api/rest/endereco_cliente?psid='+psid, function( data ) {
+    $.getJSON( '/marviin/api/rest/endereco_cliente?psid='+psid+'&mes='+messengerExtensionSupported, function( data ) {
         if(data && data.length)
         {
             $('#lista-enderecos').html('');
@@ -44,7 +44,7 @@ function get_endereco(psid)
     });
 }
 
-function process_action(psid)
+function process_action(psid, messengerExtensionSupported)
 {
     if(!!$('div.close-window')[0])
     {
@@ -67,7 +67,9 @@ function process_action(psid)
             required: 'Campo obrigatório.',
         }
     );
-    get_endereco(psid);
+    $('input#psid').val(psid);
+    $('input#mes').val(messengerExtensionSupported);
+    get_endereco(psid, messengerExtensionSupported);
 }
 
 function error_handler(err)

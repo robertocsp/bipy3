@@ -19,6 +19,7 @@ from cidades.models import Cidade
 from marviin.cliente_marviin.models import Endereco, Facebook
 from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
+from utils.aescipher import AESCipher
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
@@ -506,6 +507,10 @@ class EnderecoClienteView(views.APIView):
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
                                       u'e tente novamente novamente.')
         psid = request.GET['psid']
+        messenger_extension_supported = request.GET['mes']
+        if messenger_extension_supported == 'true':
+            cipher = AESCipher(key=settings.SECRET_KEY)
+            psid = cipher.decrypt(psid)
         try:
             cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
         except Cliente.DoesNotExist:

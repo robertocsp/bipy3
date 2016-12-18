@@ -7,6 +7,7 @@ import datetime
 import random
 import keys.keys as my_keys
 import my_cache.cache as my_cache
+from utils.aescipher import AESCipher
 from string import Template
 from flask import Flask, request, send_from_directory, Response
 from celery import chain
@@ -347,7 +348,6 @@ def get_quickreply_pgto1():
 
 
 def get_button_login(psid):
-    # TODO BOTAO CRIAR CONTA CHAMARA WEBVIEW
     # VER https://developers.facebook.com/docs/messenger-platform/messenger-extension
     return [
         {
@@ -358,6 +358,7 @@ def get_button_login(psid):
 
 
 def get_button_webview_endereco(psid):
+    cipher = AESCipher(key=my_keys.SECRET_KEY)
     return [
         {
             'type': 'postback',
@@ -366,11 +367,13 @@ def get_button_webview_endereco(psid):
         },
         {
             'type': 'web_url',
-            'url': 'https://sistema.marviin.com.br/fb_endereco?psid='+psid+'&r='+''.join(random.choice('0123456789')
-                                                                                         for x in range(3)),
+            'url': 'https://sistema.marviin.com.br/fb_endereco?r=' +
+                   ''.join(random.choice('0123456789') for x in range(3)),
             'title': 'Escolher outro',
             'webview_height_ratio': 'tall',
-            'messenger_extensions': True
+            'messenger_extensions': True,
+            'fallback_url': 'https://sistema.marviin.com.br/fb_endereco?psid=' + cipher.encrypt(psid) + '&r=' +
+                            ''.join(random.choice('0123456789') for x in range(3)),
         }
     ]
 

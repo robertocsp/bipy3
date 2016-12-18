@@ -12,6 +12,7 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 
 from loja.models import Loja
+from cliente.models import Cliente
 from marviin.cliente_marviin.models import ClienteMarviin, Facebook, FacebookTemp
 
 from string import Template
@@ -128,6 +129,18 @@ def fb_endereco(request):
     if request.method == 'GET':
         return render(request, 'fb_endereco.html', {'close': False})
     elif request.method == 'POST':
+        psid = request.POST['psid']
+        endereco = request.POST['endereco_entrega']
+        try:
+            cliente = Cliente.objects.get(chave_facebook=psid)
+        except Cliente.DoesNotExist:
+            cliente = Cliente()
+            cliente.chave_facebook = request.data.get('id_cliente')
+        cliente.nome = request.data.get('nome_cliente', None)
+        cliente.foto = request.data.get('foto_cliente', None)
+        cliente.genero = request.data.get('genero', None)
+        cliente.id_loja_facebook = request.data.get('id_loja', None)
+        cliente.save()
         return render(request, 'fb_endereco.html', {'close': True})
 
 
