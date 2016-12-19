@@ -1,6 +1,6 @@
 import base64
-from crypto.Cipher import AES
-from crypto import Random
+import Crypto.Cipher.AES as AES
+import Crypto.Random as Random
 
 
 class AESCipher:
