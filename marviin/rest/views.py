@@ -509,7 +509,7 @@ class EnderecoClienteView(views.APIView):
         psid = request.GET['psid']
         messenger_extension_supported = request.GET['mes']
         if messenger_extension_supported == 'true':
-            cipher = AESCipher(key=settings.SECRET_KEY[:32])
+            cipher = AESCipher(key=settings.bytes(bytearray(settings.SECRET_KEY))[:32])
             psid = cipher.decrypt(psid)
         try:
             cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
