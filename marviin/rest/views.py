@@ -20,6 +20,7 @@ from marviin.cliente_marviin.models import Endereco, Facebook
 from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
 from utils.aescipher import AESCipher
+from bots.facebook.my_cache import cache
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
@@ -517,6 +518,7 @@ class EnderecoClienteView(views.APIView):
             psid = unicodedata.normalize('NFKD', psid).encode('ascii', 'ignore')
             cipher = AESCipher(key=key32)
             psid = cipher.decrypt(psid)
+            logger.debug('-=-=-=-=-=-=-=- memcache :: ' + repr(cache.cache_client.get(psid)))
         try:
             cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
         except Cliente.DoesNotExist:
