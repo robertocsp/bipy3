@@ -40,6 +40,7 @@ import os
 import codecs
 import string
 import random
+import unicodedata
 
 logger = logging.getLogger('django')
 
@@ -513,6 +514,7 @@ class EnderecoClienteView(views.APIView):
             key32 = '{: <32}'.format(settings.SECRET_KEY[:32]).encode("utf-8")
             logger.debug('-=-=-=-=-=-=-=- key after :: ' + key32)
             logger.debug('-=-=-=-=-=-=-=- enc psid :: ' + psid)
+            psid = unicodedata.normalize('NFKD', psid).encode('ascii', 'ignore')
             cipher = AESCipher(key=key32)
             psid = cipher.decrypt(psid)
         try:
