@@ -509,7 +509,10 @@ class EnderecoClienteView(views.APIView):
         psid = request.GET['psid']
         messenger_extension_supported = request.GET['mes']
         if messenger_extension_supported == 'false':
-            key32 = "{: <32}".format(settings.SECRET_KEY[:32]).encode("utf-8")
+            logger.debug('-=-=-=-=-=-=-=- key before :: ' + settings.SECRET_KEY[:32])
+            key32 = '{: <32}'.format(settings.SECRET_KEY[:32]).encode("utf-8")
+            logger.debug('-=-=-=-=-=-=-=- key after :: ' + key32)
+            logger.debug('-=-=-=-=-=-=-=- enc psid :: ' + psid)
             cipher = AESCipher(key=key32)
             psid = cipher.decrypt(psid)
         try:
