@@ -360,7 +360,7 @@ def get_button_login(psid):
 def get_button_webview_endereco(psid):
     key32 = "{: <32}".format(my_keys.SECRET_KEY[:32]).encode("utf-8")
     cipher = AESCipher(key=key32)
-    my_cache.cache_client.set(psid, cipher.key)
+    my_cache.cache_client.set(psid + 'web_sec', 'oto', time=my_cache.EXPIRACAO_CACHE_CONVERSA)
     return [
         {
             'type': 'postback',

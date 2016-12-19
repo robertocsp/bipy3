@@ -518,7 +518,13 @@ class EnderecoClienteView(views.APIView):
             psid = unicodedata.normalize('NFKD', psid).encode('ascii', 'ignore')
             cipher = AESCipher(key=key32)
             psid = cipher.decrypt(psid)
-            logger.debug('-=-=-=-=-=-=-=- memcache :: ' + repr(cache.cache_client.get(psid)))
+            logger.debug('-=-=-=-=-=-=-=- memcache :: ' + repr(cache.cache_client.get(psid + 'web_sec')))
+            if cache.cache_client.get(psid + 'web_sec') is None:
+                return fail_response(400,
+                                     u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
+                                     u'e tente novamente novamente.')
+            else:
+                cache.cache_client.delete(psid + 'web_sec')
         try:
             cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
         except Cliente.DoesNotExist:
