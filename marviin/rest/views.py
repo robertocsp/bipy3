@@ -508,7 +508,7 @@ class EnderecoClienteView(views.APIView):
                                       u'e tente novamente novamente.')
         psid = request.GET['psid']
         messenger_extension_supported = request.GET['mes']
-        if messenger_extension_supported == 'true':
+        if messenger_extension_supported == 'false':
             key32 = "{: <32}".format(settings.SECRET_KEY[:32]).encode("utf-8")
             cipher = AESCipher(key=key32)
             psid = cipher.decrypt(psid)
