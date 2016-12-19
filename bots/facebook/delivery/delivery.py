@@ -358,7 +358,7 @@ def get_button_login(psid):
 
 
 def get_button_webview_endereco(psid):
-    cipher = AESCipher(key=bytes(bytearray(my_keys.SECRET_KEY))[:32])
+    cipher = AESCipher(key=my_keys.SECRET_KEY[:32])
     return [
         {
             'type': 'postback',
