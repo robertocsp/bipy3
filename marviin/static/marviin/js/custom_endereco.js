@@ -26,7 +26,8 @@ function get_endereco(psid)
                     endereco_entrega: { required: true },
                 },
                 submitHandler: function(form) {
-                    alert('form action:: ' + form.action)
+                    if(psid)
+                        form.action += '&psid=' + psid;
                     form.submit();
                 },
                 onfocusout: false,
@@ -43,7 +44,7 @@ function get_endereco(psid)
         if(error.message)
             $('#lista-enderecos').html(error.message);
         else
-            $('#lista-enderecos').html('Desculpe, mas não foi possível recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
+            $('#lista-enderecos').html('Desculpe, mas não foi possível recuperar seus endereços, por favor, refaça o login e tente novamente.');
     })
     .always(function() {
         $('div.loading-marviin').removeClass('block');
@@ -78,5 +79,5 @@ function process_action(psid)
 
 function error_handler(err)
 {
-    $('#lista-enderecos').html('Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
+    $('#lista-enderecos').html('Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login e tente novamente.');
 }

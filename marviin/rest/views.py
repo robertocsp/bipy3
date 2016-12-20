@@ -536,7 +536,7 @@ class EnderecoClienteView(views.APIView):
         if psid is None and 'psid' not in request.GET:
             logger.error('-=-=-=-=-=-=-=- parametro psid nao encontrado.')
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente novamente.')
+                                      u'e tente novamente.')
         if psid is None:
             psid = request.GET['psid']
         else:
@@ -551,7 +551,7 @@ class EnderecoClienteView(views.APIView):
             if cache.cache_client.get(psid + 'web_sec') is None:
                 return fail_response(400,
                                      u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                     u'e tente novamente novamente.')
+                                     u'e tente novamente ou acesse pelo messenger do seu celular.')
         if cache.cache_client.get(psid + 'web_sec') is not None:
             cache.cache_client.delete(psid + 'web_sec')
         try:
@@ -559,18 +559,18 @@ class EnderecoClienteView(views.APIView):
         except Cliente.DoesNotExist:
             logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente novamente.')
+                                      u'e tente novamente.')
         if cliente.cliente_marviin is None or cliente.cliente_marviin.authorization_code is None:
             logger.error('-=-=-=-=-=-=-=- usuario nao logado: ' + psid)
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente novamente.')
+                                      u'e tente novamente.')
         authorization_code = cliente.cliente_marviin.authorization_code.split('#')[0]
         try:
             signing.loads(authorization_code, max_age=600)  # max ages em segundos (10 minutos)
         except signing.BadSignature:
             logger.error('-=-=-=-=-=-=-=- usuario com login efetuado a mais de 10 minutos: ' + psid)
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente novamente.')
+                                      u'e tente novamente.')
         enderecos = Endereco.objects.filter(user=cliente.cliente_marviin.id, tipo=1).order_by('-padrao', 'endereco')
         enderecos_resultado = []
         if enderecos:

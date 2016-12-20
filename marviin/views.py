@@ -10,16 +10,19 @@ from django.shortcuts import redirect
 from django.core import signing
 from django.conf import settings
 from django.db import IntegrityError, transaction
+from django.template import RequestContext
 
 from loja.models import Loja
 from cliente.models import Cliente
 from marviin.cliente_marviin.models import ClienteMarviin, Facebook, FacebookTemp
+from utils.aescipher import AESCipher
 
 from string import Template
 
 import requests
 import logging
 import uuid
+import unicodedata
 
 logger = logging.getLogger('django')
 
@@ -127,26 +130,38 @@ def fb_authorize(request):
 
 def fb_endereco(request, psid=None):
     if request.method == 'GET':
-        render_data = {'close': False, 'psid': psid}
-        return render(request, 'fb_endereco.html', render_data)
+        render_data = {'close': False, 'psid': psid, 'error': None}
+        return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
     elif request.method == 'POST':
-        psid2 = request.POST['psid'] if 'psid' in request.POST else None
         endereco = request.POST['endereco_entrega']
-        logger.debug('-=-=-=- psid -=-=-=-' + repr(psid))
-        logger.debug('-=-=-=- psid2 -=-=-=-' + repr(psid2))
-        logger.debug('-=-=-=- endereco_entrega -=-=-=-' + repr(endereco))
-        # try:
-        #     cliente = Cliente.objects.get(chave_facebook=psid)
-        # except Cliente.DoesNotExist:
-        #     cliente = Cliente()
-        #     cliente.chave_facebook = request.data.get('id_cliente')
-        # cliente.nome = request.data.get('nome_cliente', None)
-        # cliente.foto = request.data.get('foto_cliente', None)
-        # cliente.genero = request.data.get('genero', None)
-        # cliente.id_loja_facebook = request.data.get('id_loja', None)
-        # cliente.save()
-        render_data = {'close': True, 'psid': psid}
-        return render(request, 'fb_endereco.html', render_data)
+        if psid is None and 'psid' not in request.POST:
+            logger.error('-=-=-=-=-=-=-=- parametro psid nao encontrado.')
+            render_data = {'close': False, 'psid': None, 'error': u'Desculpe, mas não foi possível completar sua ação '
+                                                                  u'de escolher o endereço. Por favor, tente '
+                                                                  u'novamente.'}
+            return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
+        if psid is None:
+            psid = request.POST['psid']
+        else:
+            logger.debug('-=-=-=-=-=-=-=- key before :: ' + settings.SECRET_KEY[:32])
+            key32 = '{: <32}'.format(settings.SECRET_KEY[:32]).encode("utf-8")
+            logger.debug('-=-=-=-=-=-=-=- key after :: ' + key32)
+            logger.debug('-=-=-=-=-=-=-=- enc psid :: ' + psid)
+            psid = unicodedata.normalize('NFKD', psid).encode('ascii', 'ignore')
+            cipher = AESCipher(key=key32)
+            psid = cipher.decrypt(psid)
+        try:
+            cliente = Cliente.objects.get(chave_facebook=psid)
+        except Cliente.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- usuario nao encontrado.')
+            render_data = {'close': False, 'psid': None, 'error': u'Desculpe, mas não foi possível completar sua ação '
+                                                                  u'de escolher o endereço. Por favor, tente '
+                                                                  u'novamente.'}
+            return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
+        cliente.pedido_info = {'endereco': endereco}
+        cliente.save()
+        render_data = {'close': True, 'psid': psid, 'error': None}
+        return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
 
 
 def fb_cad_endereco(request):
