@@ -46,6 +46,7 @@ POSTBACK_MAP = {
     'editar_item_': u'Editar item',
     'remover_item_': u'Remover item',
     'vermais_offset_': u'Ver mais itens',
+    'log_out': u'Log out',
 }
 # ULTIMO PASSO = 34
 
