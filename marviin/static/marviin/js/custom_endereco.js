@@ -26,6 +26,7 @@ function get_endereco(psid)
                     endereco_entrega: { required: true },
                 },
                 submitHandler: function(form) {
+                    alert('form action:: ' + form.action)
                     form.submit();
                 },
                 onfocusout: false,
