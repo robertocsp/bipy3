@@ -448,12 +448,14 @@ class LogOutMarviinView(views.APIView):
         if cliente.cliente_marviin is None or cliente.cliente_marviin.authorization_code is None:
             logger.error('-=-=-=-=-=-=-=- usuario nao logado: ' + psid)
             return Response({"success": False})
+        logger.debug('-=-=-=-=-=-=-=- auth code banco: ' + cliente.cliente_marviin.authorization_code)
+        logger.debug('-=-=-=-=-=-=-=- auth code logout: ' + auth_code)
         if cliente.cliente_marviin.authorization_code == auth_code:
             cliente.cliente_marviin.authorization_code = None
             cliente.cliente_marviin.save()
             return Response({"success": True})
         else:
-            logger.error('-=-=-=-=-=-=-=- authorization code invalido' + psid)
+            logger.error('-=-=-=-=-=-=-=- authorization code invalido, psid: ' + psid)
             return Response({"success": False})
 
 
