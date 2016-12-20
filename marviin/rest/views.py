@@ -450,7 +450,7 @@ class LogOutMarviinView(views.APIView):
             return Response({"success": False})
         logger.debug('-=-=-=-=-=-=-=- auth code banco: ' + cliente.cliente_marviin.authorization_code)
         logger.debug('-=-=-=-=-=-=-=- auth code logout: ' + auth_code)
-        if cliente.cliente_marviin.authorization_code == auth_code:
+        if cliente.cliente_marviin.authorization_code.split('#')[0] == auth_code:
             cliente.cliente_marviin.authorization_code = None
             cliente.cliente_marviin.save()
             return Response({"success": True})

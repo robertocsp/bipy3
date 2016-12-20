@@ -339,10 +339,11 @@ def fb_login(request):
             if request.session.get('skip_perm', False):
                 user.skip_perm = request.session.get('skip_perm', False)
             raw_auth_code = str(uuid.uuid4())
-            user.authorization_code = signing.dumps(raw_auth_code, compress=True) + '#' + raw_auth_code
+            signed_auth_code = signing.dumps(raw_auth_code, compress=True)
+            user.authorization_code = signed_auth_code + '#' + raw_auth_code
             user.save()
             return redirect('{0}&authorization_code={1}'.format(user_temp.redirect_uri,
-                                                                user.authorization_code))
+                                                                signed_auth_code))
     else:
         logger.error('-=-=-=- Acesso inválido ao login -=-=-=-')
         return render(request, 'fb_login_fail.html',

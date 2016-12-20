@@ -9,10 +9,6 @@ import facebook.facebook as fb
 from celery import Celery  # usar shared_task em caso do celery app nao ficar no arquivo de tarefas
 from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
-try:
-    from urllib.parse import quote_plus
-except ImportError:
-    from urllib import quote_plus
 
 logger = get_task_logger(__name__)
 fb.logger.parent = logger
@@ -163,7 +159,7 @@ def link_psid_marviin(self, user_id, auth_code):
     pass
     data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
     data['psid'] = user_id
-    data['auth_code'] = quote_plus(auth_code)
+    data['auth_code'] = auth_code
     url = 'http://localhost:8888/marviin/api/rest/link_to_marviin'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(
@@ -180,7 +176,7 @@ def log_out_marviin(self, user_id, auth_code):
     pass
     data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
     data['psid'] = user_id
-    data['auth_code'] = quote_plus(auth_code)
+    data['auth_code'] = auth_code
     url = 'http://localhost:8888/marviin/api/rest/log_out'
     headers = {'content-type': 'application/json',
                'Authorization': 'Basic ' + base64.b64encode(
