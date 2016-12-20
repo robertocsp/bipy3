@@ -55,7 +55,9 @@ def get_elements_menu(conversa):
     possui_itens_pedido = (len(conversa['itens_pedido']) > 0)
     pedido_andamento = (conversa['datahora_inicio_pedido'] is not None)
     try:
-        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'], max_age=600) is not None
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
     except signing.BadSignature:
         logged_in = False
     if possui_itens_pedido and pedido_andamento:
@@ -155,7 +157,9 @@ def get_quickreply_cardapio_digital(conversa):
     possui_itens_pedido = (len(conversa['itens_pedido']) > 0)
     pedido_andamento = (conversa['datahora_inicio_pedido'] is not None)
     try:
-        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'], max_age=600) is not None
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
     except signing.BadSignature:
         logged_in = False
     if possui_itens_pedido and pedido_andamento:
@@ -203,7 +207,9 @@ def get_quickreply_cardapio_digital(conversa):
 
 def get_quickreply_pedido(conversa):
     try:
-        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'], max_age=600) is not None
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
     except signing.BadSignature:
         logged_in = False
     menu = [
@@ -240,7 +246,9 @@ def get_quickreply_pedido(conversa):
 
 def get_quickreply_pedido2(conversa):
     try:
-        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'], max_age=600) is not None
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
     except signing.BadSignature:
         logged_in = False
     menu = [
@@ -282,7 +290,9 @@ def get_quickreply_pedido2(conversa):
 
 def get_quickreply_endereco(conversa):
     try:
-        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'], max_age=600) is not None
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
     except signing.BadSignature:
         logged_in = False
     menu = [
@@ -324,7 +334,9 @@ def get_quickreply_endereco(conversa):
 
 def get_quickreply_finalizar_pedido(conversa):
     try:
-        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'], max_age=600) is not None
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
     except signing.BadSignature:
         logged_in = False
     menu = [
@@ -366,7 +378,9 @@ def get_quickreply_finalizar_pedido(conversa):
 
 def get_quickreply_atualizar_pedido(conversa):
     try:
-        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'], max_age=600) is not None
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
     except signing.BadSignature:
         logged_in = False
     menu = [
@@ -393,7 +407,9 @@ def get_quickreply_atualizar_pedido(conversa):
 
 def get_quickreply_voltar_menu(conversa):
     try:
-        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'], max_age=600) is not None
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
     except signing.BadSignature:
         logged_in = False
     menu = [
@@ -425,7 +441,9 @@ def get_quickreply_conversa_suspensa():
 
 def get_quickreply_sim_nao(conversa):
     try:
-        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'], max_age=600) is not None
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
     except signing.BadSignature:
         logged_in = False
     menu = [
