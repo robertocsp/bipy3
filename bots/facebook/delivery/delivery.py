@@ -17,10 +17,10 @@ from django.core import signing
 from itertools import product
 from string import ascii_lowercase
 try:
-    from urllib.parse import parse_qs, urlencode
+    from urllib.parse import parse_qs, urlencode, quote_plus
 except ImportError:
     from urlparse import parse_qs
-    from urllib import urlencode
+    from urllib import urlencode, quote_plus
 from my_celery.tasks import get_object, send_quickreply_message, enviar_pedido, envia_resposta, send_generic_message, \
     touch_cliente, send_text_message, salva_se_nao_existir, notificacao_dashboard, get_cardapio, \
     send_image_url_message, troca_mesa_dashboard, teste_tarefa, error_handler, send_button_message, \
