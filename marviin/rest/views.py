@@ -430,6 +430,33 @@ class EnviarMensagemBotView(views.APIView):
                     return um_pedido
 
 
+class LogOutMarviinView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
+        psid = request.data.get('psid')
+        auth_code = request.data.get('auth_code')
+        try:
+            cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
+        except Cliente.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
+            return Response({"success": False})
+        if cliente.cliente_marviin is None or cliente.cliente_marviin.authorization_code is None:
+            logger.error('-=-=-=-=-=-=-=- usuario nao logado: ' + psid)
+            return Response({"success": False})
+        if cliente.cliente_marviin.authorization_code == auth_code:
+            cliente.cliente_marviin.authorization_code = None
+            cliente.cliente_marviin.save()
+            return Response({"success": True})
+        else:
+            logger.error('-=-=-=-=-=-=-=- authorization code invalido' + psid)
+            return Response({"success": False})
+
+
 class LinkToMarviinView(views.APIView):
     authentication_classes = (BasicAuthentication,)
     permission_classes = (IsAdminUser,)
@@ -523,8 +550,8 @@ class EnderecoClienteView(views.APIView):
                 return fail_response(400,
                                      u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
                                      u'e tente novamente novamente.')
-            else:
-                cache.cache_client.delete(psid + 'web_sec')
+        if cache.cache_client.get(psid + 'web_sec') is not None:
+            cache.cache_client.delete(psid + 'web_sec')
         try:
             cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
         except Cliente.DoesNotExist:

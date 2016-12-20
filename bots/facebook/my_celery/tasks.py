@@ -162,7 +162,25 @@ def link_psid_marviin(self, user_id, auth_code):
     data['auth_code'] = auth_code
     url = 'http://localhost:8888/marviin/api/rest/link_to_marviin'
     headers = {'content-type': 'application/json',
-               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    json_response = response.json()
+    logger.info(repr(response))
+    return json_response['success']
+
+
+@celery_app.task(bind=True, soft_time_limit=10)
+def log_out_marviin(self, user_id, auth_code):
+    data = {}
+    pass
+    data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
+    data['psid'] = user_id
+    data['auth_code'] = auth_code
+    url = 'http://localhost:8888/marviin/api/rest/log_out'
+    headers = {'content-type': 'application/json',
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     json_response = response.json()
     logger.info(repr(response))
@@ -177,7 +195,8 @@ def check_login_valid(self, user_id):
     data['psid'] = user_id
     url = 'http://localhost:8888/marviin/api/rest/check_login_valid'
     headers = {'content-type': 'application/json',
-               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     json_response = response.json()
     logger.info(repr(response))
@@ -207,7 +226,8 @@ def touch_cliente(self, sender_id):
     data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
     url = 'http://localhost:8888/marviin/api/rest/cliente/' + sender_id + '/touch'
     headers = {'content-type': 'application/json',
-               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     logger.info(repr(response))
 
@@ -224,7 +244,8 @@ def salva_se_nao_existir(self, sender_id, loja_id, user):
     data['genero'] = user['gender']
     url = 'http://localhost:8888/marviin/api/rest/cliente'
     headers = {'content-type': 'application/json',
-               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     logger.info(repr(response))
 
@@ -245,7 +266,8 @@ def enviar_pedido(self, sender_id, loja_id, conversa):
     data['mesa'] = conversa['mesa'][0]
     url = 'http://localhost:8888/marviin/api/rest/pedido'
     headers = {'content-type': 'application/json',
-               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     logger.info(repr(response))
 
@@ -264,7 +286,8 @@ def envia_resposta(self, conversa, loja_id, sender_id, message):
     data['uid'] = conversa['uid']
     url = 'http://localhost:8888/marviin/api/rest/mensagem_bot'
     headers = {'content-type': 'application/json',
-               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     logger.info(repr(response))
 
@@ -281,7 +304,8 @@ def troca_mesa_dashboard(self, sender_id, loja_id, conversa):
         data['mesa_anterior'] = conversa['mesa'][1]
     url = 'http://localhost:8888/marviin/api/rest/troca_mesa'
     headers = {'content-type': 'application/json',
-               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     logger.info(repr(response))
 
@@ -298,7 +322,8 @@ def notificacao_dashboard(self, sender_id, loja_id, conversa, metodo_api):
     data['mesa'] = conversa['mesa'][0]
     url = 'http://localhost:8888/marviin/api/rest/pede_'+metodo_api
     headers = {'content-type': 'application/json',
-               'Authorization': 'Basic ' + base64.b64encode(my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
     response = requests.post(url, data=json.dumps(data), headers=headers)
     logger.info(repr(response))
 
