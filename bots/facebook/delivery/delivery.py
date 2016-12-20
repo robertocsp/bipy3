@@ -506,7 +506,7 @@ def get_button_webview_endereco(psid):
             'title': 'Escolher outro',
             'webview_height_ratio': 'tall',
             'messenger_extensions': True,
-            'fallback_url': 'https://sistema.marviin.com.br/fb_endereco?psid=' + cipher.encrypt(psid),
+            'fallback_url': 'https://sistema.marviin.com.br/fb_endereco/' + cipher.encrypt(psid),
         }
     ]
 

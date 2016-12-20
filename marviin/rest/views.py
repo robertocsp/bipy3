@@ -532,14 +532,14 @@ class CheckLoginValidView(views.APIView):
 class EnderecoClienteView(views.APIView):
     permission_classes = (AllowAny,)
 
-    def get(self, request, *args, **kwargs):
-        if 'psid' not in request.GET:
+    def get(self, request, psid=None):
+        if psid is None and 'psid' not in request.GET:
             logger.error('-=-=-=-=-=-=-=- parametro psid nao encontrado.')
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
                                       u'e tente novamente novamente.')
-        psid = request.GET['psid']
-        messenger_extension_supported = request.GET['mes']
-        if messenger_extension_supported == 'false':
+        if psid is None:
+            psid = request.GET['psid']
+        else:
             logger.debug('-=-=-=-=-=-=-=- key before :: ' + settings.SECRET_KEY[:32])
             key32 = '{: <32}'.format(settings.SECRET_KEY[:32]).encode("utf-8")
             logger.debug('-=-=-=-=-=-=-=- key after :: ' + key32)

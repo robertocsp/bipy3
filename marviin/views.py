@@ -125,23 +125,28 @@ def fb_authorize(request):
                                                      'account_linking_token': account_linking_token})
 
 
-def fb_endereco(request):
+def fb_endereco(request, psid=None):
     if request.method == 'GET':
-        return render(request, 'fb_endereco.html', {'close': False})
+        render_data = {'close': False, 'psid': psid}
+        return render(request, 'fb_endereco.html', render_data)
     elif request.method == 'POST':
-        psid = request.POST['psid']
+        psid2 = request.POST['psid'] if 'psid' in request.POST else None
         endereco = request.POST['endereco_entrega']
-        try:
-            cliente = Cliente.objects.get(chave_facebook=psid)
-        except Cliente.DoesNotExist:
-            cliente = Cliente()
-            cliente.chave_facebook = request.data.get('id_cliente')
-        cliente.nome = request.data.get('nome_cliente', None)
-        cliente.foto = request.data.get('foto_cliente', None)
-        cliente.genero = request.data.get('genero', None)
-        cliente.id_loja_facebook = request.data.get('id_loja', None)
-        cliente.save()
-        return render(request, 'fb_endereco.html', {'close': True})
+        logger.debug('-=-=-=- psid -=-=-=-' + repr(psid))
+        logger.debug('-=-=-=- psid2 -=-=-=-' + repr(psid2))
+        logger.debug('-=-=-=- endereco_entrega -=-=-=-' + repr(endereco))
+        # try:
+        #     cliente = Cliente.objects.get(chave_facebook=psid)
+        # except Cliente.DoesNotExist:
+        #     cliente = Cliente()
+        #     cliente.chave_facebook = request.data.get('id_cliente')
+        # cliente.nome = request.data.get('nome_cliente', None)
+        # cliente.foto = request.data.get('foto_cliente', None)
+        # cliente.genero = request.data.get('genero', None)
+        # cliente.id_loja_facebook = request.data.get('id_loja', None)
+        # cliente.save()
+        render_data = {'close': True, 'psid': psid}
+        return render(request, 'fb_endereco.html', render_data)
 
 
 def fb_cad_endereco(request):

@@ -21,8 +21,7 @@
             <label>Escolha abaixo o endereço de entrega</label>
             <form action="" method="post" id="form-endereco">
                 {% csrf_token %}
-                <input type="hidden" name="psid" id="psid" value=""/>
-                <input type="hidden" name="mes" id="mes" value=""/>
+                <input type="hidden" name="path" id="path" value="{{ psid }}"/>
                 <div id="lista-enderecos" class="lista-enderecos{% if close %} close-window{% endif %}">
                 </div>
                 <a href="/fb_cad_endereco" id="btn-adicionar-endereco" class="btn btn-default adicionar-endereco none">
