@@ -133,15 +133,16 @@ def fb_endereco(request, psid=None):
         render_data = {'close': False, 'psid': psid, 'error': None}
         return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
     elif request.method == 'POST':
+        enc_psid = psid
         endereco = request.POST['endereco_entrega']
-        if psid is None and 'psid' not in request.POST:
+        if psid is None and 'psid' not in request.GET:
             logger.error('-=-=-=-=-=-=-=- parametro psid nao encontrado.')
             render_data = {'close': False, 'psid': None, 'error': u'Desculpe, mas não foi possível completar sua ação '
                                                                   u'de escolher o endereço. Por favor, tente '
                                                                   u'novamente.'}
             return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
         if psid is None:
-            psid = request.POST['psid']
+            psid = request.GET['psid']
         else:
             logger.debug('-=-=-=-=-=-=-=- key before :: ' + settings.SECRET_KEY[:32])
             key32 = '{: <32}'.format(settings.SECRET_KEY[:32]).encode("utf-8")
@@ -160,7 +161,7 @@ def fb_endereco(request, psid=None):
             return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
         cliente.pedido_info = {'endereco': endereco}
         cliente.save()
-        render_data = {'close': True, 'psid': psid, 'error': None}
+        render_data = {'close': True, 'psid': enc_psid, 'error': None}
         return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
 
 
