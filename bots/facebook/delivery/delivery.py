@@ -878,11 +878,15 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
         passo_inicio(sender_id, loja_id, conversa)
     elif payload == 'log_out':
         auth_code = conversa['auth_code']
-        conversa['auth_code'] = None
         conversa['passo'] = 0
-        chain(log_out_marviin.si(sender_id, auth_code),
-              send_text_message.si(sender_id, loja_id, get_mensagem('logout')),
-              send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+        if auth_code is not None:
+            conversa['auth_code'] = None
+            chain(log_out_marviin.si(sender_id, auth_code),
+                  send_text_message.si(sender_id, loja_id, get_mensagem('logout')),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+        else:
+            chain(send_text_message.si(sender_id, loja_id, get_mensagem('logout')),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_inicio(sender_id, loja_id, conversa):
