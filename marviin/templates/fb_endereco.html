@@ -12,8 +12,10 @@
         <script type="text/javascript" src="/static/marviin/js/jquery.min.js"></script>
         <script type="text/javascript" src="/static/marviin/js/jquery.validate.min.js"></script>
         <script type="text/javascript" src="/static/marviin/js/main.js"></script>
+        {% if error is None %}
         <script type="text/javascript" src="/static/marviin/js/messenger_extensions.js"></script>
         <script type="text/javascript" src="/static/marviin/js/custom_endereco.js?v=1.0"></script>
+        {% endif %}
     </head>
     <body>
         <section id="endereco-page">
@@ -23,6 +25,9 @@
                 {% csrf_token %}
                 <input type="hidden" name="path" id="path" value="{{ psid }}"/>
                 <div id="lista-enderecos" class="lista-enderecos{% if close %} close-window{% endif %}">
+                    {% if error is not None %}
+                    {{ error }}
+                    {% endif %}
                 </div>
                 <a href="/fb_cad_endereco" id="btn-adicionar-endereco" class="btn btn-default adicionar-endereco none">
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Adicionar Endereço

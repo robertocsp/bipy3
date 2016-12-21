@@ -129,8 +129,13 @@ def fb_authorize(request):
 
 
 def fb_endereco(request, psid=None):
-    for x in request.COOKIES:
-        logger.info('-=-=-=-=-=-=-=- (DJANGO) cookies :: ' + repr(x))
+    if 'sessionid' in request.COOKIES:
+        if 'AUTH_CODE' not in request.session:
+            logger.error('-=-=-=-=-=-=-=- sessão inválida.')
+            render_data = {'close': False, 'psid': None, 'error': u'Desculpe, mas não foi possível completar sua ação '
+                                                                  u'de escolher o endereço. Por favor, refaça o login '
+                                                                  u'e tente novamente.'}
+            return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
     if request.method == 'GET':
         render_data = {'close': False, 'psid': psid, 'error': None}
         return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
