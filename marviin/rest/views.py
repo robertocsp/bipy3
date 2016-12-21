@@ -533,6 +533,8 @@ class EnderecoClienteView(views.APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, psid=None):
+        for x in request.COOKIES:
+            logger.info('-=-=-=-=-=-=-=- (REST) cookies :: ' + repr(x))
         if psid is None and 'psid' not in request.GET:
             logger.error('-=-=-=-=-=-=-=- parametro psid nao encontrado.')
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '

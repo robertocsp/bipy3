@@ -129,6 +129,8 @@ def fb_authorize(request):
 
 
 def fb_endereco(request, psid=None):
+    for x in request.COOKIES:
+        logger.info('-=-=-=-=-=-=-=- (DJANGO) cookies :: ' + repr(x))
     if request.method == 'GET':
         render_data = {'close': False, 'psid': psid, 'error': None}
         return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
@@ -363,6 +365,11 @@ def fb_login(request):
             signed_auth_code = signing.dumps(raw_auth_code, compress=True)
             user.authorization_code = signed_auth_code + '#' + raw_auth_code
             user.save()
+            if request.session.session_key:
+                request.session.delete(session_key=request.session.session_key)
+            request.session.create()
+            request.session['AUTH_CODE'] = user.authorization_code
+            request.session.set_expiry(600)  # 10 minutos
             return redirect('{0}&authorization_code={1}'.format(user_temp.redirect_uri,
                                                                 signed_auth_code))
     else:
