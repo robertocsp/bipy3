@@ -813,6 +813,10 @@ def webhook():
                             conversa['suspensa'] += 1
                             conversa['uid'] = x['dashboard']['uid']
                             send_text_message.delay(sender_id, loja_id, x['dashboard']['message'], icon=u'\U0001f464')
+                        elif x.get('webview') and x['webview'].get('postload'):
+                            if x['webview'].get('postload') == 'endereco_selecionado':
+                                conversa['passo'] = 18
+                                passo_forma_pgto(None, sender_id, loja_id, conversa)
                         my_cache.cache_client.set(my_cache.cache_entry_prefix + sender_id, conversa,
                                                   time=my_cache.EXPIRACAO_CACHE_CONVERSA)
         resp = Response('success', status=200, mimetype='text/plain')
@@ -926,17 +930,18 @@ def define_passo(message, sender_id, loja_id, conversa, passo):  # de que passo 
         conversa['passo'] = 10
         passo_tres(message, sender_id, loja_id, conversa)
     elif passo == 18:
-        if u'nao' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
-            conversa['passo'] = 21
-            passo_menu(message, sender_id, loja_id, conversa)
-        elif u'sim' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
-             u'pode' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
-             u'confirm' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
-            conversa['passo'] = 0
-            passo_finalizar_enviar(message, sender_id, loja_id, conversa)
-        elif u'editar' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
-            conversa['passo'] = 16
-            passo_rever_pedido_2(message, sender_id, loja_id, conversa)
+        passo_forma_pgto(None, sender_id, loja_id, conversa)
+        # if u'nao' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+        #     conversa['passo'] = 21
+        #     passo_menu(message, sender_id, loja_id, conversa)
+        # elif u'sim' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
+        #      u'pode' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
+        #      u'confirm' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+        #     conversa['passo'] = 0
+        #     passo_finalizar_enviar(message, sender_id, loja_id, conversa)
+        # elif u'editar' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+        #     conversa['passo'] = 16
+        #     passo_rever_pedido_2(message, sender_id, loja_id, conversa)
     elif passo == 19:
         define_mesa(conversa['aux'], conversa)
         conversa['aux'] = None
@@ -1031,6 +1036,8 @@ def retomar_passo(sender_id, loja_id, conversa):
         passo_rever_pedido_2(None, sender_id, loja_id, conversa, offset=conversa['aux'])
     elif conversa['passo'] == 33:
         passo_finalizar_pedido(None, sender_id, loja_id, conversa)
+    elif conversa['passo'] == 34:
+        passo_finalizar_pedido_autorizado(None, sender_id, loja_id, conversa)
     conversa['suspensa'] = 0
 
 
@@ -1182,7 +1189,7 @@ def passo_finalizar_enviar(message, sender_id, loja_id, conversa):
 def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         if len(conversa['itens_pedido']) > 0:
-            # TODO VERIFICAR SE NECESSITA DE LOGIN OU SE AUTORIZACAO AINDA EH VALIDA
+            # VERIFICA SE NECESSITA DE LOGIN OU SE AUTORIZACAO AINDA EH VALIDA
             login_valid = check_login_valid.delay(sender_id).get()
             if login_valid is False:
                 conversa['passo'] = 33
@@ -1199,10 +1206,11 @@ def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
 def passo_finalizar_pedido_autorizado(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         if len(conversa['itens_pedido']) > 0:
-            # TODO PEGAR ENDERECO VIA WEBVIEW
+            # PEGA ENDERECO VIA WEBVIEW
             chain(send_button_message.si(sender_id, loja_id, get_mensagem('endereco'),
                                          get_button_webview_endereco(sender_id)),
-                  send_quickreply_message.si(sender_id, loja_id, 'Ou, se preferir:', get_quickreply_endereco(conversa)))()
+                  send_quickreply_message.si(sender_id, loja_id, 'Ou, se preferir:',
+                                             get_quickreply_endereco(conversa)))()
             '''
             passo_endereco(message, sender_id, loja_id, conversa)
             if conversa['mesa'] is None:
@@ -1230,6 +1238,10 @@ def passo_finalizar_pedido_autorizado(message, sender_id, loja_id, conversa):
             bot = get_mensagem('rever2')
             chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
                                                                                          get_elements_menu(conversa)))()
+
+
+def passo_forma_pgto(message, sender_id, loja_id, conversa):
+    send_text_message.delay(sender_id, loja_id, 'TODO forma de pgto.')
 
 
 def passo_pedir_mais(message, sender_id, loja_id, conversa):

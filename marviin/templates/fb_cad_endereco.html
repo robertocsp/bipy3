@@ -20,6 +20,7 @@
     <body>
         <section id="endereco-page-cad">
         <form action="" method="post" class="form-horizontal tela-cadastro" id="form-cadend">
+            {% csrf_token %}
             <img src="/static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
             <label class="titulo-label">Preencha seu endereço abaixo</label><br>
             <input type="hidden" name="path" id="path" value="{{ psid }}"/>
@@ -63,7 +64,7 @@
                 {% endif %}
             </div>
             <button type="button" class="btn btn-default adicionar-endereco btn-add-bloco-end">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> +
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             </button>
             <div class="form-group">
                 <div class="col-xs-12">
@@ -78,48 +79,5 @@
         </form>
         </section>
         <div class="loading-marviin"></div>
-        <script type="text/javascript">
-            $(".btn-add-bloco-end").click(function(){
-                numeroEndereco = Number($(".blocos-endereco .bloco-endereco:last-child .num-endereco").text()) + 1;
-
-                $(".blocos-endereco").append("<div class='bloco-endereco'> \
-                    <label class='titulo-label'>Endereço <span class='num-endereco'>" + numeroEndereco + "</span></label> \
-                    <div class='form-group'> \
-                        <div class='col-xs-12'> \
-                            <input type='text' class='form-control' id='cep-" + numeroEndereco + "' placeholder='CEP...'> \
-                        </div> \
-                    </div> \
-                    <div class='form-group'> \
-                        <div class='col-xs-12'> \
-                            <input type='text' class='form-control' id='endereco-" + numeroEndereco + "' placeholder='Endereço...'> \
-                        </div> \
-                    </div> \
-                    <div class='form-group'> \
-                        <div class='col-xs-12'> \
-                            <input type='text' class='form-control' id='complemento-" + numeroEndereco + "' placeholder='Complemento...'> \
-                        </div> \
-                    </div> \
-                    <div class='form-group'> \
-                        <div class='col-xs-12'> \
-                            <input type='text' class='form-control' id='bairro-" + numeroEndereco + "' placeholder='Bairro...'> \
-                        </div> \
-                    </div> \
-                    <div class='form-group'> \
-                        <div class='col-xs-12'> \
-                            <input type='text' class='form-control' id='cidade-" + numeroEndereco + "' placeholder='Cidade...'> \
-                        </div> \
-                    </div> \
-                    <div class='form-group'> \
-                        <div class='col-xs-12'> \
-                            <input type='text' class='form-control' id='estado-" + numeroEndereco + "' placeholder='Estado...'> \
-                        </div> \
-                    </div> \
-                     <button id='btn-cancelar' type='button' class='btn btn-danger save-card'> \
-                        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> - \
-                    </button><br> \
-                </div>");
-            });
-
-        </script>
     </body>
 </html>

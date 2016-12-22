@@ -548,6 +548,37 @@ class EnderecoClienteView(views.APIView):
                                             "padrao": endereco.padrao})
         return Response(enderecos_resultado)
 
+    def post(self, request, psid=None):
+        valid, cliente = check_valid_login(request, psid, logger)
+        if not valid:
+            return fail_response(400, u'Desculpe, não foi possível validar seus dados. Por favor, refaça o login e '
+                                      u'tente novamente.')
+        data = {
+            'entry': [
+                {
+                    'messaging': [
+                        {
+                            'sender': {
+                                'id': cliente.chave_facebook
+                            },
+                            'webview': {
+                                'postload': 'endereco_selecionado',
+                            },
+                            'recipient': {
+                                'id': cliente.id_loja_facebook
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+        url = 'https://localhost:5002/webhook'
+        headers = {'content-type': 'application/json'}
+        response = requests.post(url, data=json.dumps(data), headers=headers, verify=False)
+        logger.debug('------======------- response: ' + repr(response))
+        return Response({"success": True})
+
+
 
 class TrocarMesaView(views.APIView):
     authentication_classes = (BasicAuthentication,)

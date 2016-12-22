@@ -55,7 +55,29 @@ function process_action(psid)
 {
     if(!!$('div.close-window')[0])
     {
-        alert('TODO: fechar janela.');
+        var url = '/marviin/api/rest/endereco_cliente';
+        if (psid)
+            url += '?psid='+psid
+        else
+            url += '/' + $('input#path').val();
+        $.post(url, function(data) {
+            console.log(data);
+            if(psid)
+            {
+                MessengerExtensions.requestCloseBrowser(function success() {
+                    //nada a fazer
+                }, function error(err) {
+                    //TODO informar o usuário que ele pode fechar a WEBVIEW.
+                });
+            }
+            else
+            {
+                window.location.href='https://www.messenger.com/closeWindow/?image_url=&display_text=';
+            }
+        })
+        .fail(function(data) {
+            //TODO SOLICITAR O USUARIO TENTAR NOVAMENTE
+        });
     }
     $('button#btn-escolher-endereco').on('click', function (e){
         if($(this).hasClass('nosubmit') && !!$('[type=radio]:checked')[0])

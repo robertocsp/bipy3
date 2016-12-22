@@ -139,7 +139,7 @@ def fb_endereco(request, psid=None):
                            'url_cad_end': '#'}
             return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
         endereco = request.POST['endereco_entrega']
-        cliente.pedido_info = {'endereco': endereco}
+        cliente.pedido_info = {'endereco': endereco, 'auth_code': cliente.cliente_marviin.authorization_code}
         cliente.save()
         render_data = {'close': True, 'url_cad_end': '#'}
     render_data['psid'] = psid
