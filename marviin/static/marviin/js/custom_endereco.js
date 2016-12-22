@@ -62,6 +62,7 @@ function process_action(psid)
             url += '/' + $('input#path').val();
         $.post(url, function(data) {
             console.log(data);
+            alert('VAMOS FECHAR A JANELA');
             if(psid)
             {
                 MessengerExtensions.requestCloseBrowser(function success() {
@@ -76,8 +77,15 @@ function process_action(psid)
             }
         })
         .fail(function(data) {
-            //TODO SOLICITAR O USUARIO TENTAR NOVAMENTE
+            if(error.message)
+                $('#lista-enderecos').html(error.message);
+            else
+                $('#lista-enderecos').html('Desculpe, tivemos um erro inesperado, por favor, tente novamente.')
+        })
+        .always(function() {
+            $('div.loading-marviin').removeClass('block');
         });
+        return;
     }
     $('button#btn-escolher-endereco').on('click', function (e){
         if($(this).hasClass('nosubmit') && !!$('[type=radio]:checked')[0])
