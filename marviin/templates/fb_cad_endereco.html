@@ -5,63 +5,70 @@
          <meta charset="utf-8">
          <meta http-equiv="X-UA-Compatible" content="IE=edge">
          <meta id="viewport" name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <link rel="stylesheet" href="../static/marviin/css/font-awesome.min.css">
-        <link href="../static/marviin/css/bootstrap.min.css" rel="stylesheet">
-        <link href="../static/marviin/css/style.css" rel="stylesheet">
+        <link rel="stylesheet" href="/static/marviin/css/font-awesome.min.css">
+        <link href="/static/marviin/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/marviin/css/style.css" rel="stylesheet">
 
-        <script type="text/javascript" src="../static/marviin/js/jquery.min.js"></script>
-        <script type="text/javascript" src="../static/marviin/js/main.js"></script>
-        <script type="text/javascript" src="../static/marviin/js/messenger_extensions.js"></script>
-        <script type="text/javascript" src="../static/marviin/js/custom_endereco.js"></script>
+        <script type="text/javascript" src="/static/marviin/js/jquery.min.js"></script>
+        <script type="text/javascript" src="/static/marviin/js/jquery.validate.min.js"></script>
+        <script type="text/javascript" src="/static/marviin/js/main.js"></script>
+        {% if not error %}
+        <script type="text/javascript" src="/static/marviin/js/messenger_extensions.js"></script>
+        <script type="text/javascript" src="/static/marviin/js/custom_cad_endereco.js"></script>
+        {% endif %}
     </head>
     <body>
         <section id="endereco-page-cad">
-             <form action="" method="post" class="form-horizontal tela-cadastro" id="form-criarconta">
-            <img src="../static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
+        <form action="" method="post" class="form-horizontal tela-cadastro" id="form-cadend">
+            <img src="/static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
             <label class="titulo-label">Preencha seu endereço abaixo</label><br>
-            <input type="hidden" id="psid" name="psid" value="">
+            <input type="hidden" name="path" id="path" value="{{ psid }}"/>
             <div class="blocos-endereco">
+                {% if error %}
+                {{ error }}
+                {% else %}
                 <div class="bloco-endereco">
                     <label class="titulo-label">Endereço <span class="num-endereco">1</span></label>
                     <div class="form-group">
                         <div class="col-xs-12">
-                            <input type="text" class="form-control" id="cep" placeholder="CEP...">
+                            <input type="text" class="form-control" id="cep" name="cep" placeholder="CEP...">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-12">
-                            <input type="text" class="form-control" id="endereco" placeholder="Endereço...">
+                            <input type="text" class="form-control" id="endereco" name="endereco" placeholder="Endereço...">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-12">
-                            <input type="text" class="form-control" id="complemento" placeholder="Complemento...">
+                            <input type="text" class="form-control" id="complemento" name="complemento" placeholder="Complemento...">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-12">
-                            <input type="text" class="form-control" id="bairro" placeholder="Bairro...">
+                            <input type="text" class="form-control" id="bairro" name="bairro" placeholder="Bairro...">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-12">
-                            <input type="text" class="form-control" id="cidade" placeholder="Cidade...">
+                            <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Cidade...">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-12">
-                            <input type="text" class="form-control" id="estado" placeholder="Estado...">
+                            <input type="text" class="form-control" id="estado" name="estado" placeholder="Estado...">
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
             <button type="button" class="btn btn-default adicionar-endereco btn-add-bloco-end">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Adicionar Endereço
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> +
             </button>
             <div class="form-group">
                 <div class="col-xs-12">
                     <button id="btn-enviar" type="submit" class="btn btn-primary save-card">
-                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Enviar
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
                     </button>
                     <button id="btn-cancelar" type="button" class="btn btn-default save-card">
                         <span class="fa fa-times" aria-hidden="true"></span> Cancelar
@@ -108,7 +115,7 @@
                         </div> \
                     </div> \
                      <button id='btn-cancelar' type='button' class='btn btn-danger save-card'> \
-                        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> Excluir Endereço \
+                        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> - \
                     </button><br> \
                 </div>");
             });

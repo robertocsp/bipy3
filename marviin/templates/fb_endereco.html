@@ -14,7 +14,7 @@
         <script type="text/javascript" src="/static/marviin/js/main.js"></script>
         {% if not error %}
         <script type="text/javascript" src="/static/marviin/js/messenger_extensions.js"></script>
-        <script type="text/javascript" src="/static/marviin/js/custom_endereco.js?v=1.0"></script>
+        <script type="text/javascript" src="/static/marviin/js/custom_endereco.js?v=1.1"></script>
         {% endif %}
     </head>
     <body>
@@ -29,7 +29,7 @@
                     {{ error }}
                     {% endif %}
                 </div>
-                <a href="/fb_cad_endereco" id="btn-adicionar-endereco" class="btn btn-default adicionar-endereco none">
+                <a href="{{ url_cad_end }}" id="btn-adicionar-endereco" class="btn btn-default adicionar-endereco none">
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Adicionar Endereço
                 </a>
                 <button type="submit" id="btn-escolher-endereco" class="btn btn-primary btn-verde btn-border-white none">

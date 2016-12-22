@@ -88,4 +88,5 @@ urlpatterns = [
     url(r'^fb_endereco[/]$', fb_endereco, name='fb_endereco'),
     url(r'^fb_endereco/(?P<psid>[a-zA-Z0-9_-]+)[/]$', fb_endereco, name='fb_endereco'),
     url(r'^fb_cad_endereco/$', fb_cad_endereco, name='fb_cad_endereco'),
+    url(r'^fb_cad_endereco/(?P<psid>[a-zA-Z0-9_-]+)[/]$', fb_cad_endereco, name='fb_cad_endereco'),
 ]

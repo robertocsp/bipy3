@@ -19,8 +19,8 @@ from cidades.models import Cidade
 from marviin.cliente_marviin.models import Endereco, Facebook
 from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
-from utils.aescipher import AESCipher
 from bots.facebook.my_cache import cache
+from utils.auth import check_valid_login
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
@@ -533,44 +533,8 @@ class EnderecoClienteView(views.APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, psid=None):
-        for x in request.COOKIES:
-            logger.info('-=-=-=-=-=-=-=- (REST) cookies :: ' + repr(x))
-        if psid is None and 'psid' not in request.GET:
-            logger.error('-=-=-=-=-=-=-=- parametro psid nao encontrado.')
-            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente.')
-        if psid is None:
-            psid = request.GET['psid']
-        else:
-            logger.debug('-=-=-=-=-=-=-=- key before :: ' + settings.SECRET_KEY[:32])
-            key32 = '{: <32}'.format(settings.SECRET_KEY[:32]).encode("utf-8")
-            logger.debug('-=-=-=-=-=-=-=- key after :: ' + key32)
-            logger.debug('-=-=-=-=-=-=-=- enc psid :: ' + psid)
-            psid = unicodedata.normalize('NFKD', psid).encode('ascii', 'ignore')
-            cipher = AESCipher(key=key32)
-            psid = cipher.decrypt(psid)
-            logger.debug('-=-=-=-=-=-=-=- memcache :: ' + repr(cache.cache_client.get(psid + 'web_sec')))
-            if cache.cache_client.get(psid + 'web_sec') is None:
-                return fail_response(400,
-                                     u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                     u'e tente novamente ou acesse pelo messenger do seu celular.')
-        if cache.cache_client.get(psid + 'web_sec') is not None:
-            cache.cache_client.delete(psid + 'web_sec')
-        try:
-            cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
-        except Cliente.DoesNotExist:
-            logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
-            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente.')
-        if cliente.cliente_marviin is None or cliente.cliente_marviin.authorization_code is None:
-            logger.error('-=-=-=-=-=-=-=- usuario nao logado: ' + psid)
-            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente.')
-        authorization_code = cliente.cliente_marviin.authorization_code.split('#')[0]
-        try:
-            signing.loads(authorization_code, max_age=600)  # max ages em segundos (10 minutos)
-        except signing.BadSignature:
-            logger.error('-=-=-=-=-=-=-=- usuario com login efetuado a mais de 10 minutos: ' + psid)
+        valid, cliente = check_valid_login(request, psid, logger)
+        if not valid:
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
                                       u'e tente novamente.')
         enderecos = Endereco.objects.filter(user=cliente.cliente_marviin.id, tipo=1).order_by('-padrao', 'endereco')
