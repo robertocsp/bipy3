@@ -62,7 +62,6 @@ function process_action(psid)
             url += '/' + $('input#path').val();
         $.post(url, function(data) {
             console.log(data);
-            alert('VAMOS FECHAR A JANELA');
             if(psid)
             {
                 MessengerExtensions.requestCloseBrowser(function success() {
@@ -73,7 +72,7 @@ function process_action(psid)
             }
             else
             {
-                window.location.href='https://www.messenger.com/closeWindow/?image_url=&display_text=';
+                window.location.href='https://www.messenger.com/closeWindow/?image_url=-&display_text=-';
             }
         })
         .fail(function(data) {

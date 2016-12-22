@@ -553,6 +553,8 @@ class EnderecoClienteView(views.APIView):
         if not valid:
             return fail_response(400, u'Desculpe, não foi possível validar seus dados. Por favor, refaça o login e '
                                       u'tente novamente.')
+        logger.debug('------======------- cliente.chave_facebook: ' + repr(cliente.chave_facebook))
+        logger.debug('------======------- cliente.id_loja_facebook: ' + repr(cliente.id_loja_facebook))
         data = {
             'entry': [
                 {
