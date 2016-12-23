@@ -11,7 +11,7 @@ from pedido.models import Pedido, ItemPedido
 from cliente.models import Cliente
 from loja.models import Loja, Questionario
 from notificacao.models import Notificacao
-from fb_acesso.models import Fb_acesso, FbContasUsuario, remove_not_eligible_pages
+from fb_acesso.models import Fb_acesso, FbContasUsuario, Fb_webhook, remove_not_eligible_pages
 from pedido.templatetags.pedido_tags import minutos_passados
 from upload_cardapio.models import Cardapio
 from estados.models import Estado
@@ -19,7 +19,6 @@ from cidades.models import Cidade
 from marviin.cliente_marviin.models import Endereco, Facebook
 from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
-from bots.facebook.my_cache import cache
 from utils.auth import check_valid_login
 
 from django.contrib.auth import authenticate, login, logout
@@ -350,9 +349,14 @@ class EnviarMensagemView(views.APIView):
                 }
             ]
         }
-        url = 'https://localhost:5002/webhook'
+        try:
+            webhook_url = Fb_webhook.objects.get(app_id=pedido.loja.app_id).webhook_url
+        except Fb_webhook.DoesNotExist:
+            logger.error('------======------- webhook nao cadastrado para app_id: ' + repr(pedido.loja.app_id))
+            return fail_response(500, u'Não foi possível completar sua ação, por favor entre em contato com o '
+                                      u'administrador do sistema.')
         headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(data), headers=headers, verify=False)
+        response = requests.post(webhook_url, data=json.dumps(data), headers=headers, verify=False)
         logger.debug('------======------- response: ' + repr(response))
         response_ws = {'origem': 'sync_chat', 'uid': uid, 'sync_uid': request.data.get('sync_uid'),
                        'message': request.data.get('message')}
@@ -363,7 +367,7 @@ class EnviarMensagemView(views.APIView):
     def atualiza_historico(self, data_pedido, numero, ator, mensagem, loja_id):
         with transaction.atomic():
             pedido = Pedido.objects.select_for_update().filter(loja=loja_id, numero=numero, data=data_pedido)\
-                .select_related('cliente')
+                .select_related('cliente').select_related('loja')
             if not pedido:
                 return None
             else:
@@ -574,9 +578,19 @@ class EnderecoClienteView(views.APIView):
                 }
             ]
         }
-        url = 'https://localhost:5002/webhook'
+        try:
+            loja = Loja.objects.get(id_loja_facebook=cliente.id_loja_facebook)
+            webhook_url = Fb_webhook.objects.get(app_id=loja.app_id).webhook_url
+        except Loja.DoesNotExist, Fb_webhook.DoesNotExist:
+            if loja:
+                logger.error('------======------- webhook nao cadastrado para app_id: ' + repr(loja.app_id))
+            else:
+                logger.error('------======------- loja nao encontrada id_loja_facebook: ' +
+                             repr(cliente.id_loja_facebook))
+            return fail_response(500, u'Não foi possível completar sua ação, por favor entre em contato com o '
+                                      u'administrador do sistema.')
         headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(data), headers=headers, verify=False)
+        response = requests.post(webhook_url, data=json.dumps(data), headers=headers, verify=False)
         logger.debug('------======------- response: ' + repr(response))
         return Response({"success": True})
 

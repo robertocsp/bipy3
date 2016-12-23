@@ -10,6 +10,11 @@ class Fb_acesso(models.Model):
     app_scoped_user_id = models.CharField(max_length=128, blank=True, null=True)
 
 
+class Fb_webhook(models.Model):
+    app_id = models.CharField(primary_key=True, max_length=128, blank=False, null=False)
+    webhook_url = models.CharField(max_length=50, blank=False, null=False)
+
+
 class FbContasUsuario(models.Model):
     id = BigAutoField(primary_key=True, editable=False)
     app_scoped_user_id = models.CharField(max_length=128, blank=False, null=False)
