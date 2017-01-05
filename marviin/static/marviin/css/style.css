@@ -2033,6 +2033,32 @@ p.descri{
     display: none !important;
 }
 
+/*Tela lista estabelecimentos*/
+#campoEstabelecimento{
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #999;
+    margin-top: 17px;
+    font-size: 20px;
+    color: #999;
+    padding-left: 10px;
+}
+
+.ui-menu .ui-menu-item{
+    width: 100%;
+    color: #999;
+    border-bottom: 1px solid #999;
+    padding: 10px 0 10px 10px;
+}
+
+.ui-menu .ui-menu-item:hover{
+    cursor: pointer;
+}
+
+.ui-helper-hidden-accessible{
+    display: none;
+}
+
 @media only screen and (max-width: 1024px){
     .around{
         overflow-y: hidden;
