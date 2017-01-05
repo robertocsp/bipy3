@@ -4,24 +4,27 @@ This bot listens to port 5003 for incoming connections from Facebook.
 """
 import unicodedata
 import datetime
+import random
 import keys.keys as my_keys
 import my_cache.cache as my_cache
+from utils.aescipher import AESCipher
 from string import Template
 from flask import Flask, request, send_from_directory, Response
 from celery import chain
 from celery.exceptions import SoftTimeLimitExceeded
 from contextlib import contextmanager
+from django.core import signing
 from itertools import product
 from string import ascii_lowercase
 try:
-    from urllib.parse import parse_qs, urlencode
+    from urllib.parse import parse_qs, urlencode, quote_plus
 except ImportError:
     from urlparse import parse_qs
-    from urllib import urlencode
+    from urllib import urlencode, quote_plus
 from my_celery.tasks import get_object, send_quickreply_message, enviar_pedido, envia_resposta, send_generic_message, \
     touch_cliente, send_text_message, salva_se_nao_existir, notificacao_dashboard, get_cardapio, \
     send_image_url_message, troca_mesa_dashboard, teste_tarefa, error_handler, send_button_message, \
-    link_psid_marviin, check_login_valid
+    link_psid_marviin, check_login_valid, log_out_marviin
 from deliverylog import app_log
 
 my_cache.cache_entry_prefix = 'delivery'
@@ -43,6 +46,7 @@ POSTBACK_MAP = {
     'editar_item_': u'Editar item',
     'remover_item_': u'Remover item',
     'vermais_offset_': u'Ver mais itens',
+    'log_out': u'Log out',
 }
 # ULTIMO PASSO = 34
 
@@ -51,6 +55,12 @@ def get_elements_menu(conversa):
     menu = []
     possui_itens_pedido = (len(conversa['itens_pedido']) > 0)
     pedido_andamento = (conversa['datahora_inicio_pedido'] is not None)
+    try:
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
+    except signing.BadSignature:
+        logged_in = False
     if possui_itens_pedido and pedido_andamento:
         menu.append(
             {
@@ -119,6 +129,19 @@ def get_elements_menu(conversa):
                 }
             ]
         })
+    if logged_in:
+        menu.append(
+            {
+                'title': u'Log out',
+                'subtitle': u'Desconecte de sua conta Marviin.',
+                'buttons': [
+                    {
+                        'type': 'postback',
+                        'title': u'Log out',
+                        'payload': 'log_out'
+                    }
+                ]
+            })
     '''
     menu.append(
         {
@@ -134,6 +157,12 @@ def get_quickreply_cardapio_digital(conversa):
     menu = []
     possui_itens_pedido = (len(conversa['itens_pedido']) > 0)
     pedido_andamento = (conversa['datahora_inicio_pedido'] is not None)
+    try:
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
+    except signing.BadSignature:
+        logged_in = False
     if possui_itens_pedido and pedido_andamento:
         menu.append(
             {
@@ -167,11 +196,24 @@ def get_quickreply_cardapio_digital(conversa):
             'title': u'Voltar ao menu',
             'payload': 'voltar_menu'
         })
+    if logged_in:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Log out',
+                'payload': 'log_out'
+            })
     return menu
 
 
-def get_quickreply_pedido():
-    return [
+def get_quickreply_pedido(conversa):
+    try:
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
+    except signing.BadSignature:
+        logged_in = False
+    menu = [
         {
             'content_type': 'text',
             'title': u'Conferir e Enviar',
@@ -193,10 +235,24 @@ def get_quickreply_pedido():
             'payload': 'voltar_menu'
         }
     ]
+    if logged_in:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Log out',
+                'payload': 'log_out'
+            })
+    return menu
 
 
-def get_quickreply_pedido2():
-    return [
+def get_quickreply_pedido2(conversa):
+    try:
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
+    except signing.BadSignature:
+        logged_in = False
+    menu = [
         {
             'content_type': 'text',
             'title': u'Pedir mais coisas',
@@ -223,10 +279,24 @@ def get_quickreply_pedido2():
             'payload': 'voltar_menu'
         }
     ]
+    if logged_in:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Log out',
+                'payload': 'log_out'
+            })
+    return menu
 
 
-def get_quickreply_endereco():
-    return [
+def get_quickreply_endereco(conversa):
+    try:
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
+    except signing.BadSignature:
+        logged_in = False
+    menu = [
         {
             'content_type': 'text',
             'title': u'Pedir mais coisas',
@@ -253,10 +323,24 @@ def get_quickreply_endereco():
             'payload': 'voltar_menu'
         }
     ]
+    if logged_in:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Log out',
+                'payload': 'log_out'
+            })
+    return menu
 
 
-def get_quickreply_finalizar_pedido():
-    return [
+def get_quickreply_finalizar_pedido(conversa):
+    try:
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
+    except signing.BadSignature:
+        logged_in = False
+    menu = [
         {
             'content_type': 'text',
             'title': u'Enviar pedido',
@@ -283,10 +367,24 @@ def get_quickreply_finalizar_pedido():
             'payload': 'voltar_menu'
         }
     ]
+    if logged_in:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Log out',
+                'payload': 'log_out'
+            })
+    return menu
 
 
-def get_quickreply_atualizar_pedido():
-    return [
+def get_quickreply_atualizar_pedido(conversa):
+    try:
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
+    except signing.BadSignature:
+        logged_in = False
+    menu = [
         {
             'content_type': 'text',
             'title': u'Voltar',
@@ -298,16 +396,38 @@ def get_quickreply_atualizar_pedido():
             'payload': 'voltar_menu'
         }
     ]
+    if logged_in:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Log out',
+                'payload': 'log_out'
+            })
+    return menu
 
 
-def get_quickreply_voltar_menu():
-    return [
+def get_quickreply_voltar_menu(conversa):
+    try:
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
+    except signing.BadSignature:
+        logged_in = False
+    menu = [
         {
             'content_type': 'text',
             'title': u'Voltar ao menu',
             'payload': 'voltar_menu'
         }
     ]
+    if logged_in:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Log out',
+                'payload': 'log_out'
+            })
+    return menu
 
 
 def get_quickreply_conversa_suspensa():
@@ -320,8 +440,14 @@ def get_quickreply_conversa_suspensa():
     ]
 
 
-def get_quickreply_sim_nao():
-    return [
+def get_quickreply_sim_nao(conversa):
+    try:
+        logged_in = conversa['auth_code'] is not None and signing.loads(conversa['auth_code'],
+                                                                        key=my_keys.SECRET_KEY,
+                                                                        max_age=600) is not None
+    except signing.BadSignature:
+        logged_in = False
+    menu = [
         {
             'content_type': 'text',
             'title': u'Sim',
@@ -338,6 +464,14 @@ def get_quickreply_sim_nao():
             'payload': 'voltar_menu'
         }
     ]
+    if logged_in:
+        menu.append(
+            {
+                'content_type': 'text',
+                'title': u'Log out',
+                'payload': 'log_out'
+            })
+    return menu
 
 
 # TODO QUICKREPLY DE PGTO
@@ -346,7 +480,6 @@ def get_quickreply_pgto1():
 
 
 def get_button_login(psid):
-    # TODO BOTAO CRIAR CONTA CHAMARA WEBVIEW
     # VER https://developers.facebook.com/docs/messenger-platform/messenger-extension
     return [
         {
@@ -357,6 +490,9 @@ def get_button_login(psid):
 
 
 def get_button_webview_endereco(psid):
+    key32 = "{: <32}".format(my_keys.SECRET_KEY[:32]).encode("utf-8")
+    cipher = AESCipher(key=key32)
+    my_cache.cache_client.set(psid + 'web_sec', 'oto', time=my_cache.EXPIRACAO_CACHE_CONVERSA)
     return [
         {
             'type': 'postback',
@@ -365,10 +501,12 @@ def get_button_webview_endereco(psid):
         },
         {
             'type': 'web_url',
-            'url': 'https://sistema.marviin.com.br/fb_endereco?psid='+psid,
+            'url': 'https://sistema.marviin.com.br/fb_endereco?r=' +
+                   ''.join(random.choice('0123456789') for x in range(3)),
             'title': 'Escolher outro',
             'webview_height_ratio': 'tall',
-            'messenger_extensions': True
+            'messenger_extensions': True,
+            'fallback_url': 'https://sistema.marviin.com.br/fb_endereco/' + cipher.encrypt(psid),
         }
     ]
 
@@ -422,6 +560,7 @@ def get_mensagem(id_mensagem, **args):
         'login':      Template(u'Para sua segurança, peço que faça o login na sua conta Marviin.'),
         'login2':     Template(u'Não foi possível efetuar o login, por favor, tente novamente.'),
         'endereco':   Template(u'Por favor, me informe seu endereço de entrega.'),
+        'logout':     Template(u'Logout realizado com sucesso. Como posso auxiliá-lo(a)?'),
     }
     return mensagens[id_mensagem].substitute(args)
 
@@ -611,6 +750,7 @@ def webhook():
                                 'suspensa': 0,
                                 'uid': None,
                                 'entry': None,
+                                'auth_code': None,
                             }
                             app_log.debug('usuario:: ' + repr(user))
                         if x.get('message') or x.get('postback') or x.get('account_linking'):
@@ -665,6 +805,7 @@ def webhook():
                                                                    x['account_linking'].get('authorization_code')).get()
                                     if link:
                                         conversa['passo'] = 34
+                                        conversa['auth_code'] = x['account_linking'].get('authorization_code')
                                         passo_finalizar_pedido_autorizado(None, sender_id, loja_id, conversa)
                                 if link is False:
                                     send_text_message.delay(sender_id, loja_id, get_mensagem('login2'))
@@ -672,6 +813,10 @@ def webhook():
                             conversa['suspensa'] += 1
                             conversa['uid'] = x['dashboard']['uid']
                             send_text_message.delay(sender_id, loja_id, x['dashboard']['message'], icon=u'\U0001f464')
+                        elif x.get('webview') and x['webview'].get('postload'):
+                            if x['webview'].get('postload') == 'endereco_selecionado':
+                                conversa['passo'] = 18
+                                passo_forma_pgto(None, sender_id, loja_id, conversa)
                         my_cache.cache_client.set(my_cache.cache_entry_prefix + sender_id, conversa,
                                                   time=my_cache.EXPIRACAO_CACHE_CONVERSA)
         resp = Response('success', status=200, mimetype='text/plain')
@@ -736,6 +881,17 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
         passo_cardapio_digital(message, sender_id, loja_id, conversa)
     elif payload == 'menu_get_started':
         passo_inicio(sender_id, loja_id, conversa)
+    elif payload == 'log_out':
+        auth_code = conversa['auth_code']
+        conversa['passo'] = 0
+        if auth_code is not None:
+            conversa['auth_code'] = None
+            chain(log_out_marviin.si(sender_id, auth_code),
+                  send_text_message.si(sender_id, loja_id, get_mensagem('logout')),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+        else:
+            chain(send_text_message.si(sender_id, loja_id, get_mensagem('logout')),
+                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_inicio(sender_id, loja_id, conversa):
@@ -760,7 +916,7 @@ def define_passo(message, sender_id, loja_id, conversa, passo):  # de que passo 
     if passo == 3:
         conversa['passo'] = 26
         conversa['aux'] = message
-        passo_confirma_mesa(message, sender_id, loja_id)
+        passo_confirma_mesa(message, sender_id, loja_id, conversa)
     elif passo == 15:
         conversa['passo'] = 2
         passo_trocar_mesa(message, sender_id, loja_id, conversa)
@@ -774,17 +930,18 @@ def define_passo(message, sender_id, loja_id, conversa, passo):  # de que passo 
         conversa['passo'] = 10
         passo_tres(message, sender_id, loja_id, conversa)
     elif passo == 18:
-        if u'nao' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
-            conversa['passo'] = 21
-            passo_menu(message, sender_id, loja_id, conversa)
-        elif u'sim' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
-             u'pode' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
-             u'confirm' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
-            conversa['passo'] = 0
-            passo_finalizar_enviar(message, sender_id, loja_id, conversa)
-        elif u'editar' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
-            conversa['passo'] = 16
-            passo_rever_pedido_2(message, sender_id, loja_id, conversa)
+        passo_forma_pgto(None, sender_id, loja_id, conversa)
+        # if u'nao' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+        #     conversa['passo'] = 21
+        #     passo_menu(message, sender_id, loja_id, conversa)
+        # elif u'sim' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
+        #      u'pode' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() or \
+        #      u'confirm' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+        #     conversa['passo'] = 0
+        #     passo_finalizar_enviar(message, sender_id, loja_id, conversa)
+        # elif u'editar' in unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+        #     conversa['passo'] = 16
+        #     passo_rever_pedido_2(message, sender_id, loja_id, conversa)
     elif passo == 19:
         define_mesa(conversa['aux'], conversa)
         conversa['aux'] = None
@@ -803,7 +960,7 @@ def define_passo(message, sender_id, loja_id, conversa, passo):  # de que passo 
             conversa['passo_nao'][0](message, sender_id, loja_id, conversa, conversa['passo_nao'][1])
         else:
             bot = get_mensagem('sim_nao')
-            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_sim_nao())
+            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_sim_nao(conversa))
     elif passo == 28 or passo == 31:
         if pre_requisito_pedido(sender_id, loja_id, conversa):
             if passo == 28:
@@ -860,7 +1017,7 @@ def retomar_passo(sender_id, loja_id, conversa):
         mensagem_pedido(sender_id, loja_id, conversa)
     elif conversa['passo'] == 8:
         bot = get_mensagem('anotado', arg1=conversa['usuario']['first_name'])
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido(conversa))
     elif conversa['passo'] == 10:
         passo_tres(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 18:
@@ -879,13 +1036,15 @@ def retomar_passo(sender_id, loja_id, conversa):
         passo_rever_pedido_2(None, sender_id, loja_id, conversa, offset=conversa['aux'])
     elif conversa['passo'] == 33:
         passo_finalizar_pedido(None, sender_id, loja_id, conversa)
+    elif conversa['passo'] == 34:
+        passo_finalizar_pedido_autorizado(None, sender_id, loja_id, conversa)
     conversa['suspensa'] = 0
 
 
 def existe_pedido_andamento(sender_id, loja_id, conversa):
     if conversa['datahora_inicio_pedido'] is not None and len(conversa['itens_pedido']) > 0:
         bot = get_mensagem('pedido4', arg1=conversa['usuario']['first_name'])
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido2())
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido2(conversa))
         return True
     return False
 
@@ -897,7 +1056,7 @@ def passo_editar_item(message, sender_id, loja_id, conversa, i):
                conversa['itens_pedido'][int(i)]['descricao']
         bot = u'Digite seu pedido'
         chain(send_text_message.si(sender_id, loja_id, item, icon=None),
-              send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_atualizar_pedido()))()
+              send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_atualizar_pedido(conversa)))()
 
 
 def passo_remover_item(message, sender_id, loja_id, conversa, i):
@@ -908,7 +1067,7 @@ def passo_remover_item(message, sender_id, loja_id, conversa, i):
         bot = u'Remove o item acima?'
         define_sim_nao(conversa, 29, define_passo, 31, define_payload, 'menu_rever_pedido')
         chain(send_text_message.si(sender_id, loja_id, item, icon=None),
-              send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_sim_nao()))()
+              send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_sim_nao(conversa)))()
 
 
 def pre_requisito_pedido(sender_id, loja_id, conversa):
@@ -965,9 +1124,9 @@ def passo_cardapio(message, sender_id, loja_id, conversa):
         passo_cardapio_impresso(message, sender_id, loja_id, conversa, texto_id='cardapio5')
 
 
-def passo_confirma_mesa(message, sender_id, loja_id):
+def passo_confirma_mesa(message, sender_id, loja_id, conversa):
     bot = get_mensagem('mesa5', arg1=message)
-    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_sim_nao())
+    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_sim_nao(conversa))
 
 
 def passo_pedir_conta(message, sender_id, loja_id, conversa):
@@ -980,7 +1139,7 @@ def passo_pedir_conta(message, sender_id, loja_id, conversa):
     else:
         define_sim_nao(conversa, 3, define_passo, 25, define_payload, 'pedir_conta')
         bot = get_mensagem('conta2')
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu(conversa))
 
 
 def passo_chamar_garcom(message, sender_id, loja_id, conversa):
@@ -1030,7 +1189,7 @@ def passo_finalizar_enviar(message, sender_id, loja_id, conversa):
 def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         if len(conversa['itens_pedido']) > 0:
-            # TODO VERIFICAR SE NECESSITA DE LOGIN OU SE AUTORIZACAO AINDA EH VALIDA
+            # VERIFICA SE NECESSITA DE LOGIN OU SE AUTORIZACAO AINDA EH VALIDA
             login_valid = check_login_valid.delay(sender_id).get()
             if login_valid is False:
                 conversa['passo'] = 33
@@ -1047,10 +1206,11 @@ def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
 def passo_finalizar_pedido_autorizado(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         if len(conversa['itens_pedido']) > 0:
-            # TODO PEGAR ENDERECO VIA WEBVIEW
+            # PEGA ENDERECO VIA WEBVIEW
             chain(send_button_message.si(sender_id, loja_id, get_mensagem('endereco'),
                                          get_button_webview_endereco(sender_id)),
-                  send_quickreply_message.si(sender_id, loja_id, 'Ou, se preferir:', get_quickreply_endereco()))()
+                  send_quickreply_message.si(sender_id, loja_id, 'Ou, se preferir:',
+                                             get_quickreply_endereco(conversa)))()
             '''
             passo_endereco(message, sender_id, loja_id, conversa)
             if conversa['mesa'] is None:
@@ -1071,7 +1231,7 @@ def passo_finalizar_pedido_autorizado(message, sender_id, loja_id, conversa):
                 bot1 = pedidos
                 bot2 = get_mensagem('finalizar')
                 chain(send_text_message.si(sender_id, loja_id, bot1),
-                      send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_finalizar_pedido(),
+                      send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_finalizar_pedido(conversa),
                                                  icon=None))()
                 '''
         else:
@@ -1080,13 +1240,17 @@ def passo_finalizar_pedido_autorizado(message, sender_id, loja_id, conversa):
                                                                                          get_elements_menu(conversa)))()
 
 
+def passo_forma_pgto(message, sender_id, loja_id, conversa):
+    send_text_message.delay(sender_id, loja_id, 'TODO forma de pgto.')
+
+
 def passo_pedir_mais(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         set_variaveis(conversa,
                       itens_pedido=(False, None),
                       datetime_pedido=(False, None))
         bot = get_mensagem('pedido3')
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu(conversa))
 
 
 def add_item_pedido_menu(menu, i, item, offset=0):
@@ -1141,7 +1305,7 @@ def passo_rever_pedido_2(message, sender_id, loja_id, conversa, offset=0, eh_msg
             else:
                 bot = 'Clique abaixo para voltar.'
             chain(send_generic_message.si(sender_id, loja_id, menu),
-                  send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu()))()
+                  send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu(conversa)))()
         else:
             bot = get_mensagem('rever2')
             chain(send_text_message.si(sender_id, loja_id, bot),
@@ -1164,7 +1328,7 @@ def passo_novo_pedido(message, sender_id, loja_id, conversa):
 
 def mensagem_mesa(conversa, loja_id, sender_id):
     bot = get_mensagem('mesa')
-    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu(conversa))
 
 
 def passo_nao_entendido(message, sender_id, loja_id, conversa):
@@ -1183,7 +1347,7 @@ def passo_tres(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         conversa['nao_entendidas'] += 1
         bot = get_mensagem('anotado2')
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido(conversa))
 
 
 def passo_dois(message, sender_id, loja_id, conversa):
@@ -1194,7 +1358,7 @@ def passo_dois(message, sender_id, loja_id, conversa):
                       itens_pedido=(False, None),
                       datetime_pedido=(False, None))
         bot = get_mensagem('anotado', arg1=conversa['usuario']['first_name'])
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
+        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido(conversa))
 
 
 def passo_um(message, sender_id, loja_id, conversa):
@@ -1213,7 +1377,7 @@ def mensagem_pedido(sender_id, loja_id, conversa):
     bot = get_mensagem('pedido')
     bot1 = get_mensagem('pedido1')
     chain(send_text_message.si(sender_id, loja_id, bot),
-          send_quickreply_message.si(sender_id, loja_id, bot1, get_quickreply_voltar_menu(), icon=None))()
+          send_quickreply_message.si(sender_id, loja_id, bot1, get_quickreply_voltar_menu(conversa), icon=None))()
 
 
 def passo_trocar_mesa(message, sender_id, loja_id, conversa):

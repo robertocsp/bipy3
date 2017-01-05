@@ -10,9 +10,11 @@ from django.shortcuts import redirect
 from django.core import signing
 from django.conf import settings
 from django.db import IntegrityError, transaction
+from django.template import RequestContext
 
 from loja.models import Loja
 from marviin.cliente_marviin.models import ClienteMarviin, Facebook, FacebookTemp
+from utils.auth import check_valid_login
 
 from string import Template
 
@@ -124,18 +126,36 @@ def fb_authorize(request):
                                                      'account_linking_token': account_linking_token})
 
 
-def fb_endereco(request):
+def fb_endereco(request, psid=None):
     if request.method == 'GET':
-        return render(request, 'fb_endereco.html', {'close': False})
+        url_cad_end = '/fb_cad_endereco' if psid is None else '/fb_cad_endereco/' + psid
+        render_data = {'close': False, 'url_cad_end': url_cad_end}
     elif request.method == 'POST':
-        return render(request, 'fb_endereco.html', {'close': True})
+        valid, cliente = check_valid_login(request, psid, logger)
+        if not valid:
+            render_data = {'close': False, 'psid': None, 'error': u'Desculpe, mas não foi possível completar sua ação '
+                                                                  u'de escolher o endereço. Por favor, refaça o login '
+                                                                  u'e tente novamente.',
+                           'url_cad_end': '#'}
+            return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
+        endereco = request.POST['endereco_entrega']
+        cliente.pedido_info = {'endereco': endereco, 'auth_code': cliente.cliente_marviin.authorization_code}
+        cliente.save()
+        render_data = {'close': True, 'url_cad_end': '#'}
+    render_data['psid'] = psid
+    render_data['error'] = None
+    return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
 
 
-def fb_cad_endereco(request):
-    if request.method == 'GET':
-        return render(request, 'fb_cad_endereco.html')
-    elif request.method == 'POST':
-        pass
+def fb_cad_endereco(request, psid=None):
+    if request.method == 'POST':
+        valid, cliente = check_valid_login(request, psid, logger)
+        if not valid:
+            render_data = {'psid': None, 'error': u'Desculpe, mas não foi possível completar sua ação de adicionar '
+                                                  u'endereço. Por favor, refaça o login e tente novamente.'}
+            return render(request, 'fb_endereco.html', render_data, context_instance=RequestContext(request))
+    render_data = {'psid': psid, 'error': None}
+    return render(request, 'fb_cad_endereco.html', render_data, context_instance=RequestContext(request))
 
 
 def fb_login(request):
@@ -326,10 +346,17 @@ def fb_login(request):
             if request.session.get('skip_perm', False):
                 user.skip_perm = request.session.get('skip_perm', False)
             raw_auth_code = str(uuid.uuid4())
-            user.authorization_code = signing.dumps(raw_auth_code, compress=True) + '#' + raw_auth_code
+            signed_auth_code = signing.dumps(raw_auth_code, compress=True)
+            user.authorization_code = signed_auth_code + '#' + raw_auth_code
             user.save()
+            if request.session.session_key:
+                request.session.delete(session_key=request.session.session_key)
+            request.session.create()
+            request.session['AUTH_CODE'] = user.authorization_code
+            request.session['USER_ID'] = user_id
+            request.session.set_expiry(600)  # 10 minutos
             return redirect('{0}&authorization_code={1}'.format(user_temp.redirect_uri,
-                                                                user.authorization_code))
+                                                                signed_auth_code))
     else:
         logger.error('-=-=-=- Acesso inválido ao login -=-=-=-')
         return render(request, 'fb_login_fail.html',

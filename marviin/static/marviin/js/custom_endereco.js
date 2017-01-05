@@ -1,7 +1,11 @@
 function get_endereco(psid)
 {
-    $('div.loading-marviin').show();
-    $.getJSON( '/marviin/api/rest/endereco_cliente?psid='+psid, function( data ) {
+    var url = '/marviin/api/rest/endereco_cliente';
+    if (psid)
+        url += '?psid='+psid
+    else
+        url += '/' + $('input#path').val();
+    $.getJSON( url, function( data ) {
         if(data && data.length)
         {
             $('#lista-enderecos').html('');
@@ -14,22 +18,36 @@ function get_endereco(psid)
                 if(item.padrao == true)
                     input.prop('checked', true);
                 var endereco = ' ' + item.endereco + ' ' + item.complemento + ', ' + item.bairro + ', CEP: ' + item.cep + ', ' + item.cidade + ', ' + item.estado;
-                label.append(input).append(endereco);
+                label.append(input).append($('<span></span>').append(endereco));
                 $('#lista-enderecos').append(label);
             });
-            $('button#btn-escolher-endereco').show();
+            $('form#form-endereco').validate({
+                rules: {
+                    endereco_entrega: { required: true },
+                },
+                submitHandler: function(form) {
+                    if(psid)
+                        form.action += '&psid=' + psid;
+                    form.submit();
+                },
+                onfocusout: false,
+                onkeyup: false,
+                onclick: false
+            });
+            $('button#btn-escolher-endereco').removeClass('none');
         }
         else
             $('#lista-enderecos').html('Nenhum endereço encontrado. Utilize o botão abaixo para cadastrar seu endereço de entrega. Obrigado.');
+        $('a#btn-adicionar-endereco').removeClass('none');
     })
     .fail(function(error) {
         if(error.message)
             $('#lista-enderecos').html(error.message);
         else
-            $('#lista-enderecos').html('Desculpe, mas não foi possível recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
+            $('#lista-enderecos').html('Desculpe, mas não foi possível recuperar seus endereços, por favor, refaça o login e tente novamente.');
     })
     .always(function() {
-        $('div.loading-marviin').hide();
+        $('div.loading-marviin').removeClass('block');
     });
 }
 
@@ -37,19 +55,48 @@ function process_action(psid)
 {
     if(!!$('div.close-window')[0])
     {
-        alert('TODO: fechar janela.');
+        var url = '/marviin/api/rest/endereco_cliente';
+        if (psid)
+            url += '?psid='+psid
+        else
+            url += '/' + $('input#path').val();
+        $.post(url, function(data) {
+            console.log(data);
+            if(psid)
+            {
+                MessengerExtensions.requestCloseBrowser(function success() {
+                    //nada a fazer
+                }, function error(err) {
+                    //TODO informar o usuário que ele pode fechar a WEBVIEW.
+                });
+            }
+            else
+            {
+                window.location.href='https://www.messenger.com/closeWindow/?image_url=-&display_text=-';
+            }
+        })
+        .fail(function(data) {
+            if(error.message)
+                $('#lista-enderecos').html(error.message);
+            else
+                $('#lista-enderecos').html('Desculpe, tivemos um erro inesperado, por favor, tente novamente.')
+        })
+        .always(function() {
+            $('div.loading-marviin').removeClass('block');
+        });
+        return;
     }
-    $('form#form-endereco').validate({
-        rules: {
-            endereco_entrega: { required: true },
-        },
-        submitHandler: function(form, e) {
-            e.preventDefault();
-            if($('button#btn-escolher-endereco').hasClass('nosubmit'))
-                return false;
-            $('button#btn-escolher-endereco').addClass('nosubmit');
-            form.submit();
+    $('button#btn-escolher-endereco').on('click', function (e){
+        if($(this).hasClass('nosubmit') && !!$('[type=radio]:checked')[0])
+        {
+            $(this).removeClass('nosubmit');
         }
+        if($(this).hasClass('nosubmit'))
+        {
+            e.preventDefault();
+            return false;
+        }
+        $(this).addClass('nosubmit');
     });
     $.extend(
         $.validator.messages, {
@@ -61,5 +108,5 @@ function process_action(psid)
 
 function error_handler(err)
 {
-    $('#lista-enderecos').html('Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login e tente novamente novamente.');
+    $('#lista-enderecos').html('Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login e tente novamente.');
 }

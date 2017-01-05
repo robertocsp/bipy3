@@ -11,7 +11,7 @@ from pedido.models import Pedido, ItemPedido
 from cliente.models import Cliente
 from loja.models import Loja, Questionario
 from notificacao.models import Notificacao
-from fb_acesso.models import Fb_acesso, FbContasUsuario, remove_not_eligible_pages
+from fb_acesso.models import Fb_acesso, FbContasUsuario, Fb_webhook, remove_not_eligible_pages
 from pedido.templatetags.pedido_tags import minutos_passados
 from upload_cardapio.models import Cardapio
 from estados.models import Estado
@@ -19,6 +19,7 @@ from cidades.models import Cidade
 from marviin.cliente_marviin.models import Endereco, Facebook
 from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
+from utils.auth import check_valid_login
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
@@ -39,6 +40,7 @@ import os
 import codecs
 import string
 import random
+import unicodedata
 
 logger = logging.getLogger('django')
 
@@ -347,9 +349,14 @@ class EnviarMensagemView(views.APIView):
                 }
             ]
         }
-        url = 'https://localhost:5002/webhook'
+        try:
+            webhook_url = Fb_webhook.objects.get(app_id=pedido.loja.app_id).webhook_url
+        except Fb_webhook.DoesNotExist:
+            logger.error('------======------- webhook nao cadastrado para app_id: ' + repr(pedido.loja.app_id))
+            return fail_response(500, u'Não foi possível completar sua ação, por favor entre em contato com o '
+                                      u'administrador do sistema.')
         headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(data), headers=headers, verify=False)
+        response = requests.post(webhook_url, data=json.dumps(data), headers=headers, verify=False)
         logger.debug('------======------- response: ' + repr(response))
         response_ws = {'origem': 'sync_chat', 'uid': uid, 'sync_uid': request.data.get('sync_uid'),
                        'message': request.data.get('message')}
@@ -360,7 +367,7 @@ class EnviarMensagemView(views.APIView):
     def atualiza_historico(self, data_pedido, numero, ator, mensagem, loja_id):
         with transaction.atomic():
             pedido = Pedido.objects.select_for_update().filter(loja=loja_id, numero=numero, data=data_pedido)\
-                .select_related('cliente')
+                .select_related('cliente').select_related('loja')
             if not pedido:
                 return None
             else:
@@ -425,6 +432,35 @@ class EnviarMensagemBotView(views.APIView):
                     um_pedido.historico.append({ator: mensagem})
                     um_pedido.save()
                     return um_pedido
+
+
+class LogOutMarviinView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
+        psid = request.data.get('psid')
+        auth_code = request.data.get('auth_code')
+        try:
+            cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
+        except Cliente.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
+            return Response({"success": False})
+        if cliente.cliente_marviin is None or cliente.cliente_marviin.authorization_code is None:
+            logger.error('-=-=-=-=-=-=-=- usuario nao logado: ' + psid)
+            return Response({"success": False})
+        logger.debug('-=-=-=-=-=-=-=- auth code banco: ' + cliente.cliente_marviin.authorization_code)
+        logger.debug('-=-=-=-=-=-=-=- auth code logout: ' + auth_code)
+        if cliente.cliente_marviin.authorization_code.split('#')[0] == auth_code:
+            cliente.cliente_marviin.authorization_code = None
+            cliente.cliente_marviin.save()
+            return Response({"success": True})
+        else:
+            logger.error('-=-=-=-=-=-=-=- authorization code invalido, psid: ' + psid)
+            return Response({"success": False})
 
 
 class LinkToMarviinView(views.APIView):
@@ -500,29 +536,11 @@ class CheckLoginValidView(views.APIView):
 class EnderecoClienteView(views.APIView):
     permission_classes = (AllowAny,)
 
-    def get(self, request, *args, **kwargs):
-        if 'psid' not in request.GET:
-            logger.error('-=-=-=-=-=-=-=- parametro psid nao encontrado.')
+    def get(self, request, psid=None):
+        valid, cliente = check_valid_login(request, psid, logger)
+        if not valid:
             return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente novamente.')
-        psid = request.GET['psid']
-        try:
-            cliente = Cliente.objects.select_related('cliente_marviin').get(chave_facebook=psid)
-        except Cliente.DoesNotExist:
-            logger.error('-=-=-=-=-=-=-=- usuario nao encontrado, psid: ' + psid)
-            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente novamente.')
-        if cliente.cliente_marviin is None or cliente.cliente_marviin.authorization_code is None:
-            logger.error('-=-=-=-=-=-=-=- usuario nao logado: ' + psid)
-            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente novamente.')
-        authorization_code = cliente.cliente_marviin.authorization_code.split('#')[0]
-        try:
-            signing.loads(authorization_code, max_age=600)  # max ages em segundos (10 minutos)
-        except signing.BadSignature:
-            logger.error('-=-=-=-=-=-=-=- usuario com login efetuado a mais de 10 minutos: ' + psid)
-            return fail_response(400, u'Desculpe, mas não consegui recuperar seus endereços, por favor, refaça o login '
-                                      u'e tente novamente novamente.')
+                                      u'e tente novamente.')
         enderecos = Endereco.objects.filter(user=cliente.cliente_marviin.id, tipo=1).order_by('-padrao', 'endereco')
         enderecos_resultado = []
         if enderecos:
@@ -533,6 +551,49 @@ class EnderecoClienteView(views.APIView):
                                             "cep": endereco.cep, "estado": endereco.estado, "cidade": endereco.cidade,
                                             "padrao": endereco.padrao})
         return Response(enderecos_resultado)
+
+    def post(self, request, psid=None):
+        valid, cliente = check_valid_login(request, psid, logger)
+        if not valid:
+            return fail_response(400, u'Desculpe, não foi possível validar seus dados. Por favor, refaça o login e '
+                                      u'tente novamente.')
+        logger.debug('------======------- cliente.chave_facebook: ' + repr(cliente.chave_facebook))
+        logger.debug('------======------- cliente.id_loja_facebook: ' + repr(cliente.id_loja_facebook))
+        data = {
+            'entry': [
+                {
+                    'messaging': [
+                        {
+                            'sender': {
+                                'id': cliente.chave_facebook
+                            },
+                            'webview': {
+                                'postload': 'endereco_selecionado',
+                            },
+                            'recipient': {
+                                'id': cliente.id_loja_facebook
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+        try:
+            loja = Loja.objects.get(id_loja_facebook=cliente.id_loja_facebook)
+            webhook_url = Fb_webhook.objects.get(app_id=loja.app_id).webhook_url
+        except Loja.DoesNotExist, Fb_webhook.DoesNotExist:
+            if loja:
+                logger.error('------======------- webhook nao cadastrado para app_id: ' + repr(loja.app_id))
+            else:
+                logger.error('------======------- loja nao encontrada id_loja_facebook: ' +
+                             repr(cliente.id_loja_facebook))
+            return fail_response(500, u'Não foi possível completar sua ação, por favor entre em contato com o '
+                                      u'administrador do sistema.')
+        headers = {'content-type': 'application/json'}
+        response = requests.post(webhook_url, data=json.dumps(data), headers=headers, verify=False)
+        logger.debug('------======------- response: ' + repr(response))
+        return Response({"success": True})
+
 
 
 class TrocarMesaView(views.APIView):

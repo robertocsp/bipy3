@@ -15,3 +15,5 @@ with open(os.path.join(os.path.join(BASE_DIR, 'marviin_conf'), 'keys.txt')) as k
             CHAVE_BOT_API_INTERNA = key_value_pair[1]
         if key_value_pair[0] == 'webhook-secret':
             CHAVE_BOT_WEBHOOK = key_value_pair[1]
+        if key_value_pair[0] == 'secret_key':
+            SECRET_KEY = key_value_pair[1]
