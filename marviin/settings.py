@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marviin_conf'), 'keys.txt')) as keys_file:
     for line in keys_file:
-        key_value_pair = line.strip().split('=')
+        key_value_pair = line.strip().split('=', 1)
         if key_value_pair[0] == 'secret_key':
             SECRET_KEY = key_value_pair[1]
         elif key_value_pair[0] == 'api-secret':

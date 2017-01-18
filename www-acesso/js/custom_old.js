@@ -1,5 +1,3 @@
-//var base_url = 'https://sistema.marviin.com.br';
-var base_url = 'http://localhost:8888';
 function generateUUID() {
     var d = new Date().getTime();
     if(window.performance && typeof window.performance.now === "function"){
@@ -151,73 +149,125 @@ function preencheValoresCep(endereco, complemento, bairro, estado, cidade)
     $("#cidade_estabelecimento").fadeIn(500);
 }
 
+var monta_dados_envio = function (jsonArray)
+{
+    var json_envio = {};
+    for (var i in jsonArray)
+    {
+        json_envio[jsonArray[i].name] = jsonArray[i].value;
+    }
+    return json_envio;
+};
+
+window.onpopstate = function(event) {
+    console.log("location: " + document.location + ", state: " + JSON.stringify(event.state));
+};
+
 $(function() {
     if ($('#permissao-pagina')[0])
     {
-        setup_solicitacao_acesso();
-        var checa_todos_erros = function() {
-            var form = $( this );
+        var code = $.url().param('code');
+        var state = $.url().param('state');
+        if (code && state)
+        {
+            if(sessionStorage.stateLogin && sessionStorage.stateLogin === state)
+            {
+                $('div.loading-marviin').show();
+                $('#modulo').prop('disabled', true);
+                if (history && history.replaceState)
+                    history.replaceState('marviin login acesso', "Marviin Acesso", "/");
+                $.post('https://sistema.marviin.com.br/marviin/api/rest/acesso_bot_v2',
+                     {code: code, client_id: state.split('|')[1]},
+                     function(data) {
+                    $('#conteudo-principal').replaceWith(data);
+                    setup_solicitacao_acesso();
+                    var checa_todos_erros = function() {
+                        var form = $( this );
 
-            var marca_erros = function() {
-                form.find('.invalid-field').each( function( index, node ) {
-                    $(node).removeClass('invalid-field');
+                        var marca_erros = function() {
+                            form.find('.invalid-field').each( function( index, node ) {
+                                $(node).removeClass('invalid-field');
+                            });
+                            form.find( ":invalid" ).each( function( index, node ) {
+                                $(node).addClass('invalid-field');
+                            });
+                            if ($('#tipo_cadastro_usuario').val() === '') {
+                                $('#btn_tenho_login').addClass('invalid-field');
+                                $('#btn_nao_tenho_login').addClass('invalid-field');
+                            } else {
+                                $('#btn_tenho_login').removeClass('invalid-field');
+                                $('#btn_nao_tenho_login').removeClass('invalid-field');
+                            }
+                        };
+
+                        var form_solicitacao_acesso_function =  function( event ) {
+                            var form = $( this );
+                            if ( form[0].checkValidity && !form[0].checkValidity() ) {
+                                form.find( ':invalid' ).first().focus();
+                                event.preventDefault();
+                            } else if ($('#tipo_cadastro_usuario').val() === '') {
+                                form.find('button').focus();
+                                event.preventDefault();
+                            } else {
+                                form.off('submit');
+                                $('div.loading-marviin').show();
+                                $.post('https://sistema.marviin.com.br/marviin/api/rest/acesso_bot_v2_passo2',
+                                         {dados_acesso: JSON.stringify(monta_dados_envio(form.serializeArray()))},
+                                         function(data) {
+                                           console.log(data);
+                                           form[0].reset();
+                                           alert(data.message);
+                                           location.reload();
+                                         },
+                                         'json'
+                                )
+                                .fail(function(data) {
+                                    console.log(data);
+                                    alert_error(data);
+                                })
+                                .always(function() {
+                                    $('div.loading-marviin').hide();
+                                    form.on('submit', form_solicitacao_acesso_function);
+                                });
+                            }
+                        };
+                        form.on( 'submit', form_solicitacao_acesso_function);
+
+                        $( 'input[type=submit], button:not([type=button])', form )
+                            .on( 'click', marca_erros);
+
+                        $( 'input', form ).on( 'keypress', function( event ) {
+                            var type = $( this ).attr( 'type' );
+                            if ( /date|email|month|number|search|tel|text|time|url|week/.test ( type )
+                              && event.keyCode == 13 ) {
+                                marca_erros();
+                            }
+                        });
+                    };
+                    $('#form_solicitacao_acesso').each(checa_todos_erros);
+                })
+                .fail(function(data) {
+                    console.log(data);
+                    var error_handled = false;
+                    var error_json = get_error_json(data);
+                    if(error_json){
+                        if (error_json.type === 'perm'){
+                            carregaInfosUsuario(state.split('|')[1], 'rerequest', error_json.object.join(','));
+                            error_handled = true;
+                        } else if (error_json.type === 'msg'){
+                            alert_error(data, error_json);
+                            error_handled = true;
+                        }
+                    }
+                    if(!error_handled)
+                        alert_error(data, error_json);
+                    $('#modulo').removeProp('disabled');
+                })
+                .always(function() {
+                    $('div.loading-marviin').hide();
                 });
-                form.find( ":invalid" ).each( function( index, node ) {
-                    $(node).addClass('invalid-field');
-                });
-                if ($('#tipo_cadastro_usuario').val() === '') {
-                    $('#btn_tenho_login').addClass('invalid-field');
-                    $('#btn_nao_tenho_login').addClass('invalid-field');
-                } else {
-                    $('#btn_tenho_login').removeClass('invalid-field');
-                    $('#btn_nao_tenho_login').removeClass('invalid-field');
-                }
-            };
-
-            var form_solicitacao_acesso_function =  function( event ) {
-                var form = $( this );
-                if ( form[0].checkValidity && !form[0].checkValidity() ) {
-                    form.find( ':invalid' ).first().focus();
-                    event.preventDefault();
-                } else if ($('#tipo_cadastro_usuario').val() === '') {
-                    form.find('button').focus();
-                    event.preventDefault();
-                } else {
-                    form.off('submit');
-                    $('div.loading-marviin').show();
-                    $.post(base_url + '/marviin/api/rest/acesso_bot_v3', form.serialize(),
-                             function(data) {
-                               console.log(data);
-//                               form[0].reset();
-                               alert(data.message);
-//                               location.reload();
-                             },
-                             'json'
-                    )
-                    .fail(function(data) {
-                        console.log(data);
-                        alert_error(data);
-                    })
-                    .always(function() {
-                        $('div.loading-marviin').hide();
-                        form.on('submit', form_solicitacao_acesso_function);
-                    });
-                }
-            };
-            form.on( 'submit', form_solicitacao_acesso_function);
-
-            $( 'input[type=submit], button:not([type=button])', form )
-                .on( 'click', marca_erros);
-
-            $( 'input', form ).on( 'keypress', function( event ) {
-                var type = $( this ).attr( 'type' );
-                if ( /date|email|month|number|search|tel|text|time|url|week/.test ( type )
-                  && event.keyCode == 13 ) {
-                    marca_erros();
-                }
-            });
-        };
-        $('#form_solicitacao_acesso').each(checa_todos_erros);
+            }
+        }
 
         function setup_solicitacao_acesso()
         {
@@ -270,7 +320,7 @@ $(function() {
                             } //end if.
                             else {
                                 //CEP pesquisado não foi encontrado.
-                                $.getJSON(base_url + '/marviin/api/rest/estados', function(dados) {
+                                $.getJSON("https://sistema.marviin.com.br/marviin/api/rest/estados", function(dados) {
                                     preencheValoresCep('', '', '', dados.estados, []);
                                 });
                             }
@@ -289,7 +339,7 @@ $(function() {
             });
 
             $('#estado_estabelecimento').change(function(){
-                $.getJSON(base_url + '/marviin/api/rest/cidades?estado='+$(this).val(), function(dados) {
+                $.getJSON("https://sistema.marviin.com.br/marviin/api/rest/cidades?estado="+$(this).val(), function(dados) {
                     $("#cidade_estabelecimento").fadeOut(500);
                     preencheValoresCidade(dados.cidades);
                     $("#cidade_estabelecimento").fadeIn(500);
@@ -347,7 +397,7 @@ $(function() {
                 }
 
                 $('div.loading-marviin').show();
-                $.post(base_url + '/marviin/api/rest/esqueci_senha',
+                $.post('https://sistema.marviin.com.br/marviin/api/rest/esqueci_senha',
                      {email: fieldValidation.val()},
                      function(data) {
                        console.log(data);
@@ -377,7 +427,7 @@ $(function() {
         else if(!!token2)
             data['token2'] = token2;
         $('div.loading-marviin').show();
-        $.post(base_url + '/marviin/api/rest/valida_token',
+        $.post('https://sistema.marviin.com.br/marviin/api/rest/valida_token',
                  data,
                  function(data) {
                    $('#secao_campos_senha').html(data);
@@ -431,8 +481,8 @@ $(function() {
                         } else {
                             form.off('submit');
                             $('div.loading-marviin').show();
-                            $.post(base_url + '/marviin/api/rest/'+$('input#metodo').val(),
-                                     form.serialize(),
+                            $.post('https://sistema.marviin.com.br/marviin/api/rest/'+$('input#metodo').val(),
+                                     monta_dados_envio(form.serializeArray()),
                                      function(data) {
                                        console.log(data);
                                        alert(data.message);
@@ -483,3 +533,18 @@ $(function() {
         });
     }
 });
+
+function carregaInfosUsuario(client_id, auth_type, scope)
+{
+    var uid = generateUUID();
+    sessionStorage.stateLogin = uid+'|'+client_id;
+    if (!auth_type)
+        auth_type = 'reauthenticate';
+    if (!scope)
+        scope = 'manage_pages,pages_messaging';
+    var redirect_url='https://www.facebook.com/v2.8/dialog/oauth?client_id='+client_id+
+        '&redirect_uri=https://acesso.marviin.com.br/'+
+        '&state='+sessionStorage.stateLogin+'&scope='+scope+
+        '&auth_type='+auth_type;
+    window.location.href=redirect_url;
+}

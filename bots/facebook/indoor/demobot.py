@@ -4,8 +4,10 @@ This bot listens to port 5002 for incoming connections from Facebook.
 """
 import unicodedata
 import datetime
+import random
 import keys.keys as my_keys
 import my_cache.cache as my_cache
+from utils.aescipher import AESCipher
 from string import Template
 from flask import Flask, request, send_from_directory, Response
 from celery import chain
@@ -19,11 +21,11 @@ except ImportError:
     from urlparse import parse_qs
     from urllib import urlencode
 from my_celery.tasks import get_object, send_quickreply_message, enviar_pedido, envia_resposta, send_generic_message, \
-    touch_cliente, send_text_message, salva_se_nao_existir, notificacao_dashboard, get_cardapio, \
+    touch_cliente, send_text_message, salva_se_nao_existir, notificacao_dashboard, get_cardapio, send_button_message, \
     send_image_url_message, troca_mesa_dashboard, teste_tarefa, error_handler
 from demobotlog import app_log
 
-my_cache.cache_entry_prefix = 'indoor'
+my_cache.cache_entry_prefix = INDOOR = 'indoor'
 flask_app = Flask(__name__)
 
 app_log.debug('celery_app:::' + send_generic_message.name)
@@ -358,6 +360,22 @@ def get_quickreply_cardapio():
     ]
 
 
+def get_loja_webview(psid):
+    key32 = "{: <32}".format(my_keys.SECRET_KEY[:32]).encode("utf-8")
+    cipher = AESCipher(key=key32)
+    my_cache.cache_client.set(psid + 'web_sec', 'oto', time=my_cache.EXPIRACAO_CACHE_CONVERSA)
+    return [
+        {
+            'type': 'web_url',
+            'url': 'https://sistema.marviin.com.br/fb_lojas/' + cipher.encrypt(psid + '#' + INDOOR),
+            'title': 'Escolher estabelecimento',
+            'webview_height_ratio': 'tall',
+            'messenger_extensions': True,
+            'fallback_url': 'https://sistema.marviin.com.br/fb_lojas/' + cipher.encrypt(psid + '#' + INDOOR),
+        }
+    ]
+
+
 def get_mensagem(id_mensagem, **args):
     mensagens = {
         'ola':        Template(u'Olá $arg1, como posso ajudá-lo(a)?'),
@@ -403,6 +421,7 @@ def get_mensagem(id_mensagem, **args):
         'conta':      Template(u'Ok, já avisei para trazerem sua conta.\nMuito obrigado(a), espero que sua experiência '
                                u'tenha sido a melhor possível.\nVolte sempre!'),
         'conta2':     Template(u'Desculpe, mas não tenho anotado sua mesa. Você poderia me informar, por favor.'),
+        'loja':       Template(u'Por favor, clique abaixo e me informe onde você está.'),
     }
     return mensagens[id_mensagem].substitute(args)
 
@@ -459,7 +478,7 @@ def resposta_dashboard(message=None, payload=None, sender_id=None, loja_id=None,
                     payload == 'sair_suspensao':
         passo_finalizar_contato(sender_id, loja_id, conversa)
     else:
-        send_quickreply_message.delay(sender_id, loja_id, get_mensagem('suspensao'),
+        send_quickreply_message.delay(INDOOR, sender_id, loja_id, get_mensagem('suspensao'),
                                       get_quickreply_conversa_suspensa())
         envia_resposta.delay(conversa, loja_id, sender_id, message)
 
@@ -474,16 +493,14 @@ def set_variaveis(conversa, nao_entendidas=(True, 0), itens_pedido=(True, None),
         conversa['itens_pedido'] = [] if not itens_pedido[1] else itens_pedido[1]
 
 
-def checa_duplicidade(sender_id, loja_id, timestamp, conversa):
+def checa_duplicidade(sender_id, timestamp, conversa):
     duplicado = False
     if conversa['entry'] is None:
         conversa['entry'] = {}
     elif conversa['entry']['sender_id'] == sender_id and \
-            conversa['entry']['loja_id'] == loja_id and \
             conversa['entry']['timestamp'] == timestamp:
         duplicado = True
     conversa['entry']['sender_id'] = sender_id
-    conversa['entry']['loja_id'] = loja_id
     conversa['entry']['timestamp'] = timestamp
     return duplicado
 
@@ -568,6 +585,8 @@ def webhook():
                         conversa = my_cache.cache_client.get(my_cache.cache_entry_prefix + sender_id)
                         app_log.debug('alguma conversa no cache:: ' + repr(conversa))
                         if conversa is not None:
+                            if conversa['loja'] is not None:
+                                loja_id = conversa['loja']
                             my_cache.cache_client.set(my_cache.cache_entry_prefix + sender_id, conversa,
                                                       time=my_cache.EXPIRACAO_CACHE_CONVERSA)
                             app_log.debug('conversa:: ' + repr(conversa))
@@ -578,11 +597,14 @@ def webhook():
                                                 mimetype='text/plain')
                                 resp.status_code = 200
                                 return resp
+                            send_button_message.delay(sender_id, loja_id, get_mensagem('loja'),
+                                                   get_loja_webview(sender_id))
                             conversa = {
                                 'passo': 0,
                                 'passo_sim': None,
                                 'passo_nao': None,
                                 'usuario': user,
+                                'loja': None,
                                 'mesa': None,
                                 'aux': None,
                                 'itens_pedido': [],
@@ -593,8 +615,8 @@ def webhook():
                                 'entry': None,
                             }
                             app_log.debug('usuario:: ' + repr(user))
-                        if x.get('message') or x.get('postback'):
-                            if checa_duplicidade(sender_id, loja_id, x['timestamp'], conversa):
+                        if (x.get('message') or x.get('postback')) and conversa['loja'] is not None:
+                            if checa_duplicidade(sender_id, x['timestamp'], conversa):
                                 resp = Response(u'chamada duplicada', status=200,
                                                 mimetype='text/plain')
                                 resp.status_code = 200
@@ -641,7 +663,13 @@ def webhook():
                         elif x.get('dashboard'):
                             conversa['suspensa'] += 1
                             conversa['uid'] = x['dashboard']['uid']
-                            send_text_message.delay(sender_id, loja_id, x['dashboard']['message'], icon=u'\U0001f464')
+                            send_text_message.delay(INDOOR, sender_id, loja_id, x['dashboard']['message'],
+                                                    icon=u'\U0001f464')
+                        elif x.get('webview') and x['webview'].get('postload'):
+                            if x['webview'].get('postload') == 'loja_selecionada':
+                                conversa['passo'] = 0
+                                conversa['loja'] = loja_id
+                                passo_ola(message, sender_id, loja_id, conversa)
                         my_cache.cache_client.set(my_cache.cache_entry_prefix + sender_id, conversa,
                                                   time=my_cache.EXPIRACAO_CACHE_CONVERSA)
         resp = Response('success', status=200, mimetype='text/plain')
@@ -712,8 +740,8 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
 def passo_inicio(sender_id, loja_id, conversa):
     conversa['passo'] = 0
     bot1 = get_mensagem('getstarted', arg1=conversa['usuario']['first_name'])
-    chain(send_text_message.si(sender_id, loja_id, bot1),
-          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+    chain(send_text_message.si(INDOOR, sender_id, loja_id, bot1),
+          send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def define_sim_nao(conversa, passo, passo_sim_func, passo_sim_var, passo_nao_func, passo_nao_var):
@@ -774,7 +802,7 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
             conversa['passo_nao'][0](message, sender_id, loja_id, conversa, conversa['passo_nao'][1])
         else:
             bot = get_mensagem('sim_nao')
-            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_sim_nao())
+            send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_sim_nao())
     elif passo == 28 or passo == 31:
         if pre_requisito_pedido(sender_id, loja_id, conversa):
             if passo == 28:
@@ -797,7 +825,7 @@ def pega_usuario(sender_id, loja_id):
     while retries < 1:
         try:
             app_log.debug('pega_usuario 1:: ')
-            user = get_object.delay(sender_id, loja_id).get()
+            user = get_object.delay(INDOOR, sender_id, loja_id).get()
             salva_se_nao_existir.delay(sender_id, loja_id, user)
             app_log.debug('pega_usuario 2:: ')
             break
@@ -827,7 +855,7 @@ def passo_finalizar_contato(sender_id, loja_id, conversa):
         mensagem_pedido(sender_id, loja_id, conversa)
     elif conversa['passo'] == 8:
         bot = get_mensagem('anotado', arg1=conversa['usuario']['first_name'])
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
+        send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_pedido())
     elif conversa['passo'] == 10:
         passo_tres(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 18:
@@ -850,7 +878,7 @@ def passo_finalizar_contato(sender_id, loja_id, conversa):
 def existe_pedido_andamento(sender_id, loja_id, conversa):
     if conversa['datahora_inicio_pedido'] is not None and len(conversa['itens_pedido']) > 0:
         bot = get_mensagem('pedido4', arg1=conversa['usuario']['first_name'])
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido2())
+        send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_pedido2())
         return True
     return False
 
@@ -861,8 +889,8 @@ def passo_editar_item(message, sender_id, loja_id, conversa, i):
         item = repr(conversa['itens_pedido'][int(i)]['quantidade']) + ' ' + \
                conversa['itens_pedido'][int(i)]['descricao']
         bot = u'Digite seu pedido'
-        chain(send_text_message.si(sender_id, loja_id, item, icon=None),
-              send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_atualizar_pedido()))()
+        chain(send_text_message.si(INDOOR, sender_id, loja_id, item, icon=None),
+              send_quickreply_message.si(INDOOR, sender_id, loja_id, bot, get_quickreply_atualizar_pedido()))()
 
 
 def passo_remover_item(message, sender_id, loja_id, conversa, i):
@@ -872,15 +900,15 @@ def passo_remover_item(message, sender_id, loja_id, conversa, i):
                conversa['itens_pedido'][int(i)]['descricao']
         bot = u'Remove o item acima?'
         define_sim_nao(conversa, 29, define_passo, 31, define_payload, 'menu_rever_pedido')
-        chain(send_text_message.si(sender_id, loja_id, item, icon=None),
-              send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_sim_nao()))()
+        chain(send_text_message.si(INDOOR, sender_id, loja_id, item, icon=None),
+              send_quickreply_message.si(INDOOR, sender_id, loja_id, bot, get_quickreply_sim_nao()))()
 
 
 def pre_requisito_pedido(sender_id, loja_id, conversa):
     if conversa['datahora_inicio_pedido'] is None:
         conversa['passo'] = 0
-        chain(send_text_message.si(sender_id, loja_id, get_mensagem('pedido2')),
-              send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+        chain(send_text_message.si(INDOOR, sender_id, loja_id, get_mensagem('pedido2')),
+              send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
         return False
     return True
 
@@ -900,12 +928,13 @@ def passo_cardapio_digital(message, sender_id, loja_id, conversa):
     tarefas = []
     for cardapio in cardapios:
         app_log.debug('cardapio digital:: ' + repr(cardapio))
-        tarefas.append(send_image_url_message.si(sender_id, loja_id, cardapio))
+        tarefas.append(send_image_url_message.si(INDOOR, sender_id, loja_id, cardapio))
     if len(cardapios) == 1:
         bot = get_mensagem('cardapio3')
     else:
         bot = get_mensagem('cardapio4')
-    tarefas.append(send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_cardapio_digital(conversa)))
+    tarefas.append(send_quickreply_message.si(INDOOR, sender_id, loja_id, bot,
+                                              get_quickreply_cardapio_digital(conversa)))
     chain(tarefas)()
 
 
@@ -921,7 +950,7 @@ def passo_cardapio(message, sender_id, loja_id, conversa):
         else:
             conversa['passo'] = 27
             bot = get_mensagem('cardapio2')
-            send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_cardapio())
+            send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_cardapio())
     except SoftTimeLimitExceeded:
         app_log.debug('passo_cardapio 4:: ')
         passo_cardapio_impresso(message, sender_id, loja_id, conversa, texto_id='cardapio5')
@@ -932,7 +961,7 @@ def passo_cardapio(message, sender_id, loja_id, conversa):
 
 def passo_confirma_mesa(message, sender_id, loja_id):
     bot = get_mensagem('mesa5', arg1=message)
-    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_sim_nao())
+    send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_sim_nao())
 
 
 def passo_pedir_conta(message, sender_id, loja_id, conversa):
@@ -945,7 +974,7 @@ def passo_pedir_conta(message, sender_id, loja_id, conversa):
     else:
         define_sim_nao(conversa, 3, define_passo, 25, define_payload, 'pedir_conta')
         bot = get_mensagem('conta2')
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+        send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_voltar_menu())
 
 
 def passo_chamar_garcom(message, sender_id, loja_id, conversa):
@@ -970,8 +999,8 @@ def passo_pedir_cardapio(message, sender_id, loja_id, conversa):
 def mensagem_sucesso(sender_id, loja_id, conversa, mensagem):
     notificacao_dashboard.apply_async((sender_id, loja_id, conversa, mensagem))
     bot = get_mensagem(mensagem)
-    chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
-                                                                                 get_elements_menu(conversa)))()
+    chain(send_text_message.si(INDOOR, sender_id, loja_id, bot),
+          send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_mesa_dependencia(message, sender_id, loja_id, conversa, mensagem, passo):
@@ -986,10 +1015,10 @@ def passo_mesa_dependencia(message, sender_id, loja_id, conversa, mensagem, pass
 
 def passo_finalizar_enviar(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
-        enviar_pedido.delay(sender_id, loja_id, conversa)
+        enviar_pedido.delay(INDOOR, sender_id, loja_id, conversa)
         set_variaveis(conversa)
-        chain(send_text_message.si(sender_id, loja_id, get_mensagem('enviar')),
-              send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+        chain(send_text_message.si(INDOOR, sender_id, loja_id, get_mensagem('enviar')),
+              send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
@@ -1004,12 +1033,13 @@ def passo_finalizar_pedido(message, sender_id, loja_id, conversa):
                 pedidos += repr(item['quantidade']) + ' ' + item['descricao']
             bot1 = pedidos
             bot2 = get_mensagem('finalizar')
-            chain(send_text_message.si(sender_id, loja_id, bot1),
-                  send_quickreply_message.si(sender_id, loja_id, bot2, get_quickreply_finalizar_pedido(), icon=None))()
+            chain(send_text_message.si(INDOOR, sender_id, loja_id, bot1),
+                  send_quickreply_message.si(INDOOR, sender_id, loja_id, bot2, get_quickreply_finalizar_pedido(),
+                                             icon=None))()
         else:
             bot = get_mensagem('rever2')
-            chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
-                                                                                         get_elements_menu(conversa)))()
+            chain(send_text_message.si(INDOOR, sender_id, loja_id, bot),
+                  send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_pedir_mais(message, sender_id, loja_id, conversa):
@@ -1018,7 +1048,7 @@ def passo_pedir_mais(message, sender_id, loja_id, conversa):
                       itens_pedido=(False, None),
                       datetime_pedido=(False, None))
         bot = get_mensagem('pedido3')
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+        send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_voltar_menu())
 
 
 def add_item_pedido_menu(menu, i, item, offset=0):
@@ -1072,12 +1102,12 @@ def passo_rever_pedido_2(message, sender_id, loja_id, conversa, offset=0, eh_msg
                 bot = u'Alteração realizada com sucesso.'
             else:
                 bot = 'Clique abaixo para voltar.'
-            chain(send_generic_message.si(sender_id, loja_id, menu),
-                  send_quickreply_message.si(sender_id, loja_id, bot, get_quickreply_voltar_menu()))()
+            chain(send_generic_message.si(INDOOR, sender_id, loja_id, menu),
+                  send_quickreply_message.si(INDOOR, sender_id, loja_id, bot, get_quickreply_voltar_menu()))()
         else:
             bot = get_mensagem('rever2')
-            chain(send_text_message.si(sender_id, loja_id, bot),
-                  send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+            chain(send_text_message.si(INDOOR, sender_id, loja_id, bot),
+                  send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_trocar_mesa_2(message, sender_id, loja_id, conversa):
@@ -1100,26 +1130,26 @@ def passo_novo_pedido(message, sender_id, loja_id, conversa):
 
 def mensagem_mesa(conversa, loja_id, sender_id):
     bot = get_mensagem('mesa')
-    send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_voltar_menu())
+    send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_voltar_menu())
 
 
 def passo_nao_entendido(message, sender_id, loja_id, conversa):
     bot = get_mensagem('robo')
-    chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
-                                                                                 get_elements_menu(conversa)))()
+    chain(send_text_message.si(INDOOR, sender_id, loja_id, bot),
+          send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_agradecimento(message, sender_id, loja_id, conversa):
     bot = get_mensagem('agradeco')
-    chain(send_text_message.si(sender_id, loja_id, bot), send_generic_message.si(sender_id, loja_id,
-                                                                                 get_elements_menu(conversa)))()
+    chain(send_text_message.si(INDOOR, sender_id, loja_id, bot),
+          send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_tres(message, sender_id, loja_id, conversa):
     if pre_requisito_pedido(sender_id, loja_id, conversa):
         conversa['nao_entendidas'] += 1
         bot = get_mensagem('anotado2')
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
+        send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_pedido())
 
 
 def passo_dois(message, sender_id, loja_id, conversa):
@@ -1130,7 +1160,7 @@ def passo_dois(message, sender_id, loja_id, conversa):
                       itens_pedido=(False, None),
                       datetime_pedido=(False, None))
         bot = get_mensagem('anotado', arg1=conversa['usuario']['first_name'])
-        send_quickreply_message.delay(sender_id, loja_id, bot, get_quickreply_pedido())
+        send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_pedido())
 
 
 def passo_um(message, sender_id, loja_id, conversa):
@@ -1148,8 +1178,8 @@ def passo_um(message, sender_id, loja_id, conversa):
 def mensagem_pedido(sender_id, loja_id, conversa):
     bot = get_mensagem('pedido')
     bot1 = get_mensagem('pedido1')
-    chain(send_text_message.si(sender_id, loja_id, bot),
-          send_quickreply_message.si(sender_id, loja_id, bot1, get_quickreply_voltar_menu(), icon=None))()
+    chain(send_text_message.si(INDOOR, sender_id, loja_id, bot),
+          send_quickreply_message.si(INDOOR, sender_id, loja_id, bot1, get_quickreply_voltar_menu(), icon=None))()
 
 
 def passo_trocar_mesa(message, sender_id, loja_id, conversa):
@@ -1157,26 +1187,26 @@ def passo_trocar_mesa(message, sender_id, loja_id, conversa):
     conversa['aux'] = None
     if len(conversa['mesa']) == 2 and conversa['mesa'][0] == conversa['mesa'][1]:
         bot = get_mensagem('mesa4')
-        chain(send_text_message.si(sender_id, loja_id, bot),
-              send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+        chain(send_text_message.si(INDOOR, sender_id, loja_id, bot),
+              send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
         return
     troca_mesa_dashboard.delay(sender_id, loja_id, conversa)
     set_variaveis(conversa,
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None))
     bot = get_mensagem('mesa3', arg1=conversa['mesa'][0])
-    chain(send_text_message.si(sender_id, loja_id, bot),
-          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+    chain(send_text_message.si(INDOOR, sender_id, loja_id, bot),
+          send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def passo_menu(message, sender_id, loja_id, conversa):
-    send_generic_message.delay(sender_id, loja_id, get_elements_menu(conversa))
+    send_generic_message.delay(INDOOR, sender_id, loja_id, get_elements_menu(conversa))
 
 
 def passo_ola(message, sender_id, loja_id, conversa):
     bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
-    chain(send_text_message.si(sender_id, loja_id, bot1),
-          send_generic_message.si(sender_id, loja_id, get_elements_menu(conversa)))()
+    chain(send_text_message.si(INDOOR, sender_id, loja_id, bot1),
+          send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 if __name__ == "__main__":

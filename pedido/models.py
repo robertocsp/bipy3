@@ -41,6 +41,7 @@ class Pedido(models.Model):
     mesa = models.CharField(max_length=50, blank=True, null=True)
     loja = BigForeignKey(Loja, null=True, blank=True)
     cliente = BigForeignKey(Cliente, null=True, blank=True)
+    app = models.CharField(max_length=30, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''

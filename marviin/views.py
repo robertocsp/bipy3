@@ -12,7 +12,7 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.template import RequestContext
 
-from loja.models import Loja
+from loja.models import Loja, Apps
 from marviin.cliente_marviin.models import ClienteMarviin, Facebook, FacebookTemp
 from utils.auth import check_valid_login
 
@@ -54,8 +54,15 @@ def login_geral(request):
             if user is not None:
                 login(request, user)
                 request.session['id_loja'] = loja.id
-                request.session['id_fb_loja'] = loja.id_loja_facebook
                 request.session['nome_loja'] = loja.nome
+                apps = Apps.objects.filter(loja_id=loja.id)
+                loja_apps = []
+                for app in apps:
+                    loja_apps.append(app.app)
+                if len(loja_apps) == 0:
+                    return fail_response(500, u'Desculpe, mas ocorreu um erro inesperado, por favor tente '
+                                              u'novamente, obrigado.')
+                request.session['loja_apps'] = loja_apps
                 if 'next' in request.GET:
                     next = request.GET['next']
                     return HttpResponseRedirect(next)
@@ -212,12 +219,13 @@ def fb_login(request):
                                       u'segurança. Certifique-se que você esteja em uma rede segura e tente seu login '
                                       u'novamente. Obrigado.'})
         fb_code_to_token = Template('https://graph.facebook.com/v2.8/oauth/access_token?'
-                                    'client_id=1147337505373379&'
-                                    'client_secret=$arg1&'
-                                    'code=$arg2&'
+                                    'client_id=$arg1&'
+                                    'client_secret=$arg2&'
+                                    'code=$arg3&'
                                     'redirect_uri=https://sistema.marviin.com.br/fb_login/')
-        url_code_to_token = fb_code_to_token.substitute(arg1=settings.FB_APPS['1147337505373379'],
-                                                        arg2=user_code)
+        url_code_to_token = fb_code_to_token.substitute(arg1=settings.FB_APPS['login']['id'],
+                                                        arg2=settings.FB_APPS['login']['secret'],
+                                                        arg3=user_code)
         response = fb_request(fb_url=url_code_to_token)
         if response is None:
             logger.error('-=-=-=- Nao houve resposta a chamada url_code_to_token -=-=-=-')
@@ -237,9 +245,10 @@ def fb_login(request):
                            'account_linking_token': user_temp.account_linking_token})
         access_token = code_to_token['access_token']
         fb_check_token = Template('https://graph.facebook.com/debug_token?input_token=$arg1&'
-                                  'access_token=1147337505373379|$arg2')
+                                  'access_token=$arg2|$arg3')
         url_check_token = fb_check_token.substitute(arg1=access_token,
-                                                    arg2=settings.FB_APPS['1147337505373379'])
+                                                    arg2=settings.FB_APPS['login']['id'],
+                                                    arg3=settings.FB_APPS['login']['secret'])
         response = fb_request(fb_url=url_check_token)
         if response is None:
             logger.error('-=-=-=- Nao houve resposta a chamada url_check_token -=-=-=-')
@@ -362,6 +371,17 @@ def fb_login(request):
         return render(request, 'fb_login_fail.html',
                       {'message': u'Não é possível prosseguir com seu login. Este acesso só pode ser feito a partir '
                                   u'do Messenger. Obrigado.'})
+
+
+def fb_lojas(request, psidappid=None):
+    if request.method == 'GET':
+        if psidappid is None:
+            render_data = {'close': False, 'app': None, 'error': u'Desculpe, mas não foi possível completar sua ação '
+                                                                   u'de escolher o estabelecimento. Por favor, '
+                                                                   u'tente novamente.'}
+        if psidappid:
+            render_data = {'close': False, 'psidappid': psidappid}
+        return render(request, 'fb_lista_estabelecimentos.html', render_data, context_instance=RequestContext(request))
 
 
 def fb_request(method=None, fb_url=None, json=None):

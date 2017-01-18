@@ -33,11 +33,11 @@ def make_celery(app, vhost):
 
 
 @celery_app.task(bind=True, soft_time_limit=7)
-def get_object(self, fb_id, loja_id, **args):
-    return fb.fb_request('/' + fb_id, loja_id, args=args)
+def get_object(self, app_id, fb_id, loja_id, **args):
+    return fb.fb_request(app_id, '/' + fb_id, loja_id, args=args)
 
 
-def send_image_message(sender_id, loja_id, image_path, content_type):
+def send_image_message(app_id, sender_id, loja_id, image_path, content_type):
     payload = {
         'recipient': json.dumps(
             {
@@ -54,11 +54,11 @@ def send_image_message(sender_id, loja_id, image_path, content_type):
         )
     }
     multipart_data = {'filedata': (image_path, open(image_path, 'rb'), content_type)}
-    return fb.post(loja_id, post_args=payload, files=multipart_data)
+    return fb.post(app_id, loja_id, post_args=payload, files=multipart_data)
 
 
 @celery_app.task(bind=True, soft_time_limit=7)
-def send_image_url_message(self, sender_id, loja_id, url, icon=ROBOT_ICON):
+def send_image_url_message(self, app_id, sender_id, loja_id, url, icon=ROBOT_ICON):
     payload = {
         'recipient': {
             'id': sender_id
@@ -72,11 +72,11 @@ def send_image_url_message(self, sender_id, loja_id, url, icon=ROBOT_ICON):
             }
         }
     }
-    return fb.post(loja_id, json=payload)
+    return fb.post(app_id, loja_id, json=payload)
 
 
 @celery_app.task(bind=True, soft_time_limit=7)
-def send_button_message(self, sender_id, loja_id, text, buttons):
+def send_button_message(self, app_id, sender_id, loja_id, text, buttons):
     payload = {
         'recipient': {
             'id': sender_id
@@ -96,11 +96,11 @@ def send_button_message(self, sender_id, loja_id, text, buttons):
             }
         }
     }
-    return fb.post(loja_id, json=payload)
+    return fb.post(app_id, loja_id, json=payload)
 
 
 @celery_app.task(bind=True, soft_time_limit=7)
-def send_text_message(self, sender_id, loja_id, text, icon=ROBOT_ICON):
+def send_text_message(self, app_id, sender_id, loja_id, text, icon=ROBOT_ICON):
     if icon:
         payload_text = icon + ': ' + text
     else:
@@ -113,11 +113,11 @@ def send_text_message(self, sender_id, loja_id, text, icon=ROBOT_ICON):
             'text': payload_text
         }
     }
-    return fb.post(loja_id, json=payload)
+    return fb.post(app_id, loja_id, json=payload)
 
 
 @celery_app.task(bind=True, soft_time_limit=7)
-def send_quickreply_message(self, sender_id, loja_id, text, quick_replies, icon=ROBOT_ICON):
+def send_quickreply_message(self, app_id, sender_id, loja_id, text, quick_replies, icon=ROBOT_ICON):
     if icon:
         payload_text = icon + ': ' + text
     else:
@@ -131,11 +131,11 @@ def send_quickreply_message(self, sender_id, loja_id, text, quick_replies, icon=
             'quick_replies': quick_replies
         }
     }
-    return fb.post(loja_id, json=payload)
+    return fb.post(app_id, loja_id, json=payload)
 
 
 @celery_app.task(bind=True, soft_time_limit=7)
-def send_generic_message(self, sender_id, loja_id, elements):
+def send_generic_message(self, app_id, sender_id, loja_id, elements):
     payload = {
         'recipient': {
             'id': sender_id
@@ -150,7 +150,7 @@ def send_generic_message(self, sender_id, loja_id, elements):
             }
         }
     }
-    return fb.post(loja_id, json=payload)
+    return fb.post(app_id, loja_id, json=payload)
 
 
 @celery_app.task(bind=True, soft_time_limit=10)
@@ -208,7 +208,7 @@ def get_cardapio(self, loja_id):
     data = {}
     pass
     data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
-    data['id_loja_fb'] = loja_id
+    data['id_loja'] = loja_id
     url = 'http://localhost:8888/marviin/api/rest/cardapio'
     response = requests.get(url, auth=(my_keys.SUPER_USER_USER, my_keys.SUPER_USER_PASSWORD), params=data)
     json_response = response.json()
@@ -251,13 +251,14 @@ def salva_se_nao_existir(self, sender_id, loja_id, user):
 
 
 @celery_app.task(bind=True, soft_time_limit=10)
-def enviar_pedido(self, sender_id, loja_id, conversa):
+def enviar_pedido(self, app_id, sender_id, loja_id, conversa):
     if conversa['mesa'] is None:
         return
     data = {}
     pass
     data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
     data['id_loja'] = loja_id
+    data['app'] = app_id
     data['origem'] = 'fbmessenger'
     data['id_cliente'] = sender_id
     data['nome_cliente'] = conversa['usuario']['first_name'] + ' ' + conversa['usuario']['last_name']

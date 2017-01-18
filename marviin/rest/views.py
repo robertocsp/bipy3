@@ -9,9 +9,9 @@ from rest_framework.response import Response
 from marviin.websocket import ws
 from pedido.models import Pedido, ItemPedido
 from cliente.models import Cliente
-from loja.models import Loja, Questionario
+from loja.models import Loja, Questionario, Apps
 from notificacao.models import Notificacao
-from fb_acesso.models import Fb_acesso, FbContasUsuario, Fb_webhook, remove_not_eligible_pages
+from fb_acesso.models import Fb_acesso
 from pedido.templatetags.pedido_tags import minutos_passados
 from upload_cardapio.models import Cardapio
 from estados.models import Estado
@@ -20,6 +20,7 @@ from marviin.cliente_marviin.models import Endereco, Facebook
 from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
 from utils.auth import check_valid_login
+from utils.aescipher import AESCipher
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
@@ -71,7 +72,9 @@ class LoginView(views.APIView):
                 user = None
             if user is not None:
                 lojas = Loja.objects.raw('select l.* from loja_loja l inner join auth_user_groups g '
-                                         'on l.group_id = g.group_id where g.user_id = %s order by l.nome', [user.id])
+                                         'on l.group_id = g.group_id where g.user_id = %s and exists (select 1 from '
+                                         'loja_apps a where l.id = a.loja_id and a.ativa = 1) order by l.nome',
+                                         [user.id])
                 lojas_resultado = []
                 for loja in lojas:
                     lojas_resultado.append({"id": loja.id, "nome": loja.nome})
@@ -81,8 +84,15 @@ class LoginView(views.APIView):
                 elif len(lojas_resultado) == 1:
                     login(request, user)
                     request.session['id_loja'] = lojas[0].id
-                    request.session['id_fb_loja'] = lojas[0].id_loja_facebook
                     request.session['nome_loja'] = lojas[0].nome
+                    apps = Apps.objects.filter(loja_id=lojas[0].id)
+                    loja_apps = []
+                    for app in apps:
+                        loja_apps.append(app.app)
+                    if len(loja_apps) == 0:
+                        return fail_response(500, u'Desculpe, mas ocorreu um erro inesperado, por favor tente '
+                                                  u'novamente, obrigado.')
+                    request.session['loja_apps'] = loja_apps
                     redirect = '/pedidos/'
                     if 'next' in request.POST:
                         redirect = request.POST['next']
@@ -128,7 +138,6 @@ class ClienteView(views.APIView):
         cliente.nome = request.data.get('nome_cliente', None)
         cliente.foto = request.data.get('foto_cliente', None)
         cliente.genero = request.data.get('genero', None)
-        cliente.id_loja_facebook = request.data.get('id_loja', None)
         cliente.save()
         return Response({"success": True})
 
@@ -185,9 +194,9 @@ class EnviarPedidoView(views.APIView):
         if nao_valido:
             return nao_valido
         try:
-            loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
+            loja = Loja.objects.get(pk=request.data.get('id_loja'))
         except Loja.DoesNotExist:
-            logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
+            logger.error('-=-=-=-=-=-=-=- loja inexistente para id: ' +
                          repr(request.data.get('id_loja')))
             return Response({"success": False})
         with transaction.atomic():
@@ -211,6 +220,7 @@ class EnviarPedidoView(views.APIView):
             del request.data['id_loja']
             del request.data['id_cliente']
             del request.data['chave_bot_api_interna']
+            del request.data['app']
             notificacao_uuid = salva_notificacao(request.data, loja.id, cliente_id)
             request.data['notificacao_uuid'] = str(cliente_id) + '_' + str(loja.id) + '_' + str(notificacao_uuid)
             websocket = ws.Websocket()
@@ -246,6 +256,7 @@ class EnviarPedidoView(views.APIView):
             pedido.hora = data_hora_pedido.strftime('%H:%M:%S')
             pedido.origem = origem
             pedido.loja_id = loja_id
+            pedido.app = request.data.get('app')
             pedido.status = 'solicitado'
             pedido.mesa = request.data.get('mesa', None)
             pedido.save()  # TODO tratar exceção
@@ -342,19 +353,14 @@ class EnviarMensagemView(views.APIView):
                                 'uid': uid
                             },
                             'recipient': {
-                                'id': request.session['id_fb_loja']
+                                'id': request.session['id_loja']
                             }
                         }
                     ]
                 }
             ]
         }
-        try:
-            webhook_url = Fb_webhook.objects.get(app_id=pedido.loja.app_id).webhook_url
-        except Fb_webhook.DoesNotExist:
-            logger.error('------======------- webhook nao cadastrado para app_id: ' + repr(pedido.loja.app_id))
-            return fail_response(500, u'Não foi possível completar sua ação, por favor entre em contato com o '
-                                      u'administrador do sistema.')
+        webhook_url = settings.FB_APPS[pedido.app]['webhook']
         headers = {'content-type': 'application/json'}
         response = requests.post(webhook_url, data=json.dumps(data), headers=headers, verify=False)
         logger.debug('------======------- response: ' + repr(response))
@@ -395,9 +401,9 @@ class EnviarMensagemBotView(views.APIView):
         if nao_valido:
             return nao_valido
         try:
-            loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
+            loja = Loja.objects.get(pk=request.data.get('id_loja'))
         except Loja.DoesNotExist:
-            logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
+            logger.error('-=-=-=-=-=-=-=- loja inexistente para id: ' +
                          repr(request.data.get('id_loja')))
             return Response({"success": False})
         try:
@@ -558,7 +564,6 @@ class EnderecoClienteView(views.APIView):
             return fail_response(400, u'Desculpe, não foi possível validar seus dados. Por favor, refaça o login e '
                                       u'tente novamente.')
         logger.debug('------======------- cliente.chave_facebook: ' + repr(cliente.chave_facebook))
-        logger.debug('------======------- cliente.id_loja_facebook: ' + repr(cliente.id_loja_facebook))
         data = {
             'entry': [
                 {
@@ -571,29 +576,106 @@ class EnderecoClienteView(views.APIView):
                                 'postload': 'endereco_selecionado',
                             },
                             'recipient': {
-                                'id': cliente.id_loja_facebook
+                                'id': '-'  # loja já tem que estar selecionada no bot
                             }
                         }
                     ]
                 }
             ]
         }
-        try:
-            loja = Loja.objects.get(id_loja_facebook=cliente.id_loja_facebook)
-            webhook_url = Fb_webhook.objects.get(app_id=loja.app_id).webhook_url
-        except Loja.DoesNotExist, Fb_webhook.DoesNotExist:
-            if loja:
-                logger.error('------======------- webhook nao cadastrado para app_id: ' + repr(loja.app_id))
-            else:
-                logger.error('------======------- loja nao encontrada id_loja_facebook: ' +
-                             repr(cliente.id_loja_facebook))
-            return fail_response(500, u'Não foi possível completar sua ação, por favor entre em contato com o '
-                                      u'administrador do sistema.')
+        app = None  # TODO estará na sessão do cliente
+        webhook_url = settings.FB_APPS[app]['webhook']
         headers = {'content-type': 'application/json'}
         response = requests.post(webhook_url, data=json.dumps(data), headers=headers, verify=False)
         logger.debug('------======------- response: ' + repr(response))
         return Response({"success": True})
 
+
+class LojaView(views.APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request, psidappid=None):
+        resultado, psid, appid = self.valida_acesso(request, psidappid)
+        if resultado is not None:
+            return resultado
+        lojas = Loja.objects.raw('select l.* from loja_loja l inner join loja_apps a '
+                                 'on l.id = a.loja_id where a.ativa = 1 and a.app = %s order by l.nome', [appid])
+        lojas_resultado = []
+        for loja in lojas:
+            lojas_resultado.append({"value": loja.id, "label": loja.nome})
+        return Response(lojas_resultado)
+
+    def post(self, request, psidappid=None):
+        resultado, psid, appid = self.valida_acesso(request, psidappid)
+        if resultado is not None:
+            return resultado
+        if 'loja' not in request.POST:
+            logger.error('------======------- loja invalida')
+            return fail_response(400, u'Desculpe, não foi possível validar os dados. Por favor, saia e entre novamente '
+                                      u'na página.')
+        logger.debug('------======------- cliente.chave_facebook: ' + repr(psid))
+        data = {
+            'entry': [
+                {
+                    'messaging': [
+                        {
+                            'sender': {
+                                'id': psid
+                            },
+                            'webview': {
+                                'postload': 'loja_selecionada',
+                            },
+                            'recipient': {
+                                'id': request.POST['loja']
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+        webhook_url = settings.FB_APPS[appid]['webhook']
+        headers = {'content-type': 'application/json'}
+        response = requests.post(webhook_url, data=json.dumps(data), headers=headers, verify=False)
+        logger.debug('------======------- response: ' + repr(response))
+        return Response({"success": True})
+
+    def valida_acesso(self, request, psidappid):
+        if psidappid is None:
+            logger.error('------======------- psidappid is None')
+            return fail_response(400, u'Desculpe, não foi possível validar os dados. Por favor, saia e entre novamente '
+                                      u'na página.'), None, None
+        if 'term' not in request.GET:
+            return Response([]), None, None
+        termo = request.GET['term']
+        if len(termo) < 3:
+            return Response([]), None, None
+        logger.debug('-=-=-=-=-=-=-=- key before :: ' + settings.SECRET_KEY[:32])
+        key32 = '{: <32}'.format(settings.SECRET_KEY[:32]).encode("utf-8")
+        logger.debug('-=-=-=-=-=-=-=- key after :: ' + key32)
+        logger.debug('-=-=-=-=-=-=-=- enc psidappid :: ' + psidappid)
+        n_psidappid = unicodedata.normalize('NFKD', psidappid).encode('ascii', 'ignore')
+        cipher = AESCipher(key=key32)
+        try:
+            d_psidappid = cipher.decrypt(n_psidappid)
+            logger.debug('-=-=-=-=-=-=-=- dec psidappid :: ' + d_psidappid)
+        except TypeError:
+            logger.error('-=-=-=-=-=-=-=- encrypt_psidappid invalido: ' + psidappid)
+            return fail_response(400, u'Desculpe, não foi possível validar os dados. Por favor, saia e entre novamente '
+                                      u'na página.'), None, None
+        split_psidappid = d_psidappid.split('#')
+        if len(split_psidappid) != 2:
+            logger.error('-=-=-=-=-=-=-=- tamanho psidappid invalido: ' + repr(len(split_psidappid)))
+            return fail_response(400, u'Desculpe, não foi possível validar os dados. Por favor, saia e entre novamente '
+                                      u'na página.'), None, None
+        psid = split_psidappid[0]
+        appid = split_psidappid[1]
+        try:
+            Cliente.objects.get(chave_facebook=psid)
+        except Cliente.DoesNotExist:
+            logger.error('-=-=-=-=-=-=-=- cliente invalido: ' + psid)
+            return fail_response(400, u'Desculpe, não foi possível validar os dados. Por favor, saia e entre novamente '
+                                      u'na página.'), None, None
+        return None, psid, appid
 
 
 class TrocarMesaView(views.APIView):
@@ -605,9 +687,9 @@ class TrocarMesaView(views.APIView):
         if nao_valido:
             return nao_valido
         try:
-            loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
+            loja = Loja.objects.get(pk=request.data.get('id_loja'))
         except Loja.DoesNotExist:
-            logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
+            logger.error('-=-=-=-=-=-=-=- loja inexistente para id: ' +
                          repr(request.data.get('id_loja')))
             return Response({"success": False})
         try:
@@ -684,9 +766,9 @@ def gera_notificacao(request, origem):
         return nao_valido
     logger.debug('-=-=-=- 1 -=-=-=-')
     try:
-        loja = Loja.objects.get(id_loja_facebook=request.data.get('id_loja'))
+        loja = Loja.objects.get(pk=request.data.get('id_loja'))
     except Loja.DoesNotExist:
-        logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
+        logger.error('-=-=-=-=-=-=-=- loja inexistente para id: ' +
                      repr(request.data.get('id_loja')))
         return Response({"success": False})
     logger.debug('-=-=-=- 2 -=-=-=-')
@@ -745,6 +827,141 @@ class NotificacaoLidaView(views.APIView):
         return Response({"success": True})
 
 
+class AcessoBotV3View(views.APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        modulos = request.data.getlist('modulo')  # retorna um array
+        logger.debug('-=-=-=-=-=-=-=- modulos: ' + repr(modulos))
+        modulos_contratados = None
+        for modulo in modulos:
+            if modulo == 'indoor':
+                if modulos_contratados is None:
+                    modulos_contratados = u''
+                else:
+                    modulos_contratados += u' e '
+                modulos_contratados += u'Atendimento'
+            elif modulo == 'delivery':
+                if modulos_contratados is None:
+                    modulos_contratados = u''
+                else:
+                    modulos_contratados += u' e '
+                modulos_contratados += u'Delivery'
+        if modulos_contratados is None:
+            return fail_response(400, u'{"type": "mod", "object": "Não foi possível definir o produto contratado."}')
+        cnpj = re.sub(r'\D', '', request.data.get('cnpj_estabelecimento'))
+        try:
+            loja = Loja.objects.get(cnpj=cnpj)
+        except Loja.DoesNotExist:
+            loja = Loja()
+        loja.nome = request.data.get('nome_dashboard')
+        loja.nome_estabelecimento = request.data.get('nome_estabelecimento')
+        loja.telefone1 = request.data.get('tel_estabelecimento')
+        loja.cnpj = cnpj
+        loja.cep = request.data.get('cep_estabelecimento')
+        loja.endereco = request.data.get('endereco_estabelecimento')
+        loja.complemento = request.data.get('complemento_estabelecimento')
+        loja.bairro = request.data.get('bairro_estabelecimento')
+        loja.estado = request.data.get('estado_estabelecimento')
+        loja.cidade = request.data.get('cidade_estabelecimento')
+        body = u'<h2>Informações do Estabelecimento</h2><br>' \
+               u'<strong>Nome:</strong> ' + loja.nome_estabelecimento + u'<br><br>' \
+               u'<strong>Telefone:</strong> ' + loja.telefone1 + u'<br><br>' \
+               u'<strong>CNPJ:</strong> ' + loja.cnpj + u'<br><br>' \
+               u'<strong>CEP:</strong> ' + loja.cep + u'<br><br>' \
+               u'<strong>Endereço:</strong> ' + loja.endereco + u'<br><br>' \
+               u'<strong>Complemento:</strong> ' + loja.complemento + u'<br><br>' \
+               u'<strong>Bairro:</strong> ' + loja.bairro + u'<br><br>' \
+               u'<strong>Estado:</strong> ' + loja.estado + u'<br><br>' \
+               u'<strong>Cidade:</strong> ' + loja.cidade + u'<br><br>' \
+               u'<strong>Módulo(s):</strong> ' + ', '.join(modulos) + u'<br><br>' \
+               u'<h2>Informações do Usuário</h2><br>'
+        if request.data.get('tipo_cadastro_usuario') == '1':  # tenho login
+            login = request.data.get('login_usuario')
+            senha = request.data.get('senha_usuario')
+            user = User.objects.filter(email=login).select_related('profile').first()
+            if user is None:
+                return fail_response(400, u'{"type": "cred", "object": "Login e/ou senha inválidos. Caso tenha '
+                                          u'esquecido sua senha, clique em \'Esqueci minha senha\'."}')
+            if user.check_password(senha) is False:
+                return fail_response(400, u'{"type": "cred", "object": "Login e/ou senha inválidos. Caso tenha '
+                                          u'esquecido sua senha, clique em \'Esqueci minha senha\'."}')
+            body += u'<strong>Tipo:</strong> Já possui login<br><br>' \
+                    u'<strong>Login:</strong> ' + login + u'<br><br>' \
+                    u'<strong>Nome:</strong> ' + user.first_name + ' ' + user.last_name + u'<br><br>' \
+                    u'<strong>Email:</strong> ' + user.email + u'<br><br>' \
+                    u'<strong>Telefone:</strong> ' + user.profile.telefone + u'<br><br>'
+            grupo = Group(name=loja.nome)
+            grupo.save()
+            grupo.user_set.add(user)
+            grupo.save()
+            loja.group = grupo
+            loja.nome_contato = user.first_name + ' ' + user.last_name
+            loja.email = user.email
+            loja.telefone2 = user.profile.telefone
+            loja.save()
+            for modulo in modulos:
+                apps = Apps()
+                apps.loja = loja
+                apps.app = modulo
+                apps.ativa = True
+                apps.save()
+            # envio de email para o cliente sobre sua nova aquisicao, FALTOU FALAR DA COBRANCA
+            with codecs.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
+                                                                    'templates'),
+                                                       'acesso'), 'email-inscricao.html'),
+                             encoding='utf-8') as email_inscricao:
+                body_incompleto = email_inscricao.read().replace('\n', '')
+            body_template = Template(body_incompleto)
+            body_inscricao = body_template.substitute(arg1=user.first_name)
+            enviar_email(u'Obrigado por contratar o módulo de '+modulos_contratados+u' Marviin', body_inscricao,
+                         [user.email])
+            response = Response({"success": True, "message": u'Tudo pronto, fácil assim, você já pode começar a '
+                                                             u'utilizar seu novo produto. Acesse sua caixa postal '
+                                                             u'eletrônica, pois enviamos um e-mail com informações '
+                                                             u'importantes.'})
+        else:  # nao tenho login
+            try:
+                User.objects.get(email=request.data.get('email_usuario'))
+                return fail_response(400, u'{"type": "cred", "object": "E-mail já cadastrado no Marviin. Utilize a '
+                                          u'opção \'Já tenho login\'. Caso tenha esquecido sua senha, clique em '
+                                          u'\'Esqueci minha senha\'."}')
+            except User.DoesNotExist:
+                pass
+            loja.nome_contato = request.data.get('nome_usuario') + ' ' + request.data.get('sobrenome_usuario')
+            loja.email = request.data.get('email_usuario')
+            loja.telefone2 = request.data.get('tel_usuario')
+            loja.token_login = signing.dumps([request.data.get('nome_usuario'), request.data.get('sobrenome_usuario')],
+                                             compress=True)
+            loja.save()
+            for modulo in modulos:
+                apps = Apps()
+                apps.loja = loja
+                apps.app = modulo
+                apps.save()
+            body += u'<strong>Tipo:</strong> NÃO possui login<br><br>' \
+                    u'<strong>Nome:</strong> ' + loja.nome_contato + u'<br><br>' \
+                    u'<strong>Email:</strong> ' + loja.email + u'<br><br>' \
+                    u'<strong>Telefone:</strong> ' + loja.telefone2
+            # envio de email para cliente poder cadastrar sua senha.
+            with codecs.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
+                                                                    'templates'),
+                                                       'acesso'), 'email-senha.html'), encoding='utf-8') as email_senha:
+                body_incompleto = email_senha.read().replace('\n', '')
+            body_template = Template(body_incompleto)
+            body_senha = body_template.substitute(arg1=request.data.get('nome_usuario'),
+                                                  arg2='https://acesso.marviin.com.br/confirmacao.html?'
+                                                       'token=' + loja.token_login)
+            enviar_email(u'Cadastre sua senha e já comece a usar o Marviin', body_senha, [loja.email])
+            response = Response({"success": True, "message": u'Legal! Para completar seu cadastro, acesse seu e-mail e '
+                                                             u'siga as instruções para cadastrar sua senha.'})
+        if response.status_code == 200:
+            # envio de email para o comercial sobre solicitacao de acesso.
+            enviar_email(u'[Solicitação de Acesso] Dados da solicitação', body, ['comercial@marviin.com.br'])
+        return response
+
+
+'''
 class AcessoBotV2View(views.APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (TemplateHTMLRenderer,)
@@ -758,7 +975,7 @@ class AcessoBotV2View(views.APIView):
                                     'code=$arg3&'
                                     'redirect_uri=https://acesso.marviin.com.br/')
         url_code_to_token = fb_code_to_token.substitute(arg1=app_id,
-                                                        arg2=settings.FB_APPS[app_id],
+                                                        arg2=settings.FB_APPS[app_id]['secret'],
                                                         arg3=user_code)
         response = fb_request(fb_url=url_code_to_token)
         if response is None:
@@ -773,7 +990,7 @@ class AcessoBotV2View(views.APIView):
         fb_check_token = Template('https://graph.facebook.com/debug_token?input_token=$arg1&access_token=$arg2|$arg3')
         url_check_token = fb_check_token.substitute(arg1=access_token,
                                                     arg2=app_id,
-                                                    arg3=settings.FB_APPS[app_id])
+                                                    arg3=settings.FB_APPS[app_id]['secret'])
         response = fb_request(fb_url=url_check_token)
         if response is None:
             return fail_response(500, u'{"type": "msg", "object": "Cód. 3: Não foi possível completar a solicitação. '
@@ -871,10 +1088,10 @@ class AcessoBotV2Passo2View(views.APIView):
         loja.bairro = dados_acesso['bairro_estabelecimento']
         loja.estado = dados_acesso['estado_estabelecimento']
         loja.cidade = dados_acesso['cidade_estabelecimento']
-        loja.app_id = dados_acesso['modulo']
-        if dados_acesso['modulo'] == '548897018630774':
+        # TODO associar modulo(s) a loja
+        if dados_acesso['modulo'] == 'indoor':
             modulo_contratado = u'Atendimento'
-        elif dados_acesso['modulo'] == '1102858396500864':
+        elif dados_acesso['modulo'] == 'delivery':
             modulo_contratado = u'Delivery'
         else:
             modulo_contratado = u'Inválido, código: ' + dados_acesso['modulo']
@@ -971,7 +1188,7 @@ class AcessoBotV2Passo2View(views.APIView):
             # envio de email para o comercial sobre solicitacao de acesso.
             enviar_email(u'[Solicitação de Acesso] Dados da solicitação', body, ['comercial@marviin.com.br'])
         return response
-
+'''
 
 class ValidaTokenView(views.APIView):
     permission_classes = (AllowAny,)
@@ -1037,6 +1254,24 @@ class CriaSenhaView(views.APIView):
             loja = Loja.objects.get(token_login=token)
         except Loja.DoesNotExist:
             return fail_response(400, u'{"type": "token", "object": "Token inválido."}')
+        apps = Apps.objects.filter(loja=loja.id)
+        modulos_contratados = None
+        if apps:
+            for modulo in apps:
+                if modulo.app == 'indoor':
+                    if modulos_contratados is None:
+                        modulos_contratados = u''
+                    else:
+                        modulos_contratados += u' e '
+                    modulos_contratados += u'Atendimento'
+                elif modulo.app == 'delivery':
+                    if modulos_contratados is None:
+                        modulos_contratados = u''
+                    else:
+                        modulos_contratados += u' e '
+                    modulos_contratados += u'Delivery'
+        if modulos_contratados is None:
+            return fail_response(400, u'{"type": "mod", "object": "Não foi possível definir o produto contratado."}')
         senha = request.data.get('senha')
         confirma_senha = request.data.get('confirma_senha')
         if senha != confirma_senha:
@@ -1046,19 +1281,6 @@ class CriaSenhaView(views.APIView):
             return fail_response(400, u'{"type": "pass1", "object": "Para sua segurança sua senha deve possuir pelo '
                                       u'menos 6 caracteres, dentre eles, 1 caractere especial, 1 número, 1 letra '
                                       u'minúscula e 1 letra maiúscula."}')
-        try:
-            page = FbContasUsuario.objects.get(page_id=loja.id_loja_facebook)
-        except FbContasUsuario.DoesNotExist:
-            return fail_response(400, u'{"type": "pid", "object": "Não foi possível validar os dados enviados."}')
-        response, config_problem = fb_subscribe(page.page_id, page.page_access_token,
-                                                app_scoped_user_id=page.app_scoped_user_id,
-                                                modulo=loja.app_id)
-        if loja.app_id == '548897018630774':
-            modulo_contratado = u'Atendimento'
-        elif loja.app_id == '1102858396500864':
-            modulo_contratado = u'Delivery'
-        else:
-            modulo_contratado = u'Inválido, código: ' + loja.app_id
         body = u'<h2>Informações do Estabelecimento</h2><br>' \
                u'<strong>Nome:</strong> ' + loja.nome_estabelecimento + u'<br><br>' \
                u'<strong>Telefone:</strong> ' + loja.telefone1 + u'<br><br>' \
@@ -1069,59 +1291,51 @@ class CriaSenhaView(views.APIView):
                u'<strong>Bairro:</strong> ' + loja.bairro + u'<br><br>' \
                u'<strong>Estado:</strong> ' + loja.estado + u'<br><br>' \
                u'<strong>Cidade:</strong> ' + loja.cidade + u'<br><br>' \
-               u'<strong>Módulo:</strong> ' + modulo_contratado + u'<br><br>' \
+               u'<strong>Módulo(s):</strong> ' + modulos_contratados + u'<br><br>' \
                u'<h2>Informações do Usuário</h2><br>' \
                u'<strong>Etapa:</strong> Criação senha<br><br>' \
                u'<strong>Nome:</strong> ' + loja.nome_contato + u'<br><br>' \
                u'<strong>Email:</strong> ' + loja.email + u'<br><br>' \
                u'<strong>Telefone:</strong> ' + loja.telefone2 + u'<br><br>'
-        if response.status_code == 200:
-            with transaction.atomic():
-                while True:
-                    user, created = User.objects.get_or_create(username=''.join(random.choice(
-                        string.ascii_letters + string.digits + '@._+-') for x in range(30)))
-                    if created:
-                        break
-            user.first_name = decoded_token[0]
-            user.last_name = decoded_token[1]
-            user.email = loja.email
-            user.set_password(senha)
-            user.is_active = True
-            user.profile.telefone = loja.telefone2
-            user.save()
-            grupo = Group(name=loja.nome)
-            grupo.save()
-            grupo.user_set.add(user)
-            grupo.save()
-            loja.group = grupo
-            loja.token_login = signing.dumps('licenca_valida', compress=True)
-            loja.save()
-            if loja.app_id == '548897018630774':
-                modulo_contratado = u'Atendimento'
-            elif loja.app_id == '1102858396500864':
-                modulo_contratado = u'Delivery'
-            else:
-                modulo_contratado = u'Inválido, código: ' + loja.app_id
-            # envio de email para o cliente sobre sua nova aquisicao, FALTOU FALAR DA COBRANCA
-            with codecs.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
-                                                                    'templates'),
-                                                       'acesso'), 'email-inscricao.html'),
-                             encoding='utf-8') as email_inscricao:
-                body_incompleto = email_inscricao.read().replace('\n', '')
-            body_template = Template(body_incompleto)
-            body_inscricao = body_template.substitute(arg1=user.first_name)
-            enviar_email(u'Obrigado por assinar o módulo de ' + modulo_contratado + u' Marviin', body_inscricao,
-                         [user.email])
-            # envio de email para o comercial sobre solicitacao de acesso.
-            enviar_email(u'[Solicitação de Acesso] Dados da solicitação', body, ['comercial@marviin.com.br'])
-        if response.status_code != 200 or config_problem is not None:
-            if config_problem is None:
-                body += u'<strong>Problema no registro da página:</strong> ' + response.content + u'<br><br>'
-            else:
-                body += u'<strong>Problema de configuração da página:</strong> ' + config_problem + u'<br><br>'
-            # envio de email para suporte marviin com mensagem de erro
-            enviar_email(u'[Solicitação de Acesso] Problema na solicitação', body, ['suporte@marviin.com.br'])
-        return response
+        with transaction.atomic():
+            while True:
+                user, created = User.objects.get_or_create(username=''.join(random.choice(
+                    string.ascii_letters + string.digits + '@._+-') for x in range(30)))
+                if created:
+                    break
+        user.first_name = decoded_token[0]
+        user.last_name = decoded_token[1]
+        user.email = loja.email
+        user.set_password(senha)
+        user.is_active = True
+        user.profile.telefone = loja.telefone2
+        user.save()
+        grupo = Group(name=loja.nome)
+        grupo.save()
+        grupo.user_set.add(user)
+        grupo.save()
+        loja.group = grupo
+        loja.token_login = signing.dumps('licenca_valida', compress=True)
+        loja.save()
+        for loja_app in apps:
+            loja_app.ativa = True
+            loja_app.save()
+        # envio de email para o cliente sobre sua nova aquisicao, FALTOU FALAR DA COBRANCA
+        with codecs.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
+                                                                'templates'),
+                                                   'acesso'), 'email-inscricao.html'),
+                         encoding='utf-8') as email_inscricao:
+            body_incompleto = email_inscricao.read().replace('\n', '')
+        body_template = Template(body_incompleto)
+        body_inscricao = body_template.substitute(arg1=user.first_name)
+        enviar_email(u'Obrigado por contratar o módulo de ' + modulos_contratados + u' Marviin', body_inscricao,
+                     [user.email])
+        # envio de email para o comercial sobre solicitacao de acesso.
+        enviar_email(u'[Solicitação de Acesso] Dados da solicitação', body, ['comercial@marviin.com.br'])
+        return Response({"success": True, "message": u'Tudo pronto, fácil assim, você já pode começar a '
+                                                     u'utilizar seu novo produto. Acesse sua caixa postal '
+                                                     u'eletrônica, pois enviamos um e-mail com informações '
+                                                     u'importantes.'})
 
 
 class CriaSenha2View(views.APIView):
@@ -1443,10 +1657,10 @@ class CardapioView(views.APIView):
         if nao_valido:
             return nao_valido
         try:
-            loja = Loja.objects.get(id_loja_facebook=request.GET['id_loja_fb'])
+            loja = Loja.objects.get(pk=request.GET['id_loja'])
         except Loja.DoesNotExist:
-            logger.error('-=-=-=-=-=-=-=- loja inexistente para facebook page_id: ' +
-                         repr(request.GET['id_loja_fb']))
+            logger.error('-=-=-=-=-=-=-=- loja inexistente para id: ' +
+                         repr(request.GET['id_loja']))
             return Response({"success": False})
         cardapios = Cardapio.objects.filter(loja=loja.id).order_by('pagina')
         cardapio_payload = ['https://sistema.marviin.com.br' + cardapio.caminho for cardapio in cardapios]

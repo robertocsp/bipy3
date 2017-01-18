@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta id="viewport" name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>Marviin - Inovacao em atendimento</title>
+
+    <link href="/static/marviin/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/marviin/css/jquery-ui.css" />
+    <link href="/static/marviin/css/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/marviin/css/font-awesome.min.css" />
+
+    <script src="/static/marviin/js/jquery.min.js"></script>
+    <script src="/static/marviin/js/bootstrap.min.js"></script>
+    <script src="/static/marviin/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/static/marviin/js/main.js"></script>
+    {% if not error %}
+    <script type="text/javascript" src="/static/marviin/js/messenger_extensions.js"></script>
+    <script type="text/javascript" src="/static/marviin/js/custom_lojas.js?v=0.1"></script>
+    {% endif %}
+  </head>
+  <body>
+    <section class="main-lista-estabelecimentos">
+      <form action="" method="post" id="lojasform">
+          {% csrf_token %}
+          <img src="/static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
+          <input type="hidden" name="psidappid" id="psidappid" value="{{ psidappid }}" />
+          <label class="titulo-label">Digite abaixo o nome do estabelecimento em que você se encontra</label><br>
+          <input type="text" name="campoEstabelecimento" id="campoEstabelecimento" placeholder="Estabelecimento" />
+          <input type="hidden" name="loja" id="loja">
+          <button type="submit" id="btn-escolher-loja" class="btn btn-primary btn-verde btn-border-white">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher
+          </button>
+      </form>
+    </section>
+  </body>
+</html>

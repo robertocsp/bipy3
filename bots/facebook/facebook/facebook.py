@@ -44,21 +44,22 @@ class GraphAPIError(Exception):
         Exception.__init__(self, self.message)
 
 
-def fb_request(path, loja_id, args=None, post_args=None, json=None, files=None, method=None, headers=None):
+def fb_request(app_id, path, loja_id, args=None, post_args=None, json=None, files=None, method=None, headers=None):
     args = args or {}
 
     if post_args is not None or json is not None:
         method = "POST"
 
-    access_token = my_cache.cache_client.get(loja_id + 'pac')
+    # access_token = my_cache.cache_client.get(loja_id + 'pac')
+    access_token = my_keys.FB_APPS[app_id]['pac']
     if access_token is None:
-        access_token = get_page_access_token(loja_id)
-        logger.debug('=========================>>>>> access token call result ' + repr(access_token))
-        if access_token:
-            my_cache.cache_client.set(loja_id + 'pac', access_token, time=my_cache.EXPIRACAO_CACHE_LOJA)
-        else:
-            # TODO pensar no que fazer em caso de erro.
-            return
+        return
+        # access_token = get_page_access_token(loja_id)
+        # logger.debug('=========================>>>>> access token call result ' + repr(access_token))
+        # if access_token:
+        #     my_cache.cache_client.set(loja_id + 'pac', access_token, time=my_cache.EXPIRACAO_CACHE_LOJA)
+        # else:
+        #     return
 
     args["access_token"] = access_token
 
@@ -99,9 +100,9 @@ def fb_request(path, loja_id, args=None, post_args=None, json=None, files=None, 
     return result
 
 
-def post(loja_id, post_args=None, json=None, files=None, headers=None):
+def post(app_id, loja_id, post_args=None, json=None, files=None, headers=None):
     time_start = datetime.datetime.now().replace(microsecond=0)
-    result = fb_request('/me/messages', loja_id, post_args=post_args, json=json, files=files, headers=headers)
+    result = fb_request(app_id, '/me/messages', loja_id, post_args=post_args, json=json, files=files, headers=headers)
     delta_t = datetime.datetime.now().replace(microsecond=0) - time_start
     logger.info('>>>>> facebook call delta t ' + repr(delta_t.total_seconds()) + 's')
     logger.debug('=========================>>>>> facebook call result ' + repr(result))
