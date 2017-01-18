@@ -595,9 +595,14 @@ class LojaView(views.APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, psidappid=None):
-        resultado, psid, appid = self.valida_acesso(request, psidappid)
+        resultado, psid, appid = self.valida_acesso(psidappid)
         if resultado is not None:
             return resultado
+        if 'term' not in request.GET:
+            return Response([]), None, None
+        termo = request.GET['term']
+        if len(termo) < 3:
+            return Response([]), None, None
         lojas = Loja.objects.raw('select l.* from loja_loja l inner join loja_apps a '
                                  'on l.id = a.loja_id where a.ativa = 1 and a.app = %s order by l.nome', [appid])
         lojas_resultado = []
@@ -606,7 +611,7 @@ class LojaView(views.APIView):
         return Response(lojas_resultado)
 
     def post(self, request, psidappid=None):
-        resultado, psid, appid = self.valida_acesso(request, psidappid)
+        resultado, psid, appid = self.valida_acesso(psidappid)
         if resultado is not None:
             return resultado
         if 'loja' not in request.POST:
@@ -639,16 +644,11 @@ class LojaView(views.APIView):
         logger.debug('------======------- response: ' + repr(response))
         return Response({"success": True})
 
-    def valida_acesso(self, request, psidappid):
+    def valida_acesso(self, psidappid):
         if psidappid is None:
             logger.error('------======------- psidappid is None')
             return fail_response(400, u'Desculpe, não foi possível validar os dados. Por favor, saia e entre novamente '
                                       u'na página.'), None, None
-        if 'term' not in request.GET:
-            return Response([]), None, None
-        termo = request.GET['term']
-        if len(termo) < 3:
-            return Response([]), None, None
         logger.debug('-=-=-=-=-=-=-=- key before :: ' + settings.SECRET_KEY[:32])
         key32 = '{: <32}'.format(settings.SECRET_KEY[:32]).encode("utf-8")
         logger.debug('-=-=-=-=-=-=-=- key after :: ' + key32)
