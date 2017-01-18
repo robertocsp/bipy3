@@ -43,8 +43,6 @@ function process_action(psid)
         var url = '/marviin/api/rest/loja/'+$('input#psidappid').val();
 
         $.post(url, $('#lojasform').serialize(), function(data) {
-            alert(data);
-            alert(psid);
             if(psid)
             {
                 MessengerExtensions.requestCloseBrowser(function success() {

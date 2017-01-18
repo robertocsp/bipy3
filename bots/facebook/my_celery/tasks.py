@@ -113,6 +113,7 @@ def send_text_message(self, app_id, sender_id, loja_id, text, icon=ROBOT_ICON):
             'text': payload_text
         }
     }
+    logger.debug(repr(payload))
     return fb.post(app_id, loja_id, json=payload)
 
 
@@ -150,6 +151,7 @@ def send_generic_message(self, app_id, sender_id, loja_id, elements):
             }
         }
     }
+    logger.debug(repr(payload))
     return fb.post(app_id, loja_id, json=payload)
 
 

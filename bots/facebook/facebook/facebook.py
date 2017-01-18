@@ -52,6 +52,7 @@ def fb_request(app_id, path, loja_id, args=None, post_args=None, json=None, file
 
     # access_token = my_cache.cache_client.get(loja_id + 'pac')
     access_token = my_keys.FB_APPS[app_id]['pac']
+    logger.debug(repr(access_token))
     if access_token is None:
         return
         # access_token = get_page_access_token(loja_id)
