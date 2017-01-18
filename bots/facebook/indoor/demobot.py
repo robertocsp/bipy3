@@ -1228,6 +1228,7 @@ def passo_menu(message, sender_id, loja_id, conversa):
 
 
 def passo_ola(message, sender_id, loja_id, bot1, conversa):
+    app_log.debug('vai chamar tarefas:::')
     chain(send_text_message.si(INDOOR, sender_id, loja_id, bot1),
           send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
