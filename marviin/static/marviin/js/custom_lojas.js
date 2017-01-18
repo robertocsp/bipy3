@@ -43,7 +43,8 @@ function process_action(psid)
         var url = '/marviin/api/rest/loja/'+$('input#psidappid').val();
 
         $.post(url, $('#lojasform').serialize(), function(data) {
-            console.log(data);
+            alert(data);
+            alert(psid);
             if(psid)
             {
                 MessengerExtensions.requestCloseBrowser(function success() {
@@ -58,7 +59,7 @@ function process_action(psid)
             }
         })
         .fail(function(error) {
-            console.log(error)
+            alert(error)
 //            if(error.message)
 //                $('#lista-enderecos').html(error.message);
 //            else
