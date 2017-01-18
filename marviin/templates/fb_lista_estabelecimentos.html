@@ -25,10 +25,10 @@
     <section class="main-lista-estabelecimentos">
       <form action="" method="post" id="lojasform">
           {% csrf_token %}
-          <img src="/static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" />
           <input type="hidden" name="psidappid" id="psidappid" value="{{ psidappid }}" />
-          <label class="titulo-label">Digite abaixo o nome do estabelecimento em que você se encontra</label><br>
-          <input type="text" name="campoEstabelecimento" id="campoEstabelecimento" placeholder="Estabelecimento" />
+          <label class="titulo-label"><img src="/static/marviin/img/logo-pq-marviin-fundo-branco.png" width="106" /></label>
+          <label class="desc-label-est">Digite abaixo o nome do estabelecimento em que você se encontra</label><br>
+          <input type="text" name="campoEstabelecimento" id="campoEstabelecimento" placeholder="Estabelecimento..." />
           <input type="hidden" name="loja" id="loja">
           <button type="submit" id="btn-escolher-loja" class="btn btn-primary btn-verde btn-border-white">
             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Escolher

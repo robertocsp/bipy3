@@ -2033,6 +2033,73 @@ p.descri{
     display: none !important;
 }
 
+#lojasform .titulo-label{
+    padding: 7px 16px;
+    background-color: #f6f7f9;
+    /* color: #4b4f56; */
+    /* font-weight: bold; */
+    width: 100%;
+}
+
+#lojasform input[type="text"]{
+    margin-left: 11px;
+    padding-left: 7px;
+    border: 0;
+    border-bottom: 1px solid #ddd;
+}
+
+#lojasform #btn-escolher-loja{
+    float: right;
+    margin-right: 10px;
+    background-color: #365899;
+    border-color: #365899;
+    font-weight: bold;
+}
+
+#lojasform #campoEstabelecimento{
+    margin: 10px 0 0 11px;
+    padding-left: 7px;
+    border: 0;
+    border-bottom: 1px solid #ddd;
+    min-width: 65%;
+}
+
+#lojasform #campoEstabelecimento:focus, #lojasform #campoEstabelecimento:hover{
+    border-bottom: 1px solid #365899;
+}
+
+#lojasform .desc-label-est{
+    color: #4b4f56;
+    font-weight: 600;
+    padding: 12px 15px;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+}
+
+#lojasform .titulo-label img{
+    width: 50px;
+    display: block;
+    margin: 0 auto;
+}
+
+.ui-autocomplete.ui-widget-content{
+    left: 0;
+    margin-top: 32px;
+    width: 100%;
+    border: 0;
+    border-top: 1px solid #ddd;
+}
+
+.ui-autocomplete.ui-widget-content.ui-menu .ui-menu-item{
+    padding: 10px 0 10px 51px;
+    border-bottom: 1px solid #ddd;
+    color: #365899;
+    background: url('../img/noimage.png') no-repeat 0 0;
+    background-size: 43px 41px;
+    font-weight: bold;
+}
+
 @media only screen and (max-width: 1024px){
     .around{
         overflow-y: hidden;
