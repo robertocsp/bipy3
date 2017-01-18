@@ -587,7 +587,7 @@ def webhook():
                         if conversa is not None:
                             if conversa['loja'] is not None:
                                 loja_id = conversa['loja']
-                            else:
+                            elif x.get('webview') is None or x['webview'].get('postload') != 'loja_selecionada':
                                 app_log.debug('sender_id:: ' + repr(sender_id))
                                 app_log.debug('loja_id:: ' + repr(loja_id))
                                 app_log.debug('webview loja::')
