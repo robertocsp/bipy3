@@ -590,7 +590,7 @@ def webhook():
                         if conversa is not None:
                             if conversa['loja'] is not None:
                                 loja_id = conversa['loja']
-                            elif x.get('webview') is None or x['webview'].get('postload') != 'loja_selecionada':
+                            elif x.get('webview') is None or x['webview'].get('type') != 'loja_selecionada':
                                 app_log.debug('sender_id:: ' + repr(sender_id))
                                 app_log.debug('loja_id:: ' + repr(loja_id))
                                 app_log.debug('webview loja::')
@@ -691,6 +691,7 @@ def webhook():
                                 else:
                                     bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
                                 app_log.debug('boas vindas:: ' + repr(bot1))
+                                app_log.debug('conversa:: ' + repr(conversa))
                                 passo_ola(message, sender_id, loja_id, bot1, conversa)
                                 app_log.debug('fim:: ')
                         my_cache.cache_client.set(my_cache.cache_entry_prefix + sender_id, conversa,
