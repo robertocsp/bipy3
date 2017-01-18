@@ -692,7 +692,7 @@ def webhook():
                                     bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
                                 app_log.debug('boas vindas:: ' + repr(bot1))
                                 app_log.debug('conversa:: ' + repr(conversa))
-                                passo_ola(message, sender_id, loja_id, bot1, conversa)
+                                passo_ola(None, sender_id, loja_id, bot1, conversa)
                                 app_log.debug('fim:: ')
                         my_cache.cache_client.set(my_cache.cache_entry_prefix + sender_id, conversa,
                                                   time=my_cache.EXPIRACAO_CACHE_CONVERSA)
