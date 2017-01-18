@@ -46,6 +46,52 @@ POSTBACK_MAP = {
     'remover_item_': u'Remover item',
     'vermais_offset_': u'Ver mais itens',
 }
+MENSAGENS = {
+    'ola': Template(u'Olá $arg1, como posso ajudá-lo(a)?'),
+    'getstarted': Template(u'Legal, $arg1, vamos começar. Navegue lateralmente pelas opções abaixo, e veja como '
+                           u'posso ajudá-lo(a).'),
+    'menu': Template(u'Digite a palavra menu para saber em como posso ajudá-lo(a). '
+                     u'Você poderá digitá-la novamente a qualquer momento.'),
+    'mesa': Template(u'Por favor, digite sua mesa.'),
+    'pedido': Template(u'Excelente, digite aqui o que deseja, quanto mais detalhado melhor! ;)'),
+    'pedido1': Template(u'Exemplo: 1 água com gelo sem limão'),
+    'pedido2': Template(u'Desculpe, mas não encontrei um pedido sendo montado. Pedirei que comece um novo, por '
+                        u'favor. Obrigado.'),
+    'anotado': Template(u'Anotado.\n$arg1, deseja mais alguma coisa ou posso enviar seu pedido?'),
+    'anotado1': Template(u'Pedido atualizado.\nDeseja mais alguma coisa ou posso enviar seu pedido?'),
+    'qtde': Template(u'$arg1\nPerdoe-me, mas não consegui identificar a quantidade do(s) seguinte(s) '
+                     u'item(ns) acima.'),
+    'qtde1': Template(u'Peço, por favor, que reenvie sua última mensagem corrigindo-os.'),
+    'enviar': Template(u'Maravilha, já já seu pedido estará aí.\nPosso ajudá-lo(a) em algo mais?'),
+    'agradeco': Template(u'Eu que agradeço.'),
+    'robo': Template(u'Desculpe, mas não entendi o que deseja. \nComo posso auxiliá-lo(a)?'),
+    'anotado2': Template(u'Por favor, escolha uma das opções que lhe apresento abaixo.'),
+    'mesa3': Template(u'Certo, providenciarei que seus pedidos sejam enviados para esta mesa $arg1.'),
+    'mesa4': Template(u'Mesa anterior igual a atual.'),
+    'mesa5': Template(u'Mesa $arg1, correto?'),
+    'sim_nao': Template(u'Escolha uma das opções abaixo, por favor.'),
+    'pedido3': Template(u'Por favor, pode digitar. :)'),
+    'pedido4': Template(u'$arg1, já existe um pedido sendo montado. Deseja continuar este pedido ou começar um '
+                        u'novo?'),
+    'rever2': Template(u'Pedido se encontra vazio de itens. Como posso auxiliá-lo(a)?'),
+    'auxilio': Template(u'Em que posso ajudá-lo(a)?'),
+    'auxilio1': Template(u'Em que posso ajudá-lo(a) agora?'),
+    'auxilio2': Template(u'Anotado. Como posso ajudá-lo(a) agora?'),
+    'desenv': Template(u'Função em desenvolvimento...'),
+    'finalizar': Template(u'Segue, acima, seu pedido para conferência. Confirma o envio?'),
+    'cardapio': Template(u'Já levaremos o cardápio para você. Em que posso ajudá-lo(a) agora?'),
+    'cardapio2': Template(u'Deseja a versão digital ou quer que lhe traga o impresso?'),
+    'cardapio3': Template(u'Segue, acima, imagem do cardápio.'),
+    'cardapio4': Template(u'Seguem, acima, 2 imagens do cardápio.'),
+    'cardapio5': Template(u'Desculpe, ficarei devendo a versão digital, mas já pedi para trazerem o cardápio '
+                          u'impresso para você. Em que posso ajudá-lo(a) agora?'),
+    'garcom': Template(u'Perfeito, logo logo ele(a) estará aí. Como posso ajudá-lo(a) agora?'),
+    'suspensao': Template(u'Sua resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
+    'conta': Template(u'Ok, já avisei para trazerem sua conta.\nMuito obrigado(a), espero que sua experiência '
+                      u'tenha sido a melhor possível.\nVolte sempre!'),
+    'conta2': Template(u'Desculpe, mas não tenho anotado sua mesa. Você poderia me informar, por favor.'),
+    'loja': Template(u'Por favor, clique abaixo e me informe onde você está.'),
+}
 # ULTIMO PASSO = 31
 
 
@@ -377,53 +423,10 @@ def get_loja_webview(psid):
 
 
 def get_mensagem(id_mensagem, **args):
-    mensagens = {
-        'ola':        Template(u'Olá $arg1, como posso ajudá-lo(a)?'),
-        'getstarted': Template(u'Legal, $arg1, vamos começar. Navegue lateralmente pelas opções abaixo, e veja como '
-                               u'posso ajudá-lo(a).'),
-        'menu':       Template(u'Digite a palavra menu para saber em como posso ajudá-lo(a). '
-                               u'Você poderá digitá-la novamente a qualquer momento.'),
-        'mesa':       Template(u'Por favor, digite sua mesa.'),
-        'pedido':     Template(u'Excelente, digite aqui o que deseja, quanto mais detalhado melhor! ;)'),
-        'pedido1':    Template(u'Exemplo: 1 água com gelo sem limão'),
-        'pedido2':    Template(u'Desculpe, mas não encontrei um pedido sendo montado. Pedirei que comece um novo, por '
-                               u'favor. Obrigado.'),
-        'anotado':    Template(u'Anotado.\n$arg1, deseja mais alguma coisa ou posso enviar seu pedido?'),
-        'anotado1':   Template(u'Pedido atualizado.\nDeseja mais alguma coisa ou posso enviar seu pedido?'),
-        'qtde':       Template(u'$arg1\nPerdoe-me, mas não consegui identificar a quantidade do(s) seguinte(s) '
-                               u'item(ns) acima.'),
-        'qtde1':      Template(u'Peço, por favor, que reenvie sua última mensagem corrigindo-os.'),
-        'enviar':     Template(u'Maravilha, já já seu pedido estará aí.\nPosso ajudá-lo(a) em algo mais?'),
-        'agradeco':   Template(u'Eu que agradeço.'),
-        'robo':       Template(u'Desculpe, mas não entendi o que deseja. \nComo posso auxiliá-lo(a)?'),
-        'anotado2':   Template(u'Por favor, escolha uma das opções que lhe apresento abaixo.'),
-        'mesa3':      Template(u'Certo, providenciarei que seus pedidos sejam enviados para esta mesa $arg1.'),
-        'mesa4':      Template(u'Mesa anterior igual a atual.'),
-        'mesa5':      Template(u'Mesa $arg1, correto?'),
-        'sim_nao':    Template(u'Escolha uma das opções abaixo, por favor.'),
-        'pedido3':    Template(u'Por favor, pode digitar. :)'),
-        'pedido4':    Template(u'$arg1, já existe um pedido sendo montado. Deseja continuar este pedido ou começar um '
-                               u'novo?'),
-        'rever2':     Template(u'Pedido se encontra vazio de itens. Como posso auxiliá-lo(a)?'),
-        'auxilio':    Template(u'Em que posso ajudá-lo(a)?'),
-        'auxilio1':   Template(u'Em que posso ajudá-lo(a) agora?'),
-        'auxilio2':   Template(u'Anotado. Como posso ajudá-lo(a) agora?'),
-        'desenv':     Template(u'Função em desenvolvimento...'),
-        'finalizar':  Template(u'Segue, acima, seu pedido para conferência. Confirma o envio?'),
-        'cardapio':   Template(u'Já levaremos o cardápio para você. Em que posso ajudá-lo(a) agora?'),
-        'cardapio2':  Template(u'Deseja a versão digital ou quer que lhe traga o impresso?'),
-        'cardapio3':  Template(u'Segue, acima, imagem do cardápio.'),
-        'cardapio4':  Template(u'Seguem, acima, 2 imagens do cardápio.'),
-        'cardapio5':  Template(u'Desculpe, ficarei devendo a versão digital, mas já pedi para trazerem o cardápio '
-                               u'impresso para você. Em que posso ajudá-lo(a) agora?'),
-        'garcom':     Template(u'Perfeito, logo logo ele(a) estará aí. Como posso ajudá-lo(a) agora?'),
-        'suspensao':  Template(u'Sua resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
-        'conta':      Template(u'Ok, já avisei para trazerem sua conta.\nMuito obrigado(a), espero que sua experiência '
-                               u'tenha sido a melhor possível.\nVolte sempre!'),
-        'conta2':     Template(u'Desculpe, mas não tenho anotado sua mesa. Você poderia me informar, por favor.'),
-        'loja':       Template(u'Por favor, clique abaixo e me informe onde você está.'),
-    }
-    return mensagens[id_mensagem].substitute(args)
+    if id_mensagem in MENSAGENS:
+        return MENSAGENS[id_mensagem].substitute(args)
+    else:
+        return Template(id_mensagem).substitute(args)
 
 
 def define_mesa(mesa, conversa):
@@ -623,6 +626,8 @@ def webhook():
                                 'entry': None,
                             }
                             app_log.debug('usuario:: ' + repr(user))
+                        app_log.debug('checagem:: ' + repr((x.get('message') or x.get('postback')) and conversa['loja']
+                                                           is not None))
                         if (x.get('message') or x.get('postback')) and conversa['loja'] is not None:
                             if checa_duplicidade(sender_id, x['timestamp'], conversa):
                                 resp = Response(u'chamada duplicada', status=200,
@@ -638,7 +643,8 @@ def webhook():
                                 elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() \
                                         in saudacao:
                                     conversa['passo'] = 0
-                                    passo_ola(message, sender_id, loja_id, conversa)
+                                    bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
+                                    passo_ola(message, sender_id, loja_id, bot1, conversa)
                                 elif u'inicio' in unicodedata.normalize('NFKD', message) \
                                         .encode('ASCII', 'ignore').lower():
                                     passo_inicio(sender_id, loja_id, conversa)
@@ -673,11 +679,20 @@ def webhook():
                             conversa['uid'] = x['dashboard']['uid']
                             send_text_message.delay(INDOOR, sender_id, loja_id, x['dashboard']['message'],
                                                     icon=u'\U0001f464')
-                        elif x.get('webview') and x['webview'].get('postload'):
-                            if x['webview'].get('postload') == 'loja_selecionada':
+                        elif x.get('webview') and x['webview'].get('type'):
+                            app_log.debug('webview type:: ' + repr(x['webview'].get('type')))
+                            if x['webview'].get('type') == 'loja_selecionada':
                                 conversa['passo'] = 0
                                 conversa['loja'] = loja_id
-                                passo_ola(message, sender_id, loja_id, conversa)
+                                # TODO TORNAR CONFIGURAVEL
+                                if x['webview'].get('welcome_message'):
+                                    bot1 = get_mensagem(x['webview'].get('welcome_message'),
+                                                        arg1=conversa['usuario']['first_name'])
+                                else:
+                                    bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
+                                app_log.debug('boas vindas:: ' + repr(bot1))
+                                passo_ola(message, sender_id, loja_id, bot1, conversa)
+                                app_log.debug('fim:: ')
                         my_cache.cache_client.set(my_cache.cache_entry_prefix + sender_id, conversa,
                                                   time=my_cache.EXPIRACAO_CACHE_CONVERSA)
         resp = Response('success', status=200, mimetype='text/plain')
@@ -1211,8 +1226,7 @@ def passo_menu(message, sender_id, loja_id, conversa):
     send_generic_message.delay(INDOOR, sender_id, loja_id, get_elements_menu(conversa))
 
 
-def passo_ola(message, sender_id, loja_id, conversa):
-    bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
+def passo_ola(message, sender_id, loja_id, bot1, conversa):
     chain(send_text_message.si(INDOOR, sender_id, loja_id, bot1),
           send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 

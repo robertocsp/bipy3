@@ -628,7 +628,8 @@ class LojaView(views.APIView):
                                 'id': psid
                             },
                             'webview': {
-                                'postload': 'loja_selecionada',
+                                'type': 'loja_selecionada',
+                                'welcome_message': u'Olá $arg1, como posso ajudá-lo(a)?'
                             },
                             'recipient': {
                                 'id': request.POST['loja']
