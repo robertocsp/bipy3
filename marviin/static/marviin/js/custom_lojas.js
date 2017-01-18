@@ -40,7 +40,7 @@ function process_action(psid)
         }
         $(this).addClass('nosubmit');
 
-        var url = '/marviin/api/rest/loja'+$('input#psidappid').val();
+        var url = '/marviin/api/rest/loja/'+$('input#psidappid').val();
 
         $.post(url, $('#lojasform').serialize(), function(data) {
             console.log(data);
