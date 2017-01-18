@@ -597,6 +597,8 @@ def webhook():
                                                 mimetype='text/plain')
                                 resp.status_code = 200
                                 return resp
+                            app_log.debug('sender_id:: ' + repr(sender_id))
+                            app_log.debug('loja_id:: ' + repr(loja_id))
                             send_button_message.delay(sender_id, loja_id, get_mensagem('loja'),
                                                    get_loja_webview(sender_id))
                             conversa = {
