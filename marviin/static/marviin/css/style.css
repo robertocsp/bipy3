@@ -2057,11 +2057,11 @@ p.descri{
 }
 
 #lojasform #campoEstabelecimento{
-    margin: 10px 0 0 11px;
+    margin: 10px 0 0 0;
     padding-left: 7px;
     border: 0;
     border-bottom: 1px solid #ddd;
-    min-width: 65%;
+    width: 60%;
 }
 
 #lojasform #campoEstabelecimento:focus, #lojasform #campoEstabelecimento:hover{
@@ -2074,7 +2074,7 @@ p.descri{
     padding: 12px 15px;
     width: 100%;
     text-align: center;
-    font-size: 11px;
+    font-size: 15px;
 }
 
 #lojasform .titulo-label img{
@@ -2095,9 +2095,13 @@ p.descri{
     padding: 10px 0 10px 51px;
     border-bottom: 1px solid #ddd;
     color: #365899;
-    background: url('../img/noimage.png') no-repeat 0 0;
-    background-size: 43px 41px;
+    background: url(../img/noimage.png) no-repeat center left;
+    background-size: 40px 30px;
     font-weight: bold;
+}
+
+input, input:focus{
+    outline:none
 }
 
 @media only screen and (max-width: 1024px){
