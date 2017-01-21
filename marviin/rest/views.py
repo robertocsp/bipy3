@@ -1600,7 +1600,7 @@ def fb_greeting_text(pac, modulo='548897018630774'):
       "setting_type": "greeting",
       "greeting": {
         "text": u"Olá {{user_first_name}}, muito prazer, me chamo Marviin. Seja bem-vindo(a) a uma nova forma de "
-                u"atendimento. Clique em começar ou digite início."
+                u"atendimento. Clique no botão abaixo ou digite início."
       }
     }
     url_greeting_text = 'https://graph.facebook.com/v2.7/me/thread_settings?access_token=' + pac
