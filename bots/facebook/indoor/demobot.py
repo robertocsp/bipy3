@@ -593,12 +593,6 @@ def webhook():
                         if conversa is not None:
                             if conversa['loja'] is not None:
                                 loja_id = conversa['loja']
-                            elif x.get('webview') is None or x['webview'].get('type') != 'loja_selecionada':
-                                app_log.debug('sender_id:: ' + repr(sender_id))
-                                app_log.debug('loja_id:: ' + repr(loja_id))
-                                app_log.debug('webview loja::')
-                                send_button_message.delay(INDOOR, sender_id, loja_id, get_mensagem('loja'),
-                                                          get_loja_webview(sender_id))
                             my_cache.cache_client.set(my_cache.cache_entry_prefix + sender_id, conversa,
                                                       time=my_cache.EXPIRACAO_CACHE_CONVERSA)
                             app_log.debug('conversa:: ' + repr(conversa))
