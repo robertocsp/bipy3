@@ -604,7 +604,8 @@ class LojaView(views.APIView):
         if len(termo) < 3:
             return Response([]), None, None
         lojas = Loja.objects.raw('select l.* from loja_loja l inner join loja_apps a '
-                                 'on l.id = a.loja_id where a.ativa = 1 and a.app = %s order by l.nome', [appid])
+                                 'on l.id = a.loja_id where a.ativa = 1 and a.app = %s and l.nome like %s '
+                                 'order by l.nome', [appid, '%'+termo+'%'])
         lojas_resultado = []
         for loja in lojas:
             lojas_resultado.append({"value": loja.id, "label": loja.nome})
