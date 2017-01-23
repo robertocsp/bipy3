@@ -60,7 +60,8 @@
       <div class="coluna">
         <h3 class="info">
           <label class="status-label text-laranja"><i class="fa fa-hand-paper-o fa-2x"></i> <span>Solicitado</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
+          <label class="expandi"><i class="fa fa-window-maximize"></i></label>
+          <label class="omitir"><i class="fa fa-window-minimize" aria-hidden="true"></i></label>
         </h3>
         <ul id="solicitado" class="droptrue">
             {% include "includes/snippets/cards_pedido.html" with pedidos=solicitado %}
@@ -69,7 +70,8 @@
       <div class="coluna">
         <h3 class="info">
           <label class="status-label text-azul"><i class="fa fa-hand-grab-o fa-2x"></i> <span>Em processo</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
+          <label class="expandi"><i class="fa fa-window-maximize"></i></label>
+          <label class="omitir"><i class="fa fa-window-minimize" aria-hidden="true"></i></label>
         </h3>
         <ul id="em-processo" class="droptrue">
             {% include "includes/snippets/cards_pedido.html" with pedidos=em_processamento %}
@@ -78,7 +80,8 @@
       <div class="coluna">
         <h3 class="info">
           <label class="status-label text-verde"><i class="fa fa-hand-pointer-o fa-2x "></i> <span>Concluído</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
+          <label class="expandi"><i class="fa fa-window-maximize"></i></label>
+          <label class="omitir"><i class="fa fa-window-minimize" aria-hidden="true"></i></label>
         </h3>
         <ul id="concluido" class="droptrue">
             {% include "includes/snippets/cards_pedido.html" with pedidos=concluido %}
@@ -87,7 +90,8 @@
       <div class="coluna">
         <h3 class="info">
           <label class="status-label text-verde"><i class="fa fa-thumbs-o-up fa-2x "></i> <span>Entregue</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
+          <label class="expandi"><i class="fa fa-window-maximize"></i></label>
+          <label class="omitir"><i class="fa fa-window-minimize" aria-hidden="true"></i></label>
         </h3>
         <ul id="entregue" class="droptrue">
             {% include "includes/snippets/cards_pedido.html" with pedidos=entregue %}
@@ -96,7 +100,8 @@
       <div class="coluna">
         <h3 class="info">
           <label class="status-label text-red"><i class="fa fa-thumbs-o-down fa-2x"></i> <span>Cancelado</span></label>
-          <label class="expandi"><i class="fa fa-ellipsis-v"></i></label>
+          <label class="expandi"><i class="fa fa-window-maximize"></i></label>
+          <label class="omitir"><i class="fa fa-window-minimize" aria-hidden="true"></i></label>
         </h3>
         <ul id="cancelado" class="droptrue">
             {% include "includes/snippets/cards_pedido.html" with pedidos=cancelado %}
@@ -346,6 +351,7 @@
         //inserir span no titulo coluna
         //inserir btn para restaurar as colunas
         $(".btn-restaurar").show(600);
+        $(".omitir").hide();
         $('i.fa-ellipsis-h').removeClass('fa-ellipsis-h').addClass('fa-ellipsis-v');
         $('.coluna').addClass('coluna-normal');
         $('.coluna').removeClass('col-active');
@@ -360,13 +366,21 @@
         $('.col-active').animate({
           width: "75%"
         }, 1500 );
+    });
 
+    //Omitir coluna
+    $('.omitir').click(function(){
+        $(".btn-restaurar").show();
+        $(this).parent('.info').parent('.coluna').animate({
+          width: "0%"
+        }, 1500 );
     });
 
     //Botao restaurar as colunas
     $('.btn-restaurar').click(function(){
         $(".btn-restaurar").hide(600);
         $(".coluna").show();
+        $(".omitir").show();
         $('.coluna').removeClass('col-active');
         $('.coluna').removeClass('coluna-normal');
         $('i.fa-ellipsis-h').removeClass('fa-ellipsis-h').addClass('fa-ellipsis-v');

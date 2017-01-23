@@ -305,14 +305,15 @@ footer p{
 }
 
 .coluna{
-    width: 220px;
+    width: 218px;
     margin: 0 10px 0 0;
     float: left;
     background: #eee;
     border-bottom: 1px solid #dedede;
-    min-height: 500px;
+    height: 500px;
     padding-top: 5px;
     border-radius: 5px;
+    overflow-y: auto;
 }
 
 .coluna:last-child{
@@ -329,7 +330,7 @@ footer p{
 .droptrue > li{
     width: 196px;
     background: #fff;
-    margin: 0 0 20px 12px;
+    margin: 0 0 20px 5px;
     border-radius: 5px;
     float: left;
     height: 190px;
@@ -509,14 +510,20 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 }
 
 .coluna .info .status-label{
-    width: 82%;
+    width: 72%;
     text-transform: uppercase;
+    float: left;
+}
+
+.coluna .info .expandi, .coluna .info .omitir{
+    float: right;
+    width: 24px;
+    font-size: 14px;
+    text-align: center;
 }
 
 .coluna .info .expandi{
-    float: right;
-    width: 31px;
-    font-size: 20px;
+margin-right: 10px;
 }
 
 .status-list label.ativo{
@@ -663,14 +670,13 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 }
 
 .coluna .droptrue > li{
-    margin-left: 11px;
+    margin-left: 5px;
 }
 
 .header-pedido{
     float: left;
     width: 100%;
 }
-
 
 .coluna-normal .droptrue > li {
   width: 87%;
