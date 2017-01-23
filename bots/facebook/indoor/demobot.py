@@ -45,11 +45,14 @@ POSTBACK_MAP = {
     'editar_item_': u'Editar item',
     'remover_item_': u'Remover item',
     'vermais_offset_': u'Ver mais itens',
+    'trocar_local': u'Definir estabelecimento',
 }
 MENSAGENS = {
     'ola': Template(u'Olá $arg1, como posso ajudá-lo(a)?'),
-    'getstarted': Template(u'Legal, $arg1, vamos começar. Navegue lateralmente pelas opções abaixo, e veja como '
-                           u'posso ajudá-lo(a).'),
+    'getstarted': Template(u'Legal, após escolher o estabelecimento abaixo, navegue lateralmente pelas opções do menu '
+                           u'que lhe será apresentado(a) e veja como poderei ajudá-lo(a).'),
+    'getstarted2': Template(u'Legal, $arg1, navegue lateralmente pelas opções abaixo, e veja como '
+                            u'posso ajudá-lo(a).'),
     'menu': Template(u'Digite a palavra menu para saber em como posso ajudá-lo(a). '
                      u'Você poderá digitá-la novamente a qualquer momento.'),
     'mesa': Template(u'Por favor, digite sua mesa.'),
@@ -590,12 +593,6 @@ def webhook():
                         if conversa is not None:
                             if conversa['loja'] is not None:
                                 loja_id = conversa['loja']
-                            elif x.get('webview') is None or x['webview'].get('type') != 'loja_selecionada':
-                                app_log.debug('sender_id:: ' + repr(sender_id))
-                                app_log.debug('loja_id:: ' + repr(loja_id))
-                                app_log.debug('webview loja::')
-                                send_button_message.delay(INDOOR, sender_id, loja_id, get_mensagem('loja'),
-                                                          get_loja_webview(sender_id))
                             my_cache.cache_client.set(my_cache.cache_entry_prefix + sender_id, conversa,
                                                       time=my_cache.EXPIRACAO_CACHE_CONVERSA)
                             app_log.debug('conversa:: ' + repr(conversa))
@@ -608,8 +605,6 @@ def webhook():
                                 return resp
                             app_log.debug('sender_id:: ' + repr(sender_id))
                             app_log.debug('loja_id:: ' + repr(loja_id))
-                            send_button_message.delay(INDOOR, sender_id, loja_id, get_mensagem('loja'),
-                                                      get_loja_webview(sender_id))
                             conversa = {
                                 'passo': 0,
                                 'passo_sim': None,
@@ -626,9 +621,7 @@ def webhook():
                                 'entry': None,
                             }
                             app_log.debug('usuario:: ' + repr(user))
-                        app_log.debug('checagem:: ' + repr((x.get('message') or x.get('postback')) and conversa['loja']
-                                                           is not None))
-                        if (x.get('message') or x.get('postback')) and conversa['loja'] is not None:
+                        if x.get('message') or x.get('postback'):
                             if checa_duplicidade(sender_id, x['timestamp'], conversa):
                                 resp = Response(u'chamada duplicada', status=200,
                                                 mimetype='text/plain')
@@ -640,28 +633,31 @@ def webhook():
                                 if conversa['suspensa'] > 0:
                                     resposta_dashboard(message=message, sender_id=sender_id, loja_id=loja_id,
                                                        conversa=conversa)
-                                elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() \
-                                        in saudacao:
-                                    conversa['passo'] = 0
-                                    bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
-                                    passo_ola(message, sender_id, loja_id, bot1, conversa)
                                 elif u'inicio' in unicodedata.normalize('NFKD', message) \
                                         .encode('ASCII', 'ignore').lower():
                                     passo_inicio(sender_id, loja_id, conversa)
-                                elif u'menu' in unicodedata.normalize('NFKD', message)\
-                                        .encode('ASCII', 'ignore').lower():
-                                    conversa['passo'] = 1
-                                    passo_menu(message, sender_id, loja_id, conversa)
-                                elif u'pedido' in unicodedata.normalize('NFKD', message)\
-                                        .encode('ASCII', 'ignore').lower():
-                                    # passos 13 e 14 definidos dentro do método
-                                    passo_novo_pedido(message, sender_id, loja_id, conversa)
-                                elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() \
-                                        in agradecimentos:
-                                    conversa['passo'] = 11
-                                    passo_agradecimento(message, sender_id, loja_id, conversa)
                                 else:
-                                    define_passo(message, sender_id, loja_id, conversa, conversa['passo'])
+                                    if conversa['loja'] is None:
+                                        define_loja(sender_id, loja_id)
+                                    elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() \
+                                            in saudacao:
+                                        conversa['passo'] = 0
+                                        bot1 = get_mensagem('ola', arg1=conversa['usuario']['first_name'])
+                                        passo_ola(message, sender_id, loja_id, bot1, conversa)
+                                    elif u'menu' in unicodedata.normalize('NFKD', message)\
+                                            .encode('ASCII', 'ignore').lower():
+                                        conversa['passo'] = 1
+                                        passo_menu(message, sender_id, loja_id, conversa)
+                                    elif u'pedido' in unicodedata.normalize('NFKD', message)\
+                                            .encode('ASCII', 'ignore').lower():
+                                        # passos 13 e 14 definidos dentro do método
+                                        passo_novo_pedido(message, sender_id, loja_id, conversa)
+                                    elif unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower() \
+                                            in agradecimentos:
+                                        conversa['passo'] = 11
+                                        passo_agradecimento(message, sender_id, loja_id, conversa)
+                                    else:
+                                        define_passo(message, sender_id, loja_id, conversa, conversa['passo'])
                             elif ((x.get('message') and x['message'].get('quick_reply') and
                                    x['message']['quick_reply'].get('payload')) or
                                   (x.get('postback') and x['postback'].get('payload'))):
@@ -702,70 +698,83 @@ def webhook():
 
 
 def define_payload(message, sender_id, loja_id, conversa, payload):
-    if payload == 'menu_novo_pedido' or payload == 'menu_novo_pedido2':
-        if payload == 'menu_novo_pedido2':
-            set_variaveis(conversa)
-        # passos 13 e 14 definidos dentro do método
-        passo_novo_pedido(message, sender_id, loja_id, conversa)
-    elif payload == 'menu_trocar_mesa':
-        define_sim_nao(conversa, 3, define_passo, 15, define_payload, 'menu_trocar_mesa')
-        passo_trocar_mesa_2(message, sender_id, loja_id, conversa)
-    elif payload == 'menu_rever_pedido':
-        conversa['passo'] = 16
-        passo_rever_pedido_2(message, sender_id, loja_id, conversa)
-    elif payload.startswith('editar_item_'):
-        conversa['passo'] = 28
-        passo_editar_item(message, sender_id, loja_id, conversa, payload[len('editar_item_'):])
-    elif payload.startswith('remover_item_'):
-        # passos 29 e 31 definidos dentro do método
-        passo_remover_item(message, sender_id, loja_id, conversa, payload[len('remover_item_'):])
-    elif payload.startswith('vermais_offset_'):
-        conversa['passo'] = 30
-        conversa['aux'] = int(payload[len('vermais_offset_'):])
-        passo_rever_pedido_2(message, sender_id, loja_id, conversa, offset=conversa['aux'])
-    elif payload == 'pedir_conta':
-        # passos 24 e 25 definidos dentro do método
-        passo_pedir_conta(message, sender_id, loja_id, conversa)
-    elif payload == 'pedir_mais':
-        conversa['passo'] = 17
-        passo_pedir_mais(message, sender_id, loja_id, conversa)
-    elif payload == 'finalizar_pedido':
-        conversa['passo'] = 18
-        passo_finalizar_pedido(message, sender_id, loja_id, conversa)
-    elif payload == 'finalizar_enviar':
-        conversa['passo'] = 0
-        passo_finalizar_enviar(message, sender_id, loja_id, conversa)
-    elif payload == 'pedir_cardapio':
-        # passos 3, 19, 20, 26 e 27 utilizados nesta ação
-        passo_pedir_cardapio(message, sender_id, loja_id, conversa)
-    elif payload == 'chamar_garcom':
-        # passos 22 e 23 definidos dentro do método
-        passo_chamar_garcom(message, sender_id, loja_id, conversa)
-    elif payload == 'voltar_menu':
-        conversa['passo'] = 1
-        conversa['aux'] = None
-        conversa['passo_sim'] = None
-        conversa['passo_nao'] = None
-        passo_menu(message, sender_id, loja_id, conversa)
-    elif payload == 'sim':
-        conversa['passo_sim'][0](message, sender_id, loja_id, conversa, conversa['passo_sim'][1])
-        conversa['passo_sim'] = None
-        conversa['passo_nao'] = None
-    elif payload == 'nao':
-        conversa['passo_nao'][0](message, sender_id, loja_id, conversa, conversa['passo_nao'][1])
-    elif payload == 'cardapio_impresso':
-        passo_cardapio_impresso(message, sender_id, loja_id, conversa)
-    elif payload == 'cardapio_digital':
-        passo_cardapio_digital(message, sender_id, loja_id, conversa)
-    elif payload == 'menu_get_started':
+    if payload == 'menu_get_started':
         passo_inicio(sender_id, loja_id, conversa)
+    else:
+        if conversa['loja'] is None or payload == 'trocar_local':
+            define_loja(sender_id, loja_id)
+        elif payload == 'menu_novo_pedido' or payload == 'menu_novo_pedido2':
+            if payload == 'menu_novo_pedido2':
+                set_variaveis(conversa)
+            # passos 13 e 14 definidos dentro do método
+            passo_novo_pedido(message, sender_id, loja_id, conversa)
+        elif payload == 'menu_trocar_mesa':
+            define_sim_nao(conversa, 3, define_passo, 15, define_payload, 'menu_trocar_mesa')
+            passo_trocar_mesa_2(message, sender_id, loja_id, conversa)
+        elif payload == 'menu_rever_pedido':
+            conversa['passo'] = 16
+            passo_rever_pedido_2(message, sender_id, loja_id, conversa)
+        elif payload.startswith('editar_item_'):
+            conversa['passo'] = 28
+            passo_editar_item(message, sender_id, loja_id, conversa, payload[len('editar_item_'):])
+        elif payload.startswith('remover_item_'):
+            # passos 29 e 31 definidos dentro do método
+            passo_remover_item(message, sender_id, loja_id, conversa, payload[len('remover_item_'):])
+        elif payload.startswith('vermais_offset_'):
+            conversa['passo'] = 30
+            conversa['aux'] = int(payload[len('vermais_offset_'):])
+            passo_rever_pedido_2(message, sender_id, loja_id, conversa, offset=conversa['aux'])
+        elif payload == 'pedir_conta':
+            # passos 24 e 25 definidos dentro do método
+            passo_pedir_conta(message, sender_id, loja_id, conversa)
+        elif payload == 'pedir_mais':
+            conversa['passo'] = 17
+            passo_pedir_mais(message, sender_id, loja_id, conversa)
+        elif payload == 'finalizar_pedido':
+            conversa['passo'] = 18
+            passo_finalizar_pedido(message, sender_id, loja_id, conversa)
+        elif payload == 'finalizar_enviar':
+            conversa['passo'] = 0
+            passo_finalizar_enviar(message, sender_id, loja_id, conversa)
+        elif payload == 'pedir_cardapio':
+            # passos 3, 19, 20, 26 e 27 utilizados nesta ação
+            passo_pedir_cardapio(message, sender_id, loja_id, conversa)
+        elif payload == 'chamar_garcom':
+            # passos 22 e 23 definidos dentro do método
+            passo_chamar_garcom(message, sender_id, loja_id, conversa)
+        elif payload == 'voltar_menu':
+            conversa['passo'] = 1
+            conversa['aux'] = None
+            conversa['passo_sim'] = None
+            conversa['passo_nao'] = None
+            passo_menu(message, sender_id, loja_id, conversa)
+        elif payload == 'sim':
+            conversa['passo_sim'][0](message, sender_id, loja_id, conversa, conversa['passo_sim'][1])
+            conversa['passo_sim'] = None
+            conversa['passo_nao'] = None
+        elif payload == 'nao':
+            conversa['passo_nao'][0](message, sender_id, loja_id, conversa, conversa['passo_nao'][1])
+        elif payload == 'cardapio_impresso':
+            passo_cardapio_impresso(message, sender_id, loja_id, conversa)
+        elif payload == 'cardapio_digital':
+            passo_cardapio_digital(message, sender_id, loja_id, conversa)
+
+
+def define_loja(sender_id, loja_id):
+    send_button_message.delay(INDOOR, sender_id, loja_id, get_mensagem('loja'),
+                              get_loja_webview(sender_id))
 
 
 def passo_inicio(sender_id, loja_id, conversa):
     conversa['passo'] = 0
-    bot1 = get_mensagem('getstarted', arg1=conversa['usuario']['first_name'])
-    chain(send_text_message.si(INDOOR, sender_id, loja_id, bot1),
-          send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
+    if conversa['loja'] is None:
+        bot1 = get_mensagem('getstarted')
+        chain(send_text_message.si(INDOOR, sender_id, loja_id, bot1),
+              send_button_message.si(INDOOR, sender_id, loja_id, get_mensagem('loja'), get_loja_webview(sender_id)))()
+    else:
+        bot1 = get_mensagem('getstarted2', arg1=conversa['usuario']['first_name'])
+        chain(send_text_message.si(INDOOR, sender_id, loja_id, bot1),
+              send_generic_message.si(INDOOR, sender_id, loja_id, get_elements_menu(conversa)))()
 
 
 def define_sim_nao(conversa, passo, passo_sim_func, passo_sim_var, passo_nao_func, passo_nao_var):
