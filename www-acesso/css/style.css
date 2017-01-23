@@ -52,6 +52,7 @@ p, a, div, span, label, input, select, button{
 #permissao-pagina{
     width: 100%;
     padding: 10px;
+    float: left;
 }
 
 #status{
@@ -170,6 +171,7 @@ select{
     border-top: 1px solid #ccc;
     padding-top: 5px;
     margin-top: 10px;
+    font-weight: bold;
 }
 
 .content-dados{
@@ -186,7 +188,7 @@ h2{
 }
 
 .dados-est h2{
-    margin-bottom: 45px;
+    margin-bottom: 25px;
 }
 
 h2 label{
@@ -430,4 +432,20 @@ html, body{
 
 #envia_cadastro_marviin{
     margin-top: 30px;
+}
+
+.box-atendimento-escolha{
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 16px;
+    margin-bottom: 50px;
+}
+
+.esqueci-senha{
+    color: red;
+}
+
+.aviso{
+    color: blue;
 }

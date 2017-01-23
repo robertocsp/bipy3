@@ -27,9 +27,11 @@
         <div id="permissao-pagina">
             <form id="form_solicitacao_acesso" onsubmit="return false;">
                 <br><label class="text-into">Olá! Indique o módulo que deseja utilizar</label>
-                <div>
-                    <input type="checkbox" name="modulo" value="indoor" /> Atendimento
-                    <!--<input type="checkbox" name="modulo" value="delivery" /> Deli-->
+                <div class="box-atendimento-escolha">
+                    <input type="checkbox" name="modulo" value="indoor"> Atendimento<br>
+                    <input type="checkbox" name="demoEmail" value="demoEmail"> Demo Email<br>
+                    <input type="checkbox" name="demoSMS" value="demoSMS"> Demo SMS<br>
+                    <input type="checkbox" name="demoDashboard" value="demoDashboard"> Demo Dashboard
                 </div>
                 <div class="dados-est" id="cadastro_estabelecimento">
                     <h2><label>Dados do Estabelecimento</label></h2>
@@ -77,7 +79,7 @@
                         <input type="text" name="nome_usuario" value="" id="nome_usuario" maxlength="30"><br>
                         <label for="sobrenome_usuario">Sobrenome: </label>
                         <input type="text" name="sobrenome_usuario" value="" id="sobrenome_usuario" maxlength="30"><br>
-                        <label for="email_usuario">Email (será o seu login no Dashboard do Marviin): </label>
+                        <label for="email_usuario">Email <span class="aviso">(será o seu login no Dashboard do Marviin)</span>: </label>
                         <input type="email" name="email_usuario" value="" id="email_usuario" maxlength="100"><br>
                         <span><a href="#" class="esqueci-senha">Esqueci minha senha</a></span><br><br>
                         <label for="tel_usuario">Telefone: </label>
@@ -89,14 +91,14 @@
                         <input type="email" name="login_usuario" value="" id="login_usuario" maxlength="100"><br>
                         <label for="senha_usuario">Senha: </label>
                         <input type="password" name="senha_usuario" value="" id="senha_usuario"><br>
-                        <span><a href="#" class="esqueci-senha">Esqueci minha senha</a></span>
+                        <span><a href="#" class="esqueci-senha">Esqueci minha senha</a><br><br><br><br></span>
                     </div>
                 </div>
                 <br>
 
                 <div class="dados-bot" id="cadastro_pagina_dashboard">
                     <h2><label>Dados de utilização do Marviin</label></h2>
-                    <label for="nome_dashboard">Nome do estabelecimento no dashboard: </label>
+                    <label for="nome_dashboard">Nome do estabelecimento no Painel: </label>
                     <input type="text" name="nome_dashboard" value="" id="nome_dashboard" required maxlength="80"><br>
                 </div>
                 <br><div class="button" id="envia_cadastro_marviin">
