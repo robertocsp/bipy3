@@ -2110,6 +2110,10 @@ input, input:focus{
     outline:none
 }
 
+.btn-filtro{
+    float: right;
+}
+
 @media only screen and (max-width: 1024px){
     .around{
         overflow-y: hidden;

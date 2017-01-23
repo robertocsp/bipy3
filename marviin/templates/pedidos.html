@@ -34,6 +34,8 @@
             </div>
       </div>
     </div>
+      <a href="javascript: void(0)" class="btn btn-default btn-filtro exibir"><i class="fa fa-plus-square"></i> Exibir Filtros</a>
+      <a href="javascript: void(0)" class="btn btn-default btn-filtro esconder" ><i class="fa fa-minus-square"></i> Esconder Filtros</a>
     </form>
     <h4 class="font22"><i class="fa fa-calendar-times-o"></i> Pedidos das últimas 24 horas:</h4><br>
     <div class="around">
@@ -393,6 +395,20 @@
     $('#btn_limpar').click(function(){
         $('#campo-nome, #campo-pedido').val('');
     });
+
+    //btn filtros
+    $('.btn-filtro.exibir').click(function(){
+        $('.btn-filtro.esconder').show();
+        $('.btn-filtro.exibir').hide();
+        $('.filtros-pedidos').show();
+    });
+
+    $('.btn-filtro.esconder').click(function(){
+        $('.btn-filtro.esconder').hide();
+        $('.btn-filtro.exibir').show();
+        $('.filtros-pedidos').hide();
+    });
+
 
     //Expandir area das colunas
     $(".btn-expandir-tela").click(function(){
