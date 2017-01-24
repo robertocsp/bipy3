@@ -12,7 +12,7 @@
   </div>
     <form action="/pedidos/" method="post" id="form-filtros-pedido">
     {% csrf_token %}
-    <div class="filtros-pedidos">
+    <div class="filtros-pedidos" style="display: none;">
       <div class="col-md-6">
             <h4><i class="fa fa-filter"></i> Filtrar pedidos</h4><br>
             <div class="form-group">
@@ -35,7 +35,7 @@
       </div>
     </div>
       <a href="javascript: void(0)" class="btn btn-default btn-filtro exibir"><i class="fa fa-plus-square"></i> Exibir Filtros</a>
-      <a href="javascript: void(0)" class="btn btn-default btn-filtro esconder" ><i class="fa fa-minus-square"></i> Esconder Filtros</a>
+      <a href="javascript: void(0)" class="btn btn-default btn-filtro esconder" style="display: none;"><i class="fa fa-minus-square"></i> Esconder Filtros</a>
     </form>
     <h4 class="font22"><i class="fa fa-calendar-times-o"></i> Pedidos das últimas 24 horas:</h4><br>
     <div class="around">
