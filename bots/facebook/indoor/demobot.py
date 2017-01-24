@@ -793,10 +793,10 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
         elif payload == 'cardapio_digital':
             passo_cardapio_digital(message, sender_id, loja_id, conversa)
         elif payload == 'resposta_pesquisa_s':
-            responder_pesquisa.delay(INDOOR, sender_id, loja_id, conversa, 'sim')
+            responder_pesquisa.delay(INDOOR, sender_id, loja_id, u'sim', conversa)
             passo_resposta_pesquisa(conversa, loja_id, sender_id)
         elif payload == 'resposta_pesquisa_n':
-            responder_pesquisa.delay(INDOOR, sender_id, loja_id, conversa, u'não')
+            responder_pesquisa.delay(INDOOR, sender_id, loja_id, u'não', conversa)
             passo_resposta_pesquisa(conversa, loja_id, sender_id)
 
 
@@ -870,7 +870,7 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
     elif passo == 22:
         passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'garcom', 23)
     elif passo == 24:
-        responder_pesquisa.delay(INDOOR, sender_id, loja_id, conversa, message)
+        responder_pesquisa.delay(INDOOR, sender_id, loja_id, message, conversa)
         passo_resposta_pesquisa(conversa, loja_id, sender_id)
     elif passo == 25:
         passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'conta', 24)
