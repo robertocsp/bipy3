@@ -253,7 +253,7 @@ def salva_se_nao_existir(self, sender_id, loja_id, user):
 
 
 @celery_app.task(bind=True, soft_time_limit=10)
-def responder_pesquisa(self, app_id, sender_id, loja_id, resposta, conversa):
+def responder_pesquisa(self, app_id, sender_id, loja_id, resposta):
     data = {}
     pass
     data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
