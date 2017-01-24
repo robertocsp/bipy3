@@ -92,7 +92,8 @@ MENSAGENS = {
     'suspensao': Template(u'Sua resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
     'conta': Template(u'Legal, já avisei para trazerem sua conta.\nAgora, se não for incomodar, gostaria de lhe fazer '
                       u'uma única pergunta.\nVocê recomendaria o Marviin para os locais que você frequenta?'),
-    'conta2': Template(u'Desculpe, mas não tenho anotado sua mesa. Você poderia me informar, por favor.'),
+    'conta2': Template(u'Desculpe, mas não tenho anotado sua mesa. Você poderia me informar digitando-a abaixo, '
+                       u'por favor.'),
     'loja': Template(u'Por favor, clique abaixo e me informe onde você está.'),
     'agradecimento': Template(u'Muito obrigado(a), espero que sua experiência tenha sido a melhor possível.\n'
                               u'Caso queira conhecer mais sobre mim, acesse http://www.marviin.com.br.\n'
@@ -792,7 +793,7 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
         elif payload == 'cardapio_digital':
             passo_cardapio_digital(message, sender_id, loja_id, conversa)
         elif payload == 'resposta_pesquisa_s':
-            responder_pesquisa.delay(INDOOR, sender_id, loja_id, conversa, u'sim')
+            responder_pesquisa.delay(INDOOR, sender_id, loja_id, conversa, 'sim')
             passo_resposta_pesquisa(conversa, loja_id, sender_id)
         elif payload == 'resposta_pesquisa_n':
             responder_pesquisa.delay(INDOOR, sender_id, loja_id, conversa, u'não')
