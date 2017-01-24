@@ -89,4 +89,6 @@ urlpatterns = [
     url(r'^fb_cad_endereco/$', fb_cad_endereco, name='fb_cad_endereco'),
     url(r'^fb_cad_endereco/(?P<psid>[a-zA-Z0-9_-]+)[/]$', fb_cad_endereco, name='fb_cad_endereco'),
     url(r'^fb_lojas/(?P<psidappid>[a-zA-Z0-9_-]+)[/]$', fb_lojas, name='fb_lojas'),
+    url(r'^marviin/api/rest/pesquisa/recomendar[/]?$', views.PesquisaRecomendarView.as_view(),
+        name='pesquisa_recomendar_view'),
 ]

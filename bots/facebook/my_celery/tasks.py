@@ -253,6 +253,23 @@ def salva_se_nao_existir(self, sender_id, loja_id, user):
 
 
 @celery_app.task(bind=True, soft_time_limit=10)
+def responder_pesquisa(self, app_id, sender_id, loja_id, resposta):
+    data = {}
+    pass
+    data['chave_bot_api_interna'] = my_keys.CHAVE_BOT_API_INTERNA
+    data['id_cliente'] = sender_id
+    data['id_loja'] = loja_id
+    data['app'] = app_id
+    data['resposta'] = resposta
+    url = 'http://localhost:8888/marviin/api/rest/pesquisa/recomendar'
+    headers = {'content-type': 'application/json',
+               'Authorization': 'Basic ' + base64.b64encode(
+                   my_keys.SUPER_USER_USER + ':' + my_keys.SUPER_USER_PASSWORD)}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    logger.info(repr(response))
+
+
+@celery_app.task(bind=True, soft_time_limit=10)
 def enviar_pedido(self, app_id, sender_id, loja_id, conversa):
     if conversa['mesa'] is None:
         return

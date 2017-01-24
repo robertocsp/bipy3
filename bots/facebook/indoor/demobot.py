@@ -22,7 +22,7 @@ except ImportError:
     from urllib import urlencode
 from my_celery.tasks import get_object, send_quickreply_message, enviar_pedido, envia_resposta, send_generic_message, \
     touch_cliente, send_text_message, salva_se_nao_existir, notificacao_dashboard, get_cardapio, send_button_message, \
-    send_image_url_message, troca_mesa_dashboard, teste_tarefa, error_handler
+    send_image_url_message, troca_mesa_dashboard, responder_pesquisa, teste_tarefa, error_handler
 from demobotlog import app_log
 
 my_cache.cache_entry_prefix = INDOOR = 'indoor'
@@ -90,10 +90,14 @@ MENSAGENS = {
                           u'impresso para você. Em que posso ajudá-lo(a) agora?'),
     'garcom': Template(u'Perfeito, logo logo ele(a) estará aí. Como posso ajudá-lo(a) agora?'),
     'suspensao': Template(u'Sua resposta foi enviada.\nPara finaizar o contato clique abaixo.'),
-    'conta': Template(u'Ok, já avisei para trazerem sua conta.\nMuito obrigado(a), espero que sua experiência '
-                      u'tenha sido a melhor possível.\nVolte sempre!'),
-    'conta2': Template(u'Desculpe, mas não tenho anotado sua mesa. Você poderia me informar, por favor.'),
+    'conta': Template(u'Legal, já avisei para trazerem sua conta.\nAgora, se não for incomodar, gostaria de lhe fazer '
+                      u'uma única pergunta.\nVocê recomendaria o Marviin para os locais que você frequenta?'),
+    'conta2': Template(u'Desculpe, mas não tenho anotado sua mesa. Você poderia me informar digitando-a abaixo, '
+                       u'por favor.'),
     'loja': Template(u'Por favor, clique abaixo e me informe onde você está.'),
+    'agradecimento': Template(u'Muito obrigado(a), espero que sua experiência tenha sido a melhor possível.\n'
+                              u'Caso queira conhecer mais sobre mim, acesse http://www.marviin.com.br.\n'
+                              u'Volte sempre!'),
 }
 # ULTIMO PASSO = 31
 
@@ -359,6 +363,21 @@ def get_quickreply_voltar_menu():
     ]
 
 
+def get_quickreply_estabelecimento():
+    return [
+        {
+            'content_type': 'text',
+            'title': u'Voltar ao menu',
+            'payload': 'voltar_menu'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Estabelecimento',
+            'payload': 'trocar_local'
+        }
+    ]
+
+
 def get_quickreply_conversa_suspensa():
     return [
         {
@@ -385,6 +404,21 @@ def get_quickreply_sim_nao():
             'content_type': 'text',
             'title': u'Voltar ao menu',
             'payload': 'voltar_menu'
+        }
+    ]
+
+
+def get_quickreply_sim_nao_2():
+    return [
+        {
+            'content_type': 'text',
+            'title': u'Sim',
+            'payload': 'sim'
+        },
+        {
+            'content_type': 'text',
+            'title': u'Não',
+            'payload': 'nao'
         }
     ]
 
@@ -758,6 +792,18 @@ def define_payload(message, sender_id, loja_id, conversa, payload):
             passo_cardapio_impresso(message, sender_id, loja_id, conversa)
         elif payload == 'cardapio_digital':
             passo_cardapio_digital(message, sender_id, loja_id, conversa)
+        elif payload == 'resposta_pesquisa_s':
+            responder_pesquisa.delay(INDOOR, sender_id, loja_id, u'sim')
+            passo_resposta_pesquisa(conversa, loja_id, sender_id)
+        elif payload == 'resposta_pesquisa_n':
+            responder_pesquisa.delay(INDOOR, sender_id, loja_id, u'não')
+            passo_resposta_pesquisa(conversa, loja_id, sender_id)
+
+
+def passo_resposta_pesquisa(conversa, loja_id, sender_id):
+    conversa['passo'] = 0
+    bot = get_mensagem('agradecimento')
+    send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_estabelecimento())
 
 
 def define_loja(sender_id, loja_id):
@@ -823,6 +869,9 @@ def define_passo(message, sender_id, loja_id, conversa, passo):
         passo_cardapio_impresso(message, sender_id, loja_id, conversa)
     elif passo == 22:
         passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'garcom', 23)
+    elif passo == 24:
+        responder_pesquisa.delay(INDOOR, sender_id, loja_id, message)
+        passo_resposta_pesquisa(conversa, loja_id, sender_id)
     elif passo == 25:
         passo_mesa_dependencia(message, sender_id, loja_id, conversa, 'conta', 24)
     elif passo == 26 or passo == 29:
@@ -874,7 +923,7 @@ def pega_usuario(sender_id, loja_id):
 
 def passo_finalizar_contato(sender_id, loja_id, conversa):
     if conversa['passo'] == 0 or conversa['passo'] == 1 or conversa['passo'] == 2 or conversa['passo'] == 5 \
-            or conversa['passo'] == 20 or conversa['passo'] == 21 or conversa['passo'] == 23 or conversa['passo'] == 24:
+            or conversa['passo'] == 20 or conversa['passo'] == 21 or conversa['passo'] == 23:
         passo_menu(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 3:
         mensagem_mesa(conversa, loja_id, sender_id)
@@ -895,7 +944,7 @@ def passo_finalizar_contato(sender_id, loja_id, conversa):
         passo_finalizar_pedido(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 19:
         passo_pedir_cardapio(None, sender_id, loja_id, conversa)
-    elif conversa['passo'] == 25:
+    elif conversa['passo'] == 24 or conversa['passo'] == 25:
         passo_pedir_conta(None, sender_id, loja_id, conversa)
     elif conversa['passo'] == 27:
         passo_cardapio(None, sender_id, loja_id, conversa)
@@ -1002,8 +1051,9 @@ def passo_pedir_conta(message, sender_id, loja_id, conversa):
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None))
     if conversa['mesa'] is not None:
-        conversa['passo'] = 24
-        mensagem_sucesso(sender_id, loja_id, conversa, 'conta')
+        define_sim_nao(conversa, 24, define_payload, 'resposta_pesquisa_s', define_payload, 'resposta_pesquisa_n')
+        bot = get_mensagem('conta')
+        send_quickreply_message.delay(INDOOR, sender_id, loja_id, bot, get_quickreply_sim_nao_2())
     else:
         define_sim_nao(conversa, 3, define_passo, 25, define_payload, 'pedir_conta')
         bot = get_mensagem('conta2')
@@ -1043,7 +1093,10 @@ def passo_mesa_dependencia(message, sender_id, loja_id, conversa, mensagem, pass
     set_variaveis(conversa,
                   itens_pedido=(False, None),
                   datetime_pedido=(False, None))
-    mensagem_sucesso(sender_id, loja_id, conversa, mensagem)
+    if passo == 24:
+        define_payload(message, sender_id, loja_id, conversa, 'pedir_conta')
+    else:
+        mensagem_sucesso(sender_id, loja_id, conversa, mensagem)
 
 
 def passo_finalizar_enviar(message, sender_id, loja_id, conversa):

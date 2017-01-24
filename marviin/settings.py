@@ -73,6 +73,7 @@ INSTALLED_APPS = (
     'marviin.user_profile',
     'marviin.cliente_marviin',
     'bots.facebook.my_cache',
+    'pesquisa',
 )
 
 MIDDLEWARE_CLASSES = (

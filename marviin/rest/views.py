@@ -21,6 +21,7 @@ from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
 from utils.auth import check_valid_login
 from utils.aescipher import AESCipher
+from pesquisa.models import Recomendar
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
@@ -119,6 +120,26 @@ def valida_chamada_interna(request):
         return Response({"success": False, "type": 400, "message": u'Chamada inválida.'},
                         status=status.HTTP_400_BAD_REQUEST)
     return None
+
+
+class PesquisaRecomendarView(views.APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAdminUser,)
+
+    def post(self, request):
+        nao_valido = valida_chamada_interna(request)
+        if nao_valido:
+            return nao_valido
+        pesquisa_recomendar = Recomendar()
+        pesquisa_recomendar.app = request.data.get('app', None)
+        pesquisa_recomendar.loja_id = request.data.get('id_loja', None)
+        pesquisa_recomendar.cliente = request.data.get('id_cliente', None)
+        pesquisa_recomendar.resposta = request.data.get('resposta', None)
+        try:
+            pesquisa_recomendar.save()
+        except:
+            logger.error('Nao foi possivel salvar a pesquisa:', exc_info=True)
+        return Response({"success": True})
 
 
 class ClienteView(views.APIView):
