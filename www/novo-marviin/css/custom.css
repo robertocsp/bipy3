@@ -1031,7 +1031,6 @@ textarea.form-control {
   }
   .main-nav .navbar-brand {
     display: inline-block;
-    float: none;
   }
 
   .features-blocks .feature-block {
@@ -1095,6 +1094,35 @@ textarea.form-control {
     text-align: center;
   }
 
+  #intro a.btn{
+	  margin-bottom: 20px;
+  }
+
+  .col-left, .col-right {
+    width: 100%;
+  }
+
+  .como-comecar {
+    margin: 30px 0 50px 0px;
+    padding: 0;
+  }
+
+  .como-comecar li {
+    padding: 0px 9px;
+  }
+
+  .como-comecar li span {
+		margin-top: 15px;
+   }
+
+   #beneficios img{
+	   display: none;
+   }
+
+   .plansWrapper .plan {
+		width: 90%;
+   }
+
   .the-authors .section-padding:after {
     height: 0% !important;
   }
@@ -1131,10 +1159,14 @@ textarea.form-control {
   }
   footer .address {
     border-top: 1px solid #ccc;
-    margin: 50px auto;
-    padding: 50px 50px 0;
-  }
+    margin: 30px auto;
+    padding: 10px;
+}
   footer .copyright {
     margin: 10px auto;
+  }
+
+  .video{
+	  margin-top: 40px;
   }
 }
