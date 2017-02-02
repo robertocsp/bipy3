@@ -1728,6 +1728,21 @@ class FormularioInteresseView(views.APIView):
         return Response({'success': True})
 
 
+class FaleConoscoView(views.APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        dados = json.loads(request.data.get('formulario_dados'))
+        body = u'<h2>Dados</h2><br>' \
+               u'<strong>Nome:</strong> ' + dados['name'] + u'<br><br>' \
+               u'<strong>Email:</strong> ' + dados['email'] + u'<br><br>' \
+               u'<strong>Mensagem:</strong><br> ' + dados['message']
+
+        enviar_email(u'[Site] Fale Conosco', body, ['contato@marviin.com.br'])
+
+        return Response({'success': True})
+
+
 class FormularioIndicacaoView(views.APIView):
     permission_classes = (AllowAny,)
 

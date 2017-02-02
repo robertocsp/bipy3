@@ -452,7 +452,7 @@ def get_loja_webview(psid):
             'type': 'web_url',
             'url': 'https://sistema.marviin.com.br/fb_lojas/' + cipher.encrypt(psid + '#' + INDOOR),
             'title': 'Escolher estabelecimento',
-            'webview_height_ratio': 'tall',
+            'webview_height_ratio': 'full',
             'messenger_extensions': True,
             'fallback_url': 'https://sistema.marviin.com.br/fb_lojas/' + cipher.encrypt(psid + '#' + INDOOR),
         }

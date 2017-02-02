@@ -81,7 +81,7 @@
        <div class="row">
         <div class="col-md-12">
 			<div class="col-md-12 col-sm-12">
-				<form class="contact-form form-site form-estabelecimentos" onsubmit="return false;" id="contact-form">
+				<form class="contact-form form-site form-estabelecimentos" onsubmit="return false;" id="register-form">
 				  <div class="col-md-6 col-sm-6">
 					  <input type="text" class="form-control" name="nome" required="required" placeholder="Digite aqui o nome estabelecimento...">
 					  <select class="form-control" name="tipo_estabelecimento">
@@ -93,30 +93,33 @@
 							<option value="padaria">Padaria</option>
 							<option value="outro">Outro</option>
 						</select>
+                      <input type="text" class="form-control" name="contato" required="required" placeholder="Digite aqui o seu nome...">
 					  <input class="form-control" type="email" required="required" name="email" placeholder="Digite aqui o seu email...">	
 					  <input class="form-control telefone-estabelecimento" type="text" name="telefone" placeholder="Digite aqui o seu telefone de contato...">
-					  <input class="form-control cep-estabelecimento" type="text" name="cep" placeholder="Digite aqui o CEP do estabelecimento...">
-					  <textarea class="form-control" placeholder="Digite aqui quais os principais problemas de atendimento do seu estabelecimento..."></textarea>
+					  <input class="form-control cep-etabelecimento" type="text" name="cep" placeholder="Digite aqui o CEP do estabelecimento...">
+					  <textarea class="form-control" name="descricao_problemas" placeholder="Digite aqui quais os principais problemas de atendimento do seu estabelecimento..."></textarea>
 					  <label><input type="checkbox" name="termos" id="termos" required /> Aceito os <a href="">termos e condições de uso</a></label><br><br><br>
 				  </div>
 				  <div class="col-md-6">
 						<p><strong>Caso tenha dúvida ou queira acrescentar algo, marque abaixo os principais problemas no atendimento do seu estabelecimento.</strong></p>
 						<br><br>
 						<label><input type="checkbox" name="campo1" id="campo1" /> Percebo que os garçons não conseguem ser atenciosos aos clientes e pedidos</label><br>
-						<label><input type="checkbox" name="campo2" id="campo2" /> Perco pedidos por falta de disponibilidade de garçons</a></label><br>
-						<label><input type="checkbox" name="campo3" id="campo3" /> Não consigo oferecer promoções e ofertas aos meus clientes</a></label><br>
-						<label><input type="checkbox" name="campo4" id="campo4" /> Tenho problema em organizar a fila de pedidos a serem atendidos</a></label><br>
-						<label><input type="checkbox" name="campo5" id="campo5" /> Gostaria de conhecer o nível de satisfação do meu cliente</a></label><br>
-						<label><input type="checkbox" name="campo6" id="campo6" /> Gostaria de oferecer comanda individual para meus clientes</a></label><br>
-						<label><input type="checkbox" name="campo7" id="campo7" /> Gostaria de oferecer pagamento via celular para meus clientes</a></label><br>
-						<label><input type="checkbox" name="campo8" id="campo8" /> Gostaria de mapear meus clientes mais fiéis</a></label><br>
+						<label><input type="checkbox" name="campo2" id="campo2" /> Perco pedidos por falta de disponibilidade de garçons</label><br>
+						<label><input type="checkbox" name="campo3" id="campo3" /> Não consigo oferecer promoções e ofertas aos meus clientes</label><br>
+						<label><input type="checkbox" name="campo4" id="campo4" /> Tenho problema em organizar a fila de pedidos a serem atendidos</label><br>
+						<label><input type="checkbox" name="campo5" id="campo5" /> Gostaria de conhecer o nível de satisfação do meu cliente</label><br>
+						<label><input type="checkbox" name="campo6" id="campo6" /> Gostaria de oferecer comanda individual para meus clientes</label><br>
+						<label><input type="checkbox" name="campo7" id="campo7" /> Gostaria de oferecer pagamento via celular para meus clientes</label><br>
+						<label><input type="checkbox" name="campo8" id="campo8" /> Gostaria de mapear meus clientes mais fiéis</label><br>
 				  </div><br><br><br>
 				  <div class="col-md-12">
-					<input class="btn btn-primary" type="submit" id="submit" name="submit" data-style="expand-left"><br><br><br><br>
+					<input class="btn btn-primary" type="submit" id="submit-register" name="submit" data-style="expand-left"><br><br><br><br>
 				  </div>
 				</form>
 			</div>
 		</div>
+       </div>
+    </div>
   </section>
   <footer id="contact" class="section-padding bg-cinza">
     <div class="container">
@@ -142,13 +145,13 @@
 			<div class="container">
 				<div class="row">
         <div class="col-md-6 col-sm-6">
-            <form class="contact-form" id="contact-form" action="">
-              <input class="form-control" id="name" type="text" name="name" placeholder="Seu nome...">
-              <input class="form-control" id="email" type="email" name="email" placeholder="Seu Email...">
+            <form class="contact-form form-faleconosco" id="talktous-form" onsubmit="return false;">
+              <input class="form-control" required="required" id="name" type="text" name="name" placeholder="Seu nome...">
+              <input class="form-control" required="required" id="email" type="email" name="email" placeholder="Seu Email...">
 
-              <textarea class="form-control" id="message" rows="8" placeholder="Mensagem..."></textarea>
+              <textarea class="form-control" required="required" id="message" name="message" rows="8" placeholder="Mensagem..."></textarea>
                 
-              <input class="btn btn-primary" type="submit" id="submit" name="submit" data-style="expand-left">
+              <input class="btn btn-primary" type="submit" id="submit-contact" name="submit" data-style="expand-left">
             </form>
         </div>
 
@@ -202,8 +205,8 @@
   <script src="js/jquery.stellar.min.js"></script>
   <script src="js/waypoints.min.js"></script>
   <script src="js/animo.js"></script>
-  <script src="js/custom.js"></script>
   <script src="js/animations.js"></script>
-
+  <script src="js/jquery.mask.min.js"></script>
+  <script src="js/custom.js"></script>
 </body>
 </html>

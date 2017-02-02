@@ -64,6 +64,7 @@ urlpatterns = [
         name='pesquisa_estabelecimento_view'),
     url(r'^marviin/api/rest/indicacao_usuario[/]?$', views.FormularioIndicacaoView.as_view(),
         name='indicacao_usuario_view'),
+    url(r'^marviin/api/rest/fale_conosco[/]?$', views.FaleConoscoView.as_view(), name='fale_conosco_view'),
     url(r'^marviin/api/rest/loja/(?P<psidappid>[a-zA-Z0-9_-]+)[/]?$', views.LojaView.as_view(), name='loja_view'),
     url(r'^pedidos/$', pedidos, name='pedidos'),
     url(r'^pedidos-delivery/$', pedidos_delivery, name='pedidos_delivery'),

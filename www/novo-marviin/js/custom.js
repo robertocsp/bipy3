@@ -1,3 +1,6 @@
+var base_url = 'https://sistema.marviin.com.br';
+//var base_url = 'http://localhost:8888';
+
 $(document).ready(function() {
 
   var win = $(window);
@@ -24,6 +27,7 @@ $(document).ready(function() {
   // hide menu on load
   nav.css('top', navHeight * -1);
 */
+
   // get new height value when resizing for smaller screens
   win.resize(function(){
     if (matchMedia('(max-width: 992px)').matches) {
@@ -175,7 +179,7 @@ jQuery(function( $ ){
             {
                 if(json_envio['ordem_campos']===undefined)
                     json_envio['ordem_campos'] = [];
-                json_envio['ordem_campos'].push($('#'+jsonArray[i].name+' span').html());
+                json_envio['ordem_campos'].push($('#'+jsonArray[i].name).parent().text());
             }
             else
             {
@@ -193,7 +197,7 @@ jQuery(function( $ ){
 
             var dados_envio = montaDados($form_this.serializeArray());
 
-            $.post('https://sistema.marviin.com.br/marviin/api/rest/' + service,
+            $.post(base_url + '/marviin/api/rest/' + service,
                      {formulario_dados: JSON.stringify(dados_envio)},
                      function(data) {
                        console.log(data);
@@ -224,4 +228,9 @@ jQuery(function( $ ){
         envia_form('form-indicacao-usuario', 'indicacao_usuario', form_indicacao_usuario_function);
     };
     $('.form-indicacao-usuario').bind('submit', form_indicacao_usuario_function);
+
+    var form_fale_conosco_function = function(){
+        envia_form('form-faleconosco', 'fale_conosco', form_fale_conosco_function);
+    };
+    $('.form-faleconosco').bind('submit', form_fale_conosco_function);
 });
