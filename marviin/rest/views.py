@@ -1009,7 +1009,7 @@ class AcessoBotV3View(views.APIView):
                     u'<strong>Nome:</strong> ' + user.first_name + ' ' + user.last_name + u'<br><br>' \
                     u'<strong>Email:</strong> ' + user.email + u'<br><br>' \
                     u'<strong>Telefone:</strong> ' + user.profile.telefone + u'<br><br>'
-            if loja.group is not None:
+            if loja.group is None:
                 grupo = Group(name=loja.nome)
                 grupo.save()
                 grupo.user_set.add(user)
