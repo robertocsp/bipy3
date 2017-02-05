@@ -235,7 +235,7 @@ def monta_pedido_sms(request_data):
     for item in itens_pedido:
         if descricao_pedido is None:
             descricao_pedido = u'Mesa ' + mesa
-        descricao_pedido += u'\n' + str(item['quantidade']) + u': ' + item['descricao']
+        descricao_pedido += u'\n' + str(item['quantidade']) + u' ' + item['descricao']
     return '' if descricao_pedido is None else descricao_pedido
 
 
