@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from marviin.websocket import ws
 from pedido.models import Pedido, ItemPedido
 from cliente.models import Cliente
-from loja.models import Loja, Questionario, Apps
+from loja.models import Loja, Questionario, Apps, DemoSms, DemoEmail
 from notificacao.models import Notificacao
 from fb_acesso.models import Fb_acesso
 from pedido.templatetags.pedido_tags import minutos_passados
@@ -19,6 +19,7 @@ from cidades.models import Cidade
 from marviin.cliente_marviin.models import Endereco, Facebook
 from marviin.user_profile.models import Profile
 from marviin.forms import LoginForm
+from utils.helper import *
 from utils.auth import check_valid_login
 from utils.aescipher import AESCipher
 from pesquisa.models import Recomendar
@@ -37,12 +38,12 @@ from datetime import datetime, timedelta, date
 import json
 import logging
 import requests
-import re
 import os
 import codecs
 import string
 import random
 import unicodedata
+import base64
 
 logger = logging.getLogger('django')
 
@@ -205,6 +206,39 @@ class PedidoChatView(views.APIView):
             return Response({'success': False})
 
 
+def envia_sms_pedido(sms_id, loja_id, telefone, pedido, data_hora_pedido):
+    data = {'sendSmsRequest': {}}
+    data['sendSmsRequest']['from'] = 'Pedido Marviin'
+    data['sendSmsRequest']['to'] = '55' + telefone
+    data['sendSmsRequest']['schedule'] = data_hora_pedido.replace(microsecond=0).isoformat()
+    data['sendSmsRequest']['msg'] = pedido
+    data['sendSmsRequest']['callbackOption'] = 'FINAL'
+    data['sendSmsRequest']['id'] = sms_id
+    data['sendSmsRequest']['aggregateId'] = loja_id
+    url = 'https://api-rest.zenvia360.com.br/services/send-sms'
+    headers = {'content-type': 'application/json',
+               'Authorization': 'Basic ' + base64.b64encode(
+                   settings.SMS_USER + ':' + settings.SMS_PASSWORD)}
+    logger.info('sms:: ' + repr(data))
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    logger.info(repr(response))
+
+
+def envia_email_pedido(sms_id, loja_id, telefone, pedido, data_hora_pedido):
+    pass
+
+
+def monta_pedido_sms(request_data):
+    descricao_pedido = None
+    mesa = request_data.get('mesa', None)
+    itens_pedido = request_data.get('itens_pedido', None)
+    for item in itens_pedido:
+        if descricao_pedido is None:
+            descricao_pedido = u'Mesa ' + mesa
+        descricao_pedido += u'\n' + item['quantidade'] + u': ' + item['descricao']
+    return '' if descricao_pedido is None else descricao_pedido
+
+
 class EnviarPedidoView(views.APIView):
     authentication_classes = (BasicAuthentication,)
     permission_classes = (IsAdminUser,)
@@ -242,6 +276,24 @@ class EnviarPedidoView(views.APIView):
             del request.data['id_cliente']
             del request.data['chave_bot_api_interna']
             del request.data['app']
+            try:
+                demosms = DemoSms.objects.get(loja=loja)
+                if demosms.quantidade < 30:
+                    envia_sms_pedido(str(loja.id) + '_' + request.data['card_uid'], str(loja.id),
+                                     digitos(loja.telefone1), monta_pedido_sms(request.data), data_hora_pedido)
+                    demosms.quantidade += 1
+                    demosms.save()
+            except DemoSms.DoesNotExist:
+                pass
+            try:
+                demoemail = DemoEmail.objects.get(loja=loja)
+                if demoemail.quantidade < 30:
+                    envia_email_pedido(str(loja.id) + '_' + request.data['card_uid'], str(loja.id),
+                                       digitos(loja.telefone1), monta_pedido_sms(request.data), data_hora_pedido)
+                    demoemail.quantidade += 1
+                    demoemail.save()
+            except DemoEmail.DoesNotExist:
+                pass
             notificacao_uuid = salva_notificacao(request.data, loja.id, cliente_id)
             request.data['notificacao_uuid'] = str(cliente_id) + '_' + str(loja.id) + '_' + str(notificacao_uuid)
             websocket = ws.Websocket()
@@ -862,32 +914,75 @@ class AcessoBotV3View(views.APIView):
                 if modulos_contratados is None:
                     modulos_contratados = u''
                 else:
-                    modulos_contratados += u' e '
+                    modulos_contratados += u', '
                 modulos_contratados += u'Atendimento'
             elif modulo == 'delivery':
                 if modulos_contratados is None:
                     modulos_contratados = u''
                 else:
-                    modulos_contratados += u' e '
+                    modulos_contratados += u', '
                 modulos_contratados += u'Delivery'
+            elif modulo == 'demoEmail':
+                if modulos_contratados is None:
+                    modulos_contratados = u''
+                else:
+                    modulos_contratados += u', '
+                modulos_contratados += u'Demo E-mail'
+            elif modulo == 'demoSMS':
+                if modulos_contratados is None:
+                    modulos_contratados = u''
+                else:
+                    modulos_contratados += u', '
+                modulos_contratados += u'Demo SMS'
         if modulos_contratados is None:
             return fail_response(400, u'{"type": "mod", "object": "Não foi possível definir o produto contratado."}')
-        cnpj = re.sub(r'\D', '', request.data.get('cnpj_estabelecimento'))
+        modulos_contratados = rreplace(modulos_contratados, ',', ' e', 1)
+        loja_existente = False
+        possui_login = request.data.get('tipo_cadastro_usuario') == '1'
+        cnpj = digitos(request.data.get('cnpj_estabelecimento'))
         try:
             loja = Loja.objects.get(cnpj=cnpj)
+            loja_existente = True
         except Loja.DoesNotExist:
             loja = Loja()
-        loja.nome = request.data.get('nome_dashboard')
-        loja.nome_estabelecimento = request.data.get('nome_estabelecimento')
-        loja.telefone1 = request.data.get('tel_estabelecimento')
-        loja.cnpj = cnpj
-        loja.cep = request.data.get('cep_estabelecimento')
-        loja.endereco = request.data.get('endereco_estabelecimento')
-        loja.complemento = request.data.get('complemento_estabelecimento')
-        loja.bairro = request.data.get('bairro_estabelecimento')
-        loja.estado = request.data.get('estado_estabelecimento')
-        loja.cidade = request.data.get('cidade_estabelecimento')
+        if not loja_existente and 'indoor' not in modulos:
+            return fail_response(400, u'{"type": "mod", "object": "Para novos estabelecimentos é necessário a '
+                                      u'contratação do módulo principal, o de Atendimento."}')
+        if not possui_login and loja_existente:
+            return fail_response(400, u'{"type": "loja", "object": "CNPJ já existe cadastrado em nosso sistema, por '
+                                      u'favor utilize seu usuário e senha."}')
+        nome = request.data.get('nome_dashboard')
+        nome_estabelecimento = request.data.get('nome_estabelecimento')
+        telefone1 = request.data.get('tel_estabelecimento')
+        cnpj = cnpj
+        cep = request.data.get('cep_estabelecimento')
+        endereco = request.data.get('endereco_estabelecimento')
+        complemento = request.data.get('complemento_estabelecimento')
+        bairro = request.data.get('bairro_estabelecimento')
+        estado = request.data.get('estado_estabelecimento')
+        cidade = request.data.get('cidade_estabelecimento')
+        if possui_login and not loja_existente and (nome_estabelecimento is None or telefone1 is None or
+                                                    cnpj is None or cep is None or endereco is None or
+                                                    bairro is None or estado is None or cidade is None or
+                                                    nome is None):
+            return fail_response(400, u'{"type": "loja", "object": "CNPJ não encontrado, por favor preencha os dados '
+                                      u'do novo estabelecimento."}')
+        if nome_estabelecimento is not None and telefone1 is not None and cnpj is not None and cep is not None and \
+            endereco is not None and bairro is not None and estado is not None and cidade is not None and \
+            nome is not None:
+            loja.nome = nome
+            loja.nome_estabelecimento = nome_estabelecimento
+            loja.telefone1 = telefone1
+            loja.cnpj = cnpj
+            loja.cep = cep
+            loja.endereco = endereco
+            loja.complemento = complemento
+            loja.bairro = bairro
+            loja.estado = estado
+            loja.cidade = cidade
+        tipo = u'Novo estabelecimento' if not loja_existente else u'Estabelecimento existente'
         body = u'<h2>Informações do Estabelecimento</h2><br>' \
+               u'<strong>' + tipo + u'</strong><br><br>' \
                u'<strong>Nome:</strong> ' + loja.nome_estabelecimento + u'<br><br>' \
                u'<strong>Telefone:</strong> ' + loja.telefone1 + u'<br><br>' \
                u'<strong>CNPJ:</strong> ' + loja.cnpj + u'<br><br>' \
@@ -897,9 +992,9 @@ class AcessoBotV3View(views.APIView):
                u'<strong>Bairro:</strong> ' + loja.bairro + u'<br><br>' \
                u'<strong>Estado:</strong> ' + loja.estado + u'<br><br>' \
                u'<strong>Cidade:</strong> ' + loja.cidade + u'<br><br>' \
-               u'<strong>Módulo(s):</strong> ' + ', '.join(modulos) + u'<br><br>' \
+               u'<strong>Módulo(s):</strong> ' + modulos_contratados + u'<br><br>' \
                u'<h2>Informações do Usuário</h2><br>'
-        if request.data.get('tipo_cadastro_usuario') == '1':  # tenho login
+        if possui_login:  # tenho login
             login = request.data.get('login_usuario')
             senha = request.data.get('senha_usuario')
             user = User.objects.filter(email=login).select_related('profile').first()
@@ -914,21 +1009,17 @@ class AcessoBotV3View(views.APIView):
                     u'<strong>Nome:</strong> ' + user.first_name + ' ' + user.last_name + u'<br><br>' \
                     u'<strong>Email:</strong> ' + user.email + u'<br><br>' \
                     u'<strong>Telefone:</strong> ' + user.profile.telefone + u'<br><br>'
-            grupo = Group(name=loja.nome)
-            grupo.save()
-            grupo.user_set.add(user)
-            grupo.save()
-            loja.group = grupo
-            loja.nome_contato = user.first_name + ' ' + user.last_name
-            loja.email = user.email
-            loja.telefone2 = user.profile.telefone
-            loja.save()
-            for modulo in modulos:
-                apps = Apps()
-                apps.loja = loja
-                apps.app = modulo
-                apps.ativa = True
-                apps.save()
+            if loja.group is not None:
+                grupo = Group(name=loja.nome)
+                grupo.save()
+                grupo.user_set.add(user)
+                grupo.save()
+                loja.group = grupo
+            if not loja_existente:
+                loja.nome_contato = user.first_name + ' ' + user.last_name
+                loja.email = user.email
+                loja.telefone2 = user.profile.telefone
+                loja.save()
             # envio de email para o cliente sobre sua nova aquisicao, FALTOU FALAR DA COBRANCA
             with codecs.open(os.path.join(os.path.join(os.path.join(os.path.join(settings.BASE_DIR, 'marviin'),
                                                                     'templates'),
@@ -957,11 +1048,6 @@ class AcessoBotV3View(views.APIView):
             loja.token_login = signing.dumps([request.data.get('nome_usuario'), request.data.get('sobrenome_usuario')],
                                              compress=True)
             loja.save()
-            for modulo in modulos:
-                apps = Apps()
-                apps.loja = loja
-                apps.app = modulo
-                apps.save()
             body += u'<strong>Tipo:</strong> NÃO possui login<br><br>' \
                     u'<strong>Nome:</strong> ' + loja.nome_contato + u'<br><br>' \
                     u'<strong>Email:</strong> ' + loja.email + u'<br><br>' \
@@ -978,6 +1064,29 @@ class AcessoBotV3View(views.APIView):
             enviar_email(u'Cadastre sua senha e já comece a usar o Marviin', body_senha, [loja.email])
             response = Response({"success": True, "message": u'Legal! Para completar seu cadastro, acesse seu e-mail e '
                                                              u'siga as instruções para cadastrar sua senha.'})
+        loja_apps = []
+        if loja_existente:
+            apps = Apps.objects.filter(loja_id=loja.id)
+            for app in apps:
+                loja_apps.append(app.app)
+        for modulo in modulos:
+            if modulo not in loja_apps:
+                apps = Apps()
+                apps.loja = loja
+                apps.app = modulo
+                if possui_login:
+                    apps.ativa = True
+                apps.save()
+                if modulo == 'demoSMS':
+                    demosms = DemoSms()
+                    demosms.loja = loja
+                    demosms.quantidade = 0
+                    demosms.save()
+                elif modulo == 'demoEmail':
+                    demoemail = DemoEmail()
+                    demoemail.loja = loja
+                    demoemail.quantidade = 0
+                    demoemail.save()
         if response.status_code == 200:
             # envio de email para o comercial sobre solicitacao de acesso.
             enviar_email(u'[Solicitação de Acesso] Dados da solicitação', body, ['comercial@marviin.com.br'])
@@ -1250,16 +1359,6 @@ class ValidaTokenView(views.APIView):
         return Response(template_data, template_name='campos-senha.html')
 
 
-def valida_senha(senha):
-    if len(senha) < 6 or \
-                    re.search(r'[a-z]', senha) is None or \
-                    re.search(r'[A-Z]', senha) is None or \
-                    re.search(r'[\d]', senha) is None or \
-                    re.search(r'[^a-zA-Z\d]', senha) is None:
-        return False
-    return True
-
-
 class CriaSenhaView(views.APIView):
     permission_classes = (AllowAny,)
 
@@ -1279,20 +1378,31 @@ class CriaSenhaView(views.APIView):
             return fail_response(400, u'{"type": "token", "object": "Token inválido."}')
         apps = Apps.objects.filter(loja=loja.id)
         modulos_contratados = None
-        if apps:
-            for modulo in apps:
-                if modulo.app == 'indoor':
-                    if modulos_contratados is None:
-                        modulos_contratados = u''
-                    else:
-                        modulos_contratados += u' e '
-                    modulos_contratados += u'Atendimento'
-                elif modulo.app == 'delivery':
-                    if modulos_contratados is None:
-                        modulos_contratados = u''
-                    else:
-                        modulos_contratados += u' e '
-                    modulos_contratados += u'Delivery'
+        for modulo in apps:
+            if modulo.app == 'indoor':
+                if modulos_contratados is None:
+                    modulos_contratados = u''
+                else:
+                    modulos_contratados += u', '
+                modulos_contratados += u'Atendimento'
+            elif modulo.app == 'delivery':
+                if modulos_contratados is None:
+                    modulos_contratados = u''
+                else:
+                    modulos_contratados += u', '
+                modulos_contratados += u'Delivery'
+            elif modulo.app == 'demoEmail':
+                if modulos_contratados is None:
+                    modulos_contratados = u''
+                else:
+                    modulos_contratados += u', '
+                modulos_contratados += u'Demo E-mail'
+            elif modulo.app == 'demoSMS':
+                if modulos_contratados is None:
+                    modulos_contratados = u''
+                else:
+                    modulos_contratados += u', '
+                modulos_contratados += u'Demo SMS'
         if modulos_contratados is None:
             return fail_response(400, u'{"type": "mod", "object": "Não foi possível definir o produto contratado."}')
         senha = request.data.get('senha')

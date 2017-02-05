@@ -52,3 +52,13 @@ class Questionario(models.Model):
     loja = BigForeignKey(Loja, null=False, blank=False)
     descr_problemas = models.TextField('descr_problemas', null=True, blank=True)
     problemas = JSONField('problemas', null=True, blank=True)
+
+
+class DemoSms(models.Model):
+    loja = models.OneToOneField(Loja, on_delete=models.CASCADE)
+    quantidade = models.IntegerField(blank=True, null=True)
+
+
+class DemoEmail(models.Model):
+    loja = models.OneToOneField(Loja, on_delete=models.CASCADE)
+    quantidade = models.IntegerField(blank=True, null=True)

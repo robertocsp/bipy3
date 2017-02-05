@@ -1,5 +1,5 @@
-var base_url = 'https://sistema.marviin.com.br';
-//var base_url = 'http://localhost:8888';
+//var base_url = 'https://sistema.marviin.com.br';
+var base_url = 'http://localhost:8888';
 function generateUUID() {
     var d = new Date().getTime();
     if(window.performance && typeof window.performance.now === "function"){
@@ -221,6 +221,10 @@ $(function() {
 
         function setup_solicitacao_acesso()
         {
+            $('#btn_estabelecimento_existente').hide();
+            $('.novo_estabelecimento, .novo_estabelecimento_campo').hide();
+            $('.novo_estabelecimento_campo').prop('disabled', true);
+
             var SPMaskBehavior = function (val) {
               return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
             },
@@ -296,7 +300,31 @@ $(function() {
                 });
             });
 
+            $('#btn_novo_estabelecimento').on('click', function(){
+                $('#btn_novo_estabelecimento').hide();
+                $('#btn_estabelecimento_existente').show();
+                $('.novo_estabelecimento, .novo_estabelecimento_campo').show();
+                $('.novo_estabelecimento_campo').prop('disabled', false);
+            });
+
+            $('#btn_estabelecimento_existente').on('click', function(){
+                $('#btn_novo_estabelecimento').show();
+                $('#btn_estabelecimento_existente').hide();
+                $('.novo_estabelecimento, .novo_estabelecimento_campo').hide();
+                $('.novo_estabelecimento_campo').prop('disabled', true);
+            });
+
             $('#btn_tenho_login').on('click', function(){
+                if($('.novo_estabelecimento_campo').prop('disabled'))
+                {
+                    $('#btn_novo_estabelecimento').show();
+                    $('#btn_estabelecimento_existente').hide();
+                }
+                else
+                {
+                    $('#btn_novo_estabelecimento').hide();
+                    $('#btn_estabelecimento_existente').show();
+                }
                 $('#tipo_cadastro_usuario').val(1);
                 $('#nao_tenho_login').hide();
                 $('#tenho_login').show();
@@ -316,6 +344,10 @@ $(function() {
             });
 
             $('#btn_nao_tenho_login').on('click', function(){
+                $('#btn_novo_estabelecimento').hide();
+                $('#btn_estabelecimento_existente').hide();
+                $('.novo_estabelecimento, .novo_estabelecimento_campo').show();
+                $('.novo_estabelecimento_campo').prop('disabled', false);
                 $('#tipo_cadastro_usuario').val(2);
                 $('#tenho_login').hide();
                 $('#nao_tenho_login').show();
