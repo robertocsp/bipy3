@@ -1,5 +1,5 @@
-//var base_url = 'https://sistema.marviin.com.br';
-var base_url = 'http://localhost:8888';
+var base_url = 'https://sistema.marviin.com.br';
+//var base_url = 'http://localhost:8888';
 function generateUUID() {
     var d = new Date().getTime();
     if(window.performance && typeof window.performance.now === "function"){
