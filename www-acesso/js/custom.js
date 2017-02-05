@@ -188,9 +188,9 @@ $(function() {
                     $.post(base_url + '/marviin/api/rest/acesso_bot_v3', form.serialize(),
                              function(data) {
                                console.log(data);
-//                               form[0].reset();
+                               form[0].reset();
                                alert(data.message);
-//                               location.reload();
+                               location.reload();
                              },
                              'json'
                     )
