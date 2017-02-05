@@ -48,3 +48,14 @@ class BigForeignKey(models.ForeignKey):
                                                     isinstance(rel_field, (BigIntegerField, )))):
             return BigIntegerField().db_type(connection=connection)
         return super(BigForeignKey, self).db_type(connection)
+
+
+class BigOneToOneField(models.OneToOneField):
+    def db_type(self, connection):
+        """ Adds support for foreign keys to big integers as primary keys.
+        """
+        rel_field = self.rel.get_related_field()
+        if (isinstance(rel_field, BigAutoField) or (not connection.features.related_fields_match_type and
+                                                    isinstance(rel_field, (BigIntegerField, )))):
+            return BigIntegerField().db_type(connection=connection)
+        return super(BigOneToOneField, self).db_type(connection)

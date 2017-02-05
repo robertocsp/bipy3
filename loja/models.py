@@ -2,7 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import Group
 from jsonfield import JSONField
-from utils import BigAutoField, BigForeignKey
+from utils import BigAutoField, BigForeignKey, BigOneToOneField
 
 # Create your models here.
 
@@ -55,10 +55,10 @@ class Questionario(models.Model):
 
 
 class DemoSms(models.Model):
-    loja = models.OneToOneField(Loja, on_delete=models.CASCADE)
+    loja = BigOneToOneField(Loja, primary_key=True, on_delete=models.CASCADE)
     quantidade = models.IntegerField(blank=True, null=True)
 
 
 class DemoEmail(models.Model):
-    loja = models.OneToOneField(Loja, on_delete=models.CASCADE)
+    loja = BigOneToOneField(Loja, primary_key=True, on_delete=models.CASCADE)
     quantidade = models.IntegerField(blank=True, null=True)

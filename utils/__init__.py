@@ -1,1 +1,1 @@
-from .bigint import BigAutoField, BigForeignKey
+from .bigint import BigAutoField, BigForeignKey, BigOneToOneField
