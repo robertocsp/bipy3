@@ -40,7 +40,7 @@
                                     <p class="preco">R$ 14,50</p>
                                     <div class="editar-acompanhamento">
                                         <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#ItemPrincipal"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a>
-                                        <a class="btn btn-default" href="javascript:void(0)" class="abre-acompanhamentos"><i class="fa fa-exchange" aria-hidden="true"></i> Sub Item</a></p>
+                                        <a class="btn btn-default abre-acompanhamentos" href="javascript:void(0)"><i class="fa fa-exchange" aria-hidden="true"></i> Sub Item</a></p>
                                     </div>
                                 </div>
                             </li>
@@ -69,7 +69,7 @@
                                     <p class="preco"><span>A partir de</span> R$ 8,90</p>
                                     <div class="editar-acompanhamento">
                                         <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#ItemPrincipal"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a>
-                                        <a class="btn btn-default" href="javascript:void(0)" class="abre-acompanhamentos"><i class="fa fa-exchange" aria-hidden="true"></i> Sub Item</a></p>
+                                        <a class="btn btn-default abre-acompanhamentos" href="javascript:void(0)"><i class="fa fa-exchange" aria-hidden="true"></i> Sub Item</a></p>
                                     </div>
                                 </div>
                             </li>
@@ -80,7 +80,7 @@
                                     <p class="preco"></p>
                                     <div class="editar-acompanhamento">
                                         <p class="editar-item-princ"><a class="btn btn-primary fancybox" href="#ItemPrincipal"><i class="fa fa-pencil" aria-hidden="true"></i> Editar</a>
-                                        <a class="btn btn-default" href="javascript:void(0)" class="abre-acompanhamentos"><i class="fa fa-exchange" aria-hidden="true"></i> Sub Item</a></p>
+                                        <a class="btn btn-default abre-acompanhamentos" href="javascript:void(0)"><i class="fa fa-exchange" aria-hidden="true"></i> Sub Item</a></p>
                                     </div>
                                 </div>
                             </li>
@@ -143,12 +143,12 @@
 <!--Formularios-->
 <div id="categoria" style="width:600px;display: none;">
    <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Categoria</h2>
-   <form class="form-horizontal col-md-12"><br><br>
+   <form id="form-categoria" class="form-horizontal col-md-12"><br><br>
         <div class="form-group">
             <div class="">
-                <input type="text" class="form-control" id="nomeCategoria" placeholder="Nome Categoria...">
+                <input type="text" class="form-control" id="categoria-nome" placeholder="Nome Categoria...">
             </div><br><br>
-            <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+            <button id="salvar-categoria" type="button" class="btn btn-primary save-card">
                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
             </button>
             <button type="submit" class="btn btn-default">
@@ -159,12 +159,12 @@
 </div>
 <div id="taxaentrega" style="width:600px;display: none;">
    <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Taxa de Entrega</h2>
-   <form class="form-horizontal col-md-12"><br><br>
+   <form id="form-taxa-entrega" class="form-horizontal col-md-12"><br><br>
         <div class="form-group">
             <div class="">
-                <input type="number" class="form-control min-max" id="nomeCategoria" placeholder="Valor taxa de entrega..."><br>
+                <input type="number" class="form-control min-max" id="taxa-entrega-valor" placeholder="Valor taxa de entrega..."><br>
             </div><br><br>
-            <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+            <button id="salvar-taxa-entrega" type="button" class="btn btn-primary save-card">
                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
             </button>
             <button type="submit" class="btn btn-default">
@@ -175,12 +175,12 @@
 </div>
 <div id="itemGratis" style="width:600px;display: none;">
    <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Item gratis</h2>
-   <form class="form-horizontal col-md-12"><br><br>
+   <form id="form-item-gratis" class="form-horizontal col-md-12"><br><br>
         <div class="form-group">
             <div class="">
                 <input type="text" class="form-control" id="nomeCategoria" placeholder="Descricao..."><br>
             </div><br><br>
-            <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+            <button id="salvar-item-gratis" type="button" class="btn btn-primary save-card">
                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
             </button>
             <button type="submit" class="btn btn-default">
@@ -191,26 +191,26 @@
 </div>
 <div id="ItemPrincipal" style="width:600px;display: none;">
    <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i> Item Cardapio</h2>
-   <form class="form-horizontal col-md-12"><br><br>
+   <form id="form-item-cardapio" class="form-horizontal col-md-12"><br><br>
        <div class="form-group">
-        <select class="form-control">
+        <select id="item-cardapio-categoria" class="form-control">
             <option>Selecione Categoria</option>
             <option>Pratos</option>
             <option>Bebidas</option>
         </select><br>
-        <select class="form-control">
+        <select id="item-cardapio-tipo" class="form-control">
             <option>Selecione o tipo de item</option>
             <option>Simples</option>
             <option>Composto</option>
         </select><br>
-        <input type="text" class="form-control" id="nomeCategoria" placeholder="Nome Item..."><br>
-        <textarea type="text" class="form-control" id="nomeCategoria" placeholder="Descrição..."></textarea><br>
-        <input type="file" class="form-control" id="inputEmail" placeholder="Imagem"><br>
-        <input type="number" class="form-control" id="nomeCategoria" placeholder="Preço..."><br>
+        <input type="text" class="form-control" id="item-cardapio-nome" placeholder="Nome Item..."><br>
+        <textarea class="form-control" id="item-cardapio-desc" placeholder="Descrição..."></textarea><br>
+        <input type="file" class="form-control" id="item-cardapio-imagem" placeholder="Imagem"><br>
+        <input type="number" class="form-control" id="item-cardapio-preco" placeholder="Preço..."><br>
         <label class="checkbox-inline">
-            <input type="checkbox" value="a partir de"> Inserir termo "A partir de" no preço
+            <input id="item-cardapio-termo" type="checkbox" value="a partir de"> Inserir termo "A partir de" no preço
         </label><br><br>
-          <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+          <button id="salvar-item-cardapio" type="button" class="btn btn-primary save-card">
             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
           </button>
           <button type="submit" class="btn btn-default">
@@ -221,22 +221,22 @@
 </div>
 <div id="acompanhamento" style="width:600px;display: none;">
    <h2 class="sub-header"><i class="fa fa-tasks" aria-hidden="true"></i>Lista Sub Item</h2>
-   <form class="form-horizontal col-md-12"><br>
+   <form id="form-subitem" class="form-horizontal col-md-12"><br>
        <div class="form-group">
-        <select class="form-control">
+        <select id="subitem-categoria" class="form-control">
             <option>Selecione Categoria</option>
             <option>Pratos</option>
             <option>Bebidas</option>
         </select><br>
-        <select class="form-control">
+        <select id="subitem-item-cardapio" class="form-control">
             <option>Selecione Item Cardapio</option>
             <option>File de frango com fritas e farofa</option>
             <option>Espaguete com queijo resvalado e mollho rose</option>
         </select><br>
-        <input type="text" class="form-control" id="nomeCategoria" placeholder="Titulo..."><br>
-        <textarea class="form-control" id="nomeCategoria" placeholder="Descrição..."></textarea><br>
-        <input type="number" class="form-control min-max" id="nomeCategoria" placeholder="Mínimo de itens...">
-        <input type="number" class="form-control min-max" id="nomeCategoria" placeholder="Máximo de itens..."><br>
+        <input type="text" class="form-control" id="subitem-titulo" placeholder="Titulo..."><br>
+        <textarea class="form-control" id="subitem-desc" placeholder="Descrição..."></textarea><br>
+        <input type="number" class="form-control min-max" id="subitem-min-item" placeholder="Mínimo de itens...">
+        <input type="number" class="form-control min-max" id="subitem-max-item" placeholder="Máximo de itens..."><br>
         <select class="form-control">
             <option>Selecione o tipo da lista de acompanhamentos</option>
             <option>Escolha única</option>
@@ -245,13 +245,13 @@
         <h3>Itens:</h3><br>
         <div class="lista-itens-acomp">
             <div class="item-acomp">
-                <input type='text' class='form-control nome-item' id='nomeCategoria' placeholder='Nome...'>
-                <input type='text' class='form-control preco-item' id='nomeCategoria' placeholder='Preço...'>
+                <input type='text' class='form-control nome-item' id='subitem-nome-item' placeholder='Nome...'>
+                <input type='text' class='form-control preco-item' id='subitem-preco' placeholder='Preço...'>
                 <a class='btn btn-danger' id='remove'><i class='fa fa-times' aria-hidden='true'></i> Excluir</a>
             </div>
         </div>
         <a class='btn btn-success' id='add'><i class='fa fa-plus' aria-hidden='true'></i> Adicionar Item</a><br><br><br>
-        <button id="save-menu-fb" type="button" class="btn btn-primary save-card">
+        <button id="salvar-subitem" type="button" class="btn btn-primary save-card">
             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Salvar
         </button>
         <button type="submit" class="btn btn-default">
@@ -262,7 +262,7 @@
 </div>
 
         <!-- Tela principal pedido-->
-         <div  class="cardapio-full" id="card-princ" width="320" style="display:none;">
+         <div  class="cardapio-full tela-cardapio" id="card-princ" style="display:none;">
             <div class="header-cardapio"><label class="nome-tela">Tela Principal</label></div>
             <ul>
                 <li>
@@ -313,7 +313,7 @@
 
          <!-- Tela escolha item unico-->
 
-        <div class="cardapio-full" id="item-unico"  width="320" style="display:none;">
+        <div class="cardapio-full tela-cardapio" id="item-unico" style="display:none;">
             <div class="header-cardapio"><a href=""><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i></a><label class="nome-tela back">Tela lista escolha única</label></div>
             <ul class="lista-unica">
                 <li>
@@ -359,7 +359,7 @@
 
 
          <!-- Tela incluir itens multiplos-->
-        <div class="cardapio-full" id="multiplos-itens" width="320" style="display:none;">
+        <div class="cardapio-full" id="multiplos-itens" style="display:none;">
             <div class="header-cardapio"><a href=""><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i></a><label class="nome-tela back">Tela lista escolhas multiplas</label></div>
             <ul class="lista-unica lista-add">
                 <li>
@@ -418,7 +418,7 @@
 
         <!--Tela resumo do pedido-->
 
-        <div class="cardapio-full" id="resumo" width="320" height="450" style="display:none;">
+        <div class="cardapio-full" id="resumo" style="display:none;">
             <div class="resumo-pedido" id="resumo-pedido">
                 <div class="header-cardapio"><a href=""><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i></a><label class="nome-tela back">Tela de resumo do pedido</label></div>
                 <p class="titulo-resumo"><strong>Pizza de quatro queijos</strong></p>

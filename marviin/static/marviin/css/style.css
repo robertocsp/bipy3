@@ -1616,17 +1616,20 @@ textarea.form-control.msg-users{
 
 .cardapio-full .preco{
     width: 21%;
+    height: 51px;
 }
 
 .cardapio-full .preco span{
     width: 100%;
     text-align: center;
-    margin: 5px 0 6px 0;
+    margin: 0 0 6px 0;
     display: block;
-    color: #c1161c;
+    color: #365899;
     font-weight: bold;
     font-size: 11px;
 }
+
+.cardapio-full
 
 .cardapio-full  ul li{
     float: left;
@@ -1645,19 +1648,24 @@ textarea.form-control.msg-users{
     padding-top: 6px;
 }
 
+.content-meio p:first-child{
+    margin-bottom: 4px;
+}
+
 .cardapio-full .btn-verde{
     width: 100%;
     border-radius: 0;
     padding: 10px 0;
     font-weight: bold;
     font-size: 16px;
+    background: #365899;
 }
 
 .header-cardapio{
     float: left;
     width: 100%;
     color: #fff;
-    background: #c1161c;
+    background: #365899;
 }
 
 .header-cardapio label, .header-cardapio p, .header-cardapio a{
@@ -1709,8 +1717,9 @@ p.descri{
 }
 
 .cardapio-full ul.lista-unica  li{
-    min-height: auto;
+    height: 70px;
     width: 100%;
+    float: left;
 }
 
 .check{
