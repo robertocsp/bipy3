@@ -30,6 +30,10 @@ with open(os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'marviin_conf'), 
             EMAIL_USER = key_value_pair[1]
         elif key_value_pair[0] == 'email-password':
             EMAIL_PASSWORD = key_value_pair[1]
+        elif key_value_pair[0] == 'sms_user':
+            SMS_USER = key_value_pair[1]
+        elif key_value_pair[0] == 'sms_password':
+            SMS_PASSWORD = key_value_pair[1]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -74,6 +78,7 @@ INSTALLED_APPS = (
     'marviin.cliente_marviin',
     'bots.facebook.my_cache',
     'pesquisa',
+    'sms',
 )
 
 MIDDLEWARE_CLASSES = (

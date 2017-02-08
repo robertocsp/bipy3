@@ -29,40 +29,42 @@
                 <br><label class="text-into">Olá! Indique o módulo que deseja utilizar</label>
                 <div class="box-atendimento-escolha">
                     <input type="checkbox" name="modulo" value="indoor"> Atendimento<br>
-                    <input type="checkbox" name="demoEmail" value="demoEmail"> Demo Email<br>
-                    <input type="checkbox" name="demoSMS" value="demoSMS"> Demo SMS<br>
-                    <input type="checkbox" name="demoDashboard" value="demoDashboard"> Demo Dashboard
+                    <input type="checkbox" name="modulo" value="demoEmail"> Demo Email<br>
+                    <input type="checkbox" name="modulo" value="demoSMS"> Demo SMS<br>
+                    <!--<input type="checkbox" name="demoDashboard" value="demoDashboard"> Demo Dashboard-->
                 </div>
                 <div class="dados-est" id="cadastro_estabelecimento">
                     <h2><label>Dados do Estabelecimento</label></h2>
-                    <label for="nome_estabelecimento">Nome do estabelecimento: </label>
-                    <input type="text" name="nome_estabelecimento" value="" id="nome_estabelecimento" required maxlength="100"><br>
-                    <label for="tel_estabelecimento">Telefone do estabelecimento: </label>
-                    <input type="text" name="tel_estabelecimento" value="" id="tel_estabelecimento" required><br>
                     <label for="cnpj_estabelecimento">CNPJ do Estabelecimento: </label>
                     <input type="text" name="cnpj_estabelecimento" value="" id="cnpj_estabelecimento" required><br>
-                    <div class="input-middle">
-                        <label for="cep_estabelecimento">CEP: </label>
-                        <input type="text" name="cep_estabelecimento" value="" id="cep_estabelecimento" required><br>
+                    <button type="button" class="btn-tenho" id="btn_novo_estabelecimento" title="Preencher dados novo estabelecimento"><i class="fa fa-plus" aria-hidden="true"></i> Preencher dados novo estabelecimento</button>
+                    <button type="button" class="btn-tenho" id="btn_estabelecimento_existente" title="Estabelecimento existente"><i class="fa fa-save" aria-hidden="true"></i> Estabelecimento existente</button>
+                    <label class="novo_estabelecimento" for="nome_estabelecimento">Nome do estabelecimento: </label>
+                    <input class="novo_estabelecimento_campo" type="text" name="nome_estabelecimento" value="" id="nome_estabelecimento" required maxlength="100"><br class="novo_estabelecimento">
+                    <label class="novo_estabelecimento" for="tel_estabelecimento">Telefone do estabelecimento: </label>
+                    <input class="novo_estabelecimento_campo" type="text" name="tel_estabelecimento" value="" id="tel_estabelecimento" required><br class="novo_estabelecimento">
+                    <div class="input-middle novo_estabelecimento">
+                        <label class="novo_estabelecimento" for="cep_estabelecimento">CEP: </label>
+                        <input class="novo_estabelecimento_campo" type="text" name="cep_estabelecimento" value="" id="cep_estabelecimento" required><br class="novo_estabelecimento">
                     </div>
-                    <label for="endereco_estabelecimento">Endereco do estabelecimento: </label>
-                    <input type="text" name="endereco_estabelecimento" value="" id="endereco_estabelecimento" required maxlength="200"><br>
-                    <div class="input-middle">
-                        <label for="complemento_estabelecimento">Complemento: </label>
-                        <input type="text" name="complemento_estabelecimento" value="" id="complemento_estabelecimento" maxlength="100">
+                    <label class="novo_estabelecimento" for="endereco_estabelecimento">Endereco do estabelecimento: </label>
+                    <input class="novo_estabelecimento_campo" type="text" name="endereco_estabelecimento" value="" id="endereco_estabelecimento" required maxlength="200"><br class="novo_estabelecimento">
+                    <div class="input-middle novo_estabelecimento">
+                        <label class="novo_estabelecimento" for="complemento_estabelecimento">Complemento: </label>
+                        <input class="novo_estabelecimento_campo" type="text" name="complemento_estabelecimento" value="" id="complemento_estabelecimento" maxlength="100">
                     </div>
-                    <div class="input-middle">
-                        <label for="bairro_estabelecimento">Bairro: </label>
-                        <input type="text" name="bairro_estabelecimento" value="" id="bairro_estabelecimento" required maxlength="100"><br>
+                    <div class="input-middle novo_estabelecimento">
+                        <label class="novo_estabelecimento" for="bairro_estabelecimento">Bairro: </label>
+                        <input class="novo_estabelecimento_campo" type="text" name="bairro_estabelecimento" value="" id="bairro_estabelecimento" required maxlength="100"><br class="novo_estabelecimento">
                     </div>
-                    <div class="input-middle">
-                        <label for="estado_estabelecimento">Estado</label>
-                        <select class="form-control" name="estado_estabelecimento" id="estado_estabelecimento" required>
+                    <div class="input-middle novo_estabelecimento">
+                        <label class="novo_estabelecimento" for="estado_estabelecimento">Estado</label>
+                        <select class="form-control novo_estabelecimento_campo" name="estado_estabelecimento" id="estado_estabelecimento" required>
                         </select>
                     </div>
-                    <div class="input-middle">
-                        <label for="cidade_estabelecimento">Cidade: </label>
-                        <select class="form-control" name="cidade_estabelecimento" id="cidade_estabelecimento" required>
+                    <div class="input-middle novo_estabelecimento">
+                        <label class="novo_estabelecimento" for="cidade_estabelecimento">Cidade: </label>
+                        <select class="form-control novo_estabelecimento_campo" name="cidade_estabelecimento" id="cidade_estabelecimento" required>
                         </select>
                     </div>
                  </div>
@@ -96,10 +98,10 @@
                 </div>
                 <br>
 
-                <div class="dados-bot" id="cadastro_pagina_dashboard">
+                <div class="dados-bot novo_estabelecimento" id="cadastro_pagina_dashboard">
                     <h2><label>Dados de utilização do Marviin</label></h2>
                     <label for="nome_dashboard">Nome do estabelecimento no Painel: </label>
-                    <input type="text" name="nome_dashboard" value="" id="nome_dashboard" required maxlength="80"><br>
+                    <input class="novo_estabelecimento_campo" type="text" name="nome_dashboard" value="" id="nome_dashboard" required maxlength="80"><br>
                 </div>
                 <br><div class="button" id="envia_cadastro_marviin">
                     <input type="submit" id="ok" name="selecionar" value="ENVIAR SOLICITAÇÃO">
