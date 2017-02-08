@@ -510,7 +510,7 @@ label.solicitado:hover, label.em-processo:hover, label.concluido:hover, label.en
 }
 
 .coluna .info .status-label{
-    width: 72%;
+    width: 70%;
     text-transform: uppercase;
     float: left;
 }
