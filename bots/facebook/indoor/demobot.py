@@ -639,21 +639,7 @@ def webhook():
                                 return resp
                             app_log.debug('sender_id:: ' + repr(sender_id))
                             app_log.debug('loja_id:: ' + repr(loja_id))
-                            conversa = {
-                                'passo': 0,
-                                'passo_sim': None,
-                                'passo_nao': None,
-                                'usuario': user,
-                                'loja': None,
-                                'mesa': None,
-                                'aux': None,
-                                'itens_pedido': [],
-                                'nao_entendidas': 0,
-                                'datahora_inicio_pedido': None,
-                                'suspensa': 0,
-                                'uid': None,
-                                'entry': None,
-                            }
+                            conversa = reset_conversa(user)
                             app_log.debug('usuario:: ' + repr(user))
                         if x.get('message') or x.get('postback'):
                             if checa_duplicidade(sender_id, x['timestamp'], conversa):
@@ -664,7 +650,10 @@ def webhook():
                             if x.get('message') and x['message'].get('text') and not x['message'].get('quick_reply'):
                                 message = x['message']['text'].strip()
                                 app_log.debug('message: '+message)
-                                if conversa['suspensa'] > 0:
+                                if u'fim' == unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
+                                    conversa = reset_conversa(conversa)
+                                    passo_inicio(sender_id, loja_id, conversa)
+                                elif conversa['suspensa'] > 0:
                                     resposta_dashboard(message=message, sender_id=sender_id, loja_id=loja_id,
                                                        conversa=conversa)
                                 elif u'inicio' in unicodedata.normalize('NFKD', message) \
@@ -729,6 +718,25 @@ def webhook():
         resp = Response('success', status=200, mimetype='text/plain')
         resp.status_code = 200
         return resp
+
+
+def reset_conversa(conversa=None, user=None):
+    conversa2 = {
+        'passo': 0,
+        'passo_sim': None,
+        'passo_nao': None,
+        'usuario': user if user is not None else conversa['user'] if conversa is not None else None,
+        'loja': None,
+        'mesa': None,
+        'aux': None,
+        'itens_pedido': [],
+        'nao_entendidas': 0,
+        'datahora_inicio_pedido': None,
+        'suspensa': 0,
+        'uid': None,
+        'entry': None,
+    }
+    return conversa2
 
 
 def define_payload(message, sender_id, loja_id, conversa, payload):
