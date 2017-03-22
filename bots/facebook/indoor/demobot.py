@@ -725,7 +725,7 @@ def reset_conversa(conversa=None, user=None):
         'passo': 0,
         'passo_sim': None,
         'passo_nao': None,
-        'usuario': user if user is not None else conversa['user'] if conversa is not None else None,
+        'usuario': user if user is not None else conversa['usuario'] if conversa is not None else None,
         'loja': None,
         'mesa': None,
         'aux': None,
