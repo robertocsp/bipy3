@@ -639,7 +639,7 @@ def webhook():
                                 return resp
                             app_log.debug('sender_id:: ' + repr(sender_id))
                             app_log.debug('loja_id:: ' + repr(loja_id))
-                            conversa = reset_conversa(user)
+                            conversa = reset_conversa(user=user)
                             app_log.debug('usuario:: ' + repr(user))
                         if x.get('message') or x.get('postback'):
                             if checa_duplicidade(sender_id, x['timestamp'], conversa):
@@ -651,7 +651,7 @@ def webhook():
                                 message = x['message']['text'].strip()
                                 app_log.debug('message: '+message)
                                 if u'fim' == unicodedata.normalize('NFKD', message).encode('ASCII', 'ignore').lower():
-                                    conversa = reset_conversa(conversa)
+                                    conversa = reset_conversa(conversa=conversa)
                                     passo_inicio(sender_id, loja_id, conversa)
                                 elif conversa['suspensa'] > 0:
                                     resposta_dashboard(message=message, sender_id=sender_id, loja_id=loja_id,
